@@ -38,8 +38,8 @@
   <div class="side-tabs"><button type="button" id="editFront" class="side-tab active">Edit Front (left)</button><button type="button" id="editBack" class="side-tab">Edit Back (right)</button></div>
   <div class="id-tools"><button type="button" id="idAutoDetect" class="btn secondary">Auto Detect &amp; Straighten</button><button type="button" id="idRotate" class="btn secondary">Rotate 90°</button><button type="button" id="idResetCorners" class="btn secondary">Reset corners</button></div>
   <canvas id="idCropCanvas" class="id-crop-canvas" width="900" height="500" aria-label="Crop editor with four draggable corners"></canvas>
-  <p class="id-help">Photo upload ke baad auto-detection ki koshish hogi. Chaar corner handles ko card ke corners par drag karein. Rotate button har click par photo ko 90° ghumata hai. Perspective correction ke liye editor mein OpenCV load hona zaroori hai; nahi hua to manual crop ka rectangular fallback diya jayega.</p>
-  <p id="idEditorStatus" class="id-status" aria-live="polite">Pehle Front aur Back photos choose karein.</p>
+  <p class="id-help">Photo upload ke baad page halka rakhne ke liye auto-detect apne aap nahi chalega. Auto Detect button se card edges check karein. Chaar corner handles ko card ke corners par drag karein. Rotate button har click par photo ko 90° ghumata hai. Perspective correction ke liye editor mein OpenCV load hona zaroori hai; nahi hua to manual crop ka rectangular fallback diya jayega.</p>
+  <p id="idEditorStatus" class="id-status" aria-live="polite">Pehle Front aur Back photos choose karein. Auto Detect zaroorat par button se chalayen.</p>
 </div>
 <div class="grid id-settings">
   <div class="field"><label>Copies</label><input id="idCopies" type="number" min="1" max="20" value="1"></div>
@@ -86,7 +86,6 @@ $('logout').onclick=()=>{$('ownerToken').value='';localStorage.removeItem('rkdw_
 $('year').textContent=new Date().getFullYear();const url=location.href;const qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=12&data='+encodeURIComponent(url);$('qr').src=qrUrl;$('qrtext').textContent=url;$('downloadQR').onclick=()=>{const a=document.createElement('a');a.href=qrUrl;a.download='rk-digital-world-smart-print-qr.png';a.target='_blank';a.click()};
 const tok=localStorage.getItem('rkdw_owner_token');if(tok)$('ownerToken').value=tok;
 </script>
-<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
 (function(){
@@ -158,7 +157,7 @@ function loadSide(sideName,file){
     activeSide=sideName;
     updateButtons();drawCropCanvas();
     status((sideName==="front"?"Front":"Back")+" photo loaded. Auto-detection ki koshish ho rahi hai; zaroorat par corners manually drag karein.");
-    autoDetect(sideName,false);
+    status((sideName==="front"?"Front":"Back")+" photo ready. Auto Detect button se edges check karein, ya blue corners manually adjust karein.");
   };
   img.onerror=function(){status("Photo load nahi hui. JPG, PNG ya WEBP file dobara choose karein.");};
   img.src=s.objectUrl;
@@ -216,15 +215,33 @@ byId("idCropCanvas").addEventListener("pointerup",stopDragging);
 byId("idCropCanvas").addEventListener("pointercancel",stopDragging);
 byId("idCropCanvas").addEventListener("lostpointercapture",stopDragging);
 
+let openCvLoadPromise=null;
 function waitForOpenCV(timeoutMs){
-  return new Promise((resolve,reject)=>{
+  if(window.cv && typeof window.cv.Mat==="function")return Promise.resolve(window.cv);
+  if(openCvLoadPromise)return openCvLoadPromise;
+  openCvLoadPromise=new Promise((resolve,reject)=>{
     const started=Date.now();
+    let settled=false;
+    const finish=(err,value)=>{
+      if(settled)return;settled=true;
+      if(err){openCvLoadPromise=null;reject(err);}else resolve(value);
+    };
+    let script=document.querySelector('script[data-rkdw-opencv-loader="true"]');
+    if(!script){
+      script=document.createElement("script");
+      script.src="https://docs.opencv.org/4.x/opencv.js";
+      script.async=true;
+      script.dataset.rkdwOpencvLoader="true";
+      script.onerror=()=>finish(new Error("OpenCV library download nahi hui."));
+      document.head.appendChild(script);
+    }
     (function check(){
-      if(window.cv && typeof window.cv.Mat==="function"){resolve(window.cv);return;}
-      if(Date.now()-started>timeoutMs){reject(new Error("OpenCV load nahi hua"));return;}
+      if(window.cv && typeof window.cv.Mat==="function"){finish(null,window.cv);return;}
+      if(Date.now()-started>timeoutMs){finish(new Error("OpenCV load hone mein samay laga. Aap manual crop aur Rotate se aage badh sakte hain."));return;}
       setTimeout(check,250);
     })();
   });
+  return openCvLoadPromise;
 }
 function orderQuad(points){
   const sums=points.map(p=>p.x+p.y),diffs=points.map(p=>p.y-p.x);
