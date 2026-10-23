@@ -73,6 +73,7 @@ app.post("/api/requests", upload.single("file"), (req, res) => {
     mimeType: req.file.mimetype,
     bytes: req.file.size,
     settings,
+    jobType: req.body.jobType === "id-card" ? "id-card" : "standard",
     status: "Pending approval",
     createdAt: new Date().toISOString(),
     approvedAt: null,
@@ -86,6 +87,21 @@ app.post("/api/requests", upload.single("file"), (req, res) => {
 // Owner dashboard APIs
 app.get("/api/owner/requests", auth(OWNER_TOKEN), (_req, res) => {
   res.json(readDb().map(({ storedName, ...r }) => r));
+});
+
+// Return the exact ID-card A4 PDF uploaded by the customer for owner review.
+// This route is protected with the same owner token as the approval dashboard.
+app.get("/api/owner/requests/:id/preview", auth(OWNER_TOKEN), (req, res) => {
+  const row = readDb().find(x => x.id === req.params.id);
+  if (!row || row.jobType !== "id-card" || path.extname(row.originalName).toLowerCase() !== ".pdf") {
+    return res.status(404).json({ error: "ID-card preview not found." });
+  }
+  const filePath = path.join(UPLOAD_DIR, path.basename(row.storedName));
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: "Preview file missing." });
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", 'inline; filename="ID-Card-Front-Back.pdf"');
+  res.setHeader("Cache-Control", "no-store");
+  res.sendFile(filePath);
 });
 app.post("/api/owner/requests/:id/decision", auth(OWNER_TOKEN), (req, res) => {
   const decision = req.body && req.body.decision;

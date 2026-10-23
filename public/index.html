@@ -3,11 +3,29 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#f4f6fb;color:#182033}header{background:linear-gradient(120deg,#14182a,#34308b,#5145d8);color:#fff;padding:24px 16px 35px}.wrap{max-width:1000px;margin:auto}.brand{font-weight:850;font-size:21px}.tag{font-size:12px;color:#dfe0ff;margin-top:3px}.hero{margin-top:25px;max-width:650px}.hero h1{font-size:clamp(28px,5vw,42px);line-height:1.08;margin:0 0 9px}.hero p{line-height:1.6;color:#e6e7ff;margin:0}main{max-width:1000px;margin:-14px auto 40px;padding:0 14px}.card{background:white;border:1px solid #e2e7f0;border-radius:18px;padding:20px;box-shadow:0 8px 25px #101b3a0b;margin-bottom:15px}h2{font-size:18px;margin:0 0 5px}.sub{color:#657087;font-size:13px;line-height:1.5;margin:0 0 17px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field label{display:block;font-size:12px;font-weight:750;margin-bottom:6px;color:#48536a}.field input,.field select{width:100%;padding:12px;border:1px solid #d8dfeb;border-radius:10px;background:#fff;font:inherit;font-size:14px}.full{grid-column:1/-1}.drop{display:block;text-align:center;border:1.5px dashed #aaaef1;background:#f7f7ff;border-radius:14px;padding:24px 12px;margin-bottom:16px;cursor:pointer}.drop b{display:block}.drop small{color:#657087;display:block;margin-top:5px}input[type=file]{display:none}.btn{border:0;border-radius:11px;background:#5145d8;color:#fff;padding:12px 16px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.5}.secondary{background:#eef0f8;color:#29334a}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.notice{background:#fff6dd;color:#795414;border:1px solid #f5dfa0;padding:12px;border-radius:12px;font-size:12px;line-height:1.5;margin-bottom:15px}.hidden{display:none!important}.tabs{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap}.tab{border:1px solid #dce1ee;background:#fff;border-radius:10px;padding:11px 13px;font-weight:750;color:#59647a;cursor:pointer}.tab.active{background:#e9e8ff;border-color:#c5c2ff;color:#4338ca}.item{border:1px solid #e1e6ef;border-radius:13px;padding:14px;margin-top:12px}.itemtop{display:flex;justify-content:space-between;gap:10px}.item h3{font-size:14px;margin:0 0 5px;overflow-wrap:anywhere}.meta{font-size:12px;color:#647087;line-height:1.7;white-space:pre-line}.status{font-size:10px;font-weight:850;padding:5px 8px;border-radius:999px;background:#fff1c6;color:#8a5d00;height:max-content}.status.approved,.status.printing,.status.printed{background:#d7fae8;color:#08744c}.status.rejected,.status.print-error{background:#fee2e2;color:#b91c1c}.empty{padding:25px 8px;text-align:center;color:#758096;font-size:13px}.foot{text-align:center;font-size:12px;color:#7b8496;padding:18px}.qr{width:160px;height:160px;max-width:100%;object-fit:contain}.fine{font-size:12px;color:#647087;line-height:1.6}
 @media(max-width:600px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.card{padding:16px}.itemtop{flex-direction:column}}
+
+.id-choose{margin:12px 0 18px}.id-upload-label{display:block;text-align:left;padding:15px;margin:8px 0 0;background:#fafaff;border:1.5px dashed #aaaef1;border-radius:12px;cursor:pointer}.id-upload-label b{display:block;overflow-wrap:anywhere}.id-upload-label small{display:block;margin-top:5px;color:#657087}.side-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:13px 0}.side-tab{border:1px solid #dce1ee;background:#fff;border-radius:10px;padding:10px 14px;font-weight:800;color:#59647a;cursor:pointer}.side-tab.active{background:#e9e8ff;border-color:#c5c2ff;color:#4338ca}.id-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.id-editor{border:1px solid #e1e6ef;border-radius:14px;padding:12px;background:#fbfcff}.id-crop-canvas{display:block;width:100%;height:auto;border:1px solid #d8dfeb;background:#f8fafc;border-radius:10px;touch-action:none;cursor:crosshair}.id-help{font-size:12px;color:#647087;line-height:1.6}.id-settings{margin-top:15px}.id-a4-preview{display:block;width:min(100%,595px);height:auto;margin:14px auto;border:1px solid #d5dbea;background:white;box-shadow:0 5px 20px #101b3a12}.id-status{font-size:13px;color:#4338ca;line-height:1.5;margin-top:10px;white-space:pre-line}.preview-modal{position:fixed;inset:0;z-index:1000;background:rgba(14,18,38,.78);display:flex;align-items:center;justify-content:center;padding:14px}.preview-panel{background:#fff;border-radius:16px;width:min(100%,900px);height:min(94vh,1000px);display:flex;flex-direction:column;padding:14px;gap:10px}.preview-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.preview-panel-head h2{margin:0}.preview-frame{width:100%;flex:1;min-height:0;border:1px solid #dce1ee;border-radius:8px;background:#f5f6fa}
+
+.promo-eyebrow{display:inline-flex;align-items:center;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:850;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:7px 11px;margin-bottom:12px}.hero h1{max-width:760px}.hero p{max-width:690px}.hero-pills,.hero-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:17px}.hero-pills span{font-size:12px;font-weight:750;color:#f2f3ff;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.09);border-radius:999px;padding:8px 11px}.hero-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:11px;padding:12px 16px;font-weight:850;font-size:13px}.hero-link-primary{background:#fff;color:#302b8f}.hero-link-ghost{border:1px solid rgba(255,255,255,.55);color:#fff;background:rgba(255,255,255,.08)}.promo-section{margin-bottom:16px}.promo-intro{display:flex;gap:18px;align-items:flex-end;justify-content:space-between;margin:4px 2px 13px}.promo-intro h2{font-size:clamp(22px,3.5vw,30px);margin:0 0 5px;color:#18264c}.promo-intro p{font-size:13px;line-height:1.6;color:#647087;margin:0;max-width:640px}.promo-services-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.promo-service{background:#fff;border:1px solid #e0e6f2;border-radius:17px;padding:17px;box-shadow:0 8px 22px #101b3a08;min-width:0;position:relative;overflow:hidden}.promo-service:before{content:"";height:4px;position:absolute;top:0;left:0;right:0;background:linear-gradient(90deg,#2a55d5,#7864f4)}.promo-service-icon{width:44px;height:44px;border-radius:13px;background:#edf1ff;display:flex;align-items:center;justify-content:center;font-size:24px;margin:2px 0 11px}.promo-service h3{font-size:15px;margin:0 0 8px;color:#1d2b50}.promo-service p{font-size:12px;line-height:1.7;color:#647087;margin:0}.promo-service strong{color:#4138b8}.promo-note{margin:12px 2px 0;color:#79839a;font-size:11px;line-height:1.6}.service-divider{height:1px;background:#e7ebf4;margin:14px 0}.promo-service .service-label{display:inline-block;font-size:10px;letter-spacing:.05em;font-weight:850;border-radius:999px;background:#eef2ff;color:#4740a9;padding:5px 8px;margin-bottom:9px}
+@media(max-width:850px){.promo-services-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.promo-intro{align-items:flex-start;flex-direction:column}.hero{margin-top:20px}}
+@media(max-width:520px){.promo-services-grid{grid-template-columns:1fr}.hero-actions{flex-direction:column;align-items:stretch}.hero-link{width:100%}.hero-pills span{font-size:11px}}
 </style></head><body>
-<header><div class="wrap"><div class="brand">RK Digital World</div><div class="tag">SMART PRINT • UPLOAD • APPROVE • PRINT</div><div class="hero"><h1>Print karwana ab simple hai.</h1><p>PDF ya photo upload karein, apni print settings chunein aur shop approval ka wait karein.</p></div></div></header>
+<header><div class="wrap"><div class="brand">RK DIGITAL WORLD</div><div class="tag">DIGITAL SEVA • MOBILE REPAIR • PRINTING</div><div class="hero"><span class="promo-eyebrow">Aapki apni Digital & Mobile Service Shop</span><h1>Digital kaam ho ya mobile repair — sab ek jagah.</h1><p>Online form services, mobile display replacement, accessories aur smart print portal — RK Digital World mein aapka swagat hai.</p><div class="hero-pills"><span>✓ Online Digital Services</span><span>✓ Mobile Repair & Accessories</span><span>✓ PDF / Photo Print</span></div><div class="hero-actions"><a class="hero-link hero-link-primary" href="#services">Hamari Services Dekhein ↓</a><a class="hero-link hero-link-ghost" href="#printPortal">Online Print Upload →</a></div></div></div></header>
 <main>
-<div class="notice"><b>Privacy:</b> Aadhaar, PAN ya doosre sensitive documents sirf tab upload karein jab zaroori ho. Ye demo system hai; public launch se pehle HTTPS, owner login, file deletion policy aur security controls configure karna zaroori hai.</div>
-<div class="tabs"><button class="tab active" data-view="customer">Customer Upload</button><button class="tab" data-view="owner">Owner Approval</button></div>
+<section id="services" class="promo-section">
+  <div class="promo-intro">
+    <div><h2>Hamari Services</h2><p>Digital paperwork se lekar mobile repair aur printing tak, zaroori kaam ek hi jagah.</p></div>
+  </div>
+  <div class="promo-services-grid">
+    <article class="promo-service"><div class="promo-service-icon">🧾</div><span class="service-label">ONLINE DIGITAL SEVA</span><h3>Online Form & Document Services</h3><p>PAN Card apply / correction<br>Voter ID apply<br>Learner Licence / Driving Licence online apply<br>Kisan registration<br>Electricity meter application<br>Aadhaar se cash withdrawal ki suvidha</p></article>
+    <article class="promo-service"><div class="promo-service-icon">📱</div><span class="service-label">MOBILE REPAIR</span><h3>Mobile Repair & Display</h3><p>Mobile repair service<br><strong>Display replacement</strong><br>Tempered glass fitting <strong>₹20 se shuru</strong></p><div class="service-divider"></div><p>Repair ke liye phone shop par laayen; model aur part availability ke hisaab se kaam hoga.</p></article>
+    <article class="promo-service"><div class="promo-service-icon">🎧</div><span class="service-label">ACCESSORIES AVAILABLE</span><h3>Mobile Accessories</h3><p>Mobile covers • Earphones • Earbuds<br>Chargers • Data cables<br>Smart watches • Bluetooth speakers</p><div class="service-divider"></div><p>Products ki availability shop par confirm karein.</p></article>
+    <article class="promo-service"><div class="promo-service-icon">🖨️</div><span class="service-label">PRINT & PHOTO</span><h3>Printing & Photocopy</h3><p>PDF / document print<br>Passport-size photo & photo print<br>Colour photocopy:<br><strong>Single side ₹10 • Double side ₹20</strong></p><div class="service-divider"></div><p>Online PDF upload karke shop approval ke liye bhejein.</p></article>
+  </div>
+  <p class="promo-note">Online applications portal availability, document requirements aur eligibility par depend karte hain. RK Digital World kisi government department ki official website nahi hai. ID documents sirf zaroorat par upload karein.</p>
+</section>
+<div class="notice"><b>Privacy & Print Safety:</b> Aadhaar, PAN ya doosre sensitive documents sirf zaroori hone par upload karein. Shop approval se pehle job print nahi hoti. Public use ke liye document access aur deletion policy ko shop owner ko maintain karna chahiye.</div>
+<div id="printPortal" class="tabs"><button class="tab active" data-view="customer">Customer Upload</button><button class="tab" data-view="owner">Owner Approval</button><button class="tab" data-view="idcard">ID Card Front + Back</button></div>
 <section id="customer" class="card">
 <h2>File upload karein</h2><p class="sub">PDF, JPG, PNG ya WEBP • Maximum 20 MB</p>
 <label class="drop" for="file"><b id="fileLabel">↑ File choose karein</b><small>Tap karke apne phone/laptop se file select karein</small></label><input id="file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp">
@@ -22,6 +40,36 @@
 <div class="row"><button id="send" class="btn" disabled>Send for approval →</button><button id="clear" class="btn secondary">Reset</button></div>
 <p id="result" class="fine" aria-live="polite"></p>
 </section>
+
+<section id="idcard" class="card hidden">
+<h2>A4 ID Card — Front + Back</h2>
+<p class="sub">Dono photos ek hi A4 page par banengi. Front upar baayein aur Back upar daayein rahega. Preview check karne ke baad hi approval ke liye bhejein.</p>
+<div class="notice">ID/Aadhaar photo ko seedha rakhkar, card ke chaaron kinare frame mein capture karein. Auto-detect galat ho to neeche chaar neele corner handles ko drag karke adjust karein. Sensitive ID images sirf zaroorat par upload karein.</div>
+<div class="grid id-choose">
+  <div class="field"><label>Front photo (print par upar baayein)</label><label class="id-upload-label" for="idFrontFile"><b id="idFrontLabel">Front photo choose karein</b><small>JPG, PNG ya WEBP • Photo of card front</small></label><input id="idFrontFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+  <div class="field"><label>Back photo (print par upar daayein)</label><label class="id-upload-label" for="idBackFile"><b id="idBackLabel">Back photo choose karein</b><small>JPG, PNG ya WEBP • Photo of card back</small></label><input id="idBackFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+</div>
+<div class="id-editor">
+  <b>Photo crop & straighten</b>
+  <div class="side-tabs"><button type="button" id="editFront" class="side-tab active">Edit Front (left)</button><button type="button" id="editBack" class="side-tab">Edit Back (right)</button></div>
+  <div class="id-tools"><button type="button" id="idAutoDetect" class="btn secondary">Auto Detect &amp; Straighten</button><button type="button" id="idRotate" class="btn secondary">Rotate 90°</button><button type="button" id="idResetCorners" class="btn secondary">Reset corners</button></div>
+  <canvas id="idCropCanvas" class="id-crop-canvas" width="900" height="500" aria-label="Crop editor with four draggable corners"></canvas>
+  <p class="id-help">Auto Detect ek quick lightweight edge scan hai; har photo par exact result guaranteed nahi hai. Chaar corner handles ko card ke exact corners par drag karke correct karein. Auto Detect button page ko heavy library se load nahi karta. Rotate button har click par photo ko 90° ghumata hai. Perspective correction ke liye editor mein OpenCV load hona zaroori hai; nahi hua to manual crop ka rectangular fallback diya jayega.</p>
+  <p id="idEditorStatus" class="id-status" aria-live="polite">Pehle Front aur Back photos choose karein. Auto Detect zaroorat par button se chalayen.</p>
+</div>
+<div class="grid id-settings">
+  <div class="field"><label>Copies</label><input id="idCopies" type="number" min="1" max="20" value="1"></div>
+  <div class="field"><label>Print type</label><select id="idColor"><option>Black &amp; White</option><option>Color</option></select></div>
+</div>
+<div class="row"><button id="idBuildPreview" class="btn" type="button" disabled>Preview A4 page</button><button id="idSend" class="btn" type="button" disabled>Send ID card for approval →</button></div>
+<p id="idUploadResult" class="fine" aria-live="polite"></p>
+<div id="idPreviewWrap" class="hidden">
+  <h2>Final A4 Print Preview</h2>
+  <p class="sub">Front = top-left • Back = top-right. Yehi layout PDF mein upload hoga aur Owner approval par dikhaya jayega.</p>
+  <canvas id="idA4Preview" class="id-a4-preview" width="840" height="1188"></canvas>
+</div>
+</section>
+
 <section id="owner" class="card hidden">
 <h2>Owner approval dashboard</h2><p class="sub">Apne private owner token se login karein. Token customer ke saath share na karein.</p>
 <div class="field"><label>Owner token</label><input id="ownerToken" type="password" autocomplete="current-password" placeholder="Owner token"></div>
@@ -29,19 +77,417 @@
 <div id="requests"><div class="empty">Owner token enter karke Load requests dabayein.</div></div>
 </section>
 <section class="card"><h2>Customer QR code</h2><p class="sub">Server ko HTTPS hosting par deploy karne ke baad is website ke live URL ka QR print karein.</p><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><img id="qr" class="qr" alt="Website QR code"><div style="flex:1;min-width:190px"><p class="fine" id="qrtext">Current URL ka QR generate ho raha hai.</p><button class="btn secondary" id="downloadQR">QR image download</button></div></div></section>
+
+<div id="ownerPreviewModal" class="preview-modal hidden" role="dialog" aria-modal="true" aria-label="Final A4 print preview">
+  <div class="preview-panel">
+    <div class="preview-panel-head"><h2>Final A4 Print Preview</h2><button id="closeOwnerPreview" type="button" class="btn secondary">Close</button></div>
+    <p class="fine">Ye uploaded PDF hai jise approve karne par print agent download karega.</p>
+    <iframe id="ownerPreviewFrame" class="preview-frame" title="Exact approved print PDF"></iframe>
+  </div>
+</div>
+
 <div class="foot">© <span id="year"></span> RK Digital World • Smart Print Portal</div>
 </main>
 <script>
 const $=id=>document.getElementById(id);let file=null;
-function tab(v){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('customer').classList.toggle('hidden',v!=='customer');$('owner').classList.toggle('hidden',v!=='owner')}
+function tab(v){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));['customer','owner','idcard'].forEach(id=>$(id).classList.toggle('hidden',id!==v))}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>tab(b.dataset.view));
 $('file').onchange=()=>{file=$('file').files[0]||null;$('fileLabel').textContent=file?file.name+' ('+(file.size/1048576).toFixed(2)+' MB)':'↑ File choose karein';$('send').disabled=!file};
 $('clear').onclick=()=>{file=null;$('file').value='';$('fileLabel').textContent='↑ File choose karein';$('send').disabled=true;$('result').textContent='';['note'].forEach(id=>$(id).value='')};
 $('send').onclick=async()=>{if(!file)return;const fd=new FormData();fd.append('file',file);['paper','orientation','copies','color','fit','sides','note'].forEach(id=>fd.append(id,$(id).value));$('send').disabled=true;$('result').textContent='Uploading…';try{const r=await fetch('/api/requests',{method:'POST',body:fd});const data=await r.json();if(!r.ok)throw Error(data.error||'Upload failed');$('result').textContent='Request ID: '+data.id+' • '+data.message;file=null;$('file').value='';$('fileLabel').textContent='↑ File choose karein'}catch(e){$('result').textContent='Error: '+e.message+' (Server start/deploy hua hai?)'}finally{$('send').disabled=!file}};
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-$('load').onclick=async()=>{const token=$('ownerToken').value.trim();if(!token){$('requests').innerHTML='<div class="empty">Owner token enter karein.</div>';return}localStorage.setItem('rkdw_owner_token',token);$('requests').innerHTML='<div class="empty">Loading…</div>';try{const r=await fetch('/api/owner/requests',{headers:{Authorization:'Bearer '+token}});const data=await r.json();if(!r.ok)throw Error(data.error||'Could not load');if(!data.length){$('requests').innerHTML='<div class="empty">Koi request nahi hai.</div>';return}$('requests').innerHTML=data.map(x=>`<div class="item"><div class="itemtop"><div><h3>${esc(x.originalName)} • ${esc(x.id)}</h3><div class="meta">${esc(new Date(x.createdAt).toLocaleString('en-IN'))}\n${esc(x.settings.paper)}, ${esc(x.settings.orientation)}, ${esc(x.settings.copies)} copy/copies • ${esc(x.settings.color)}\nFit: ${esc(x.settings.fit)} • ${esc(x.settings.sides)}\nNote: ${esc(x.settings.note||'—')}</div></div><span class="status ${esc(x.status.toLowerCase().replaceAll(' ','-'))}">${esc(x.status)}</span></div>${x.status==='Pending approval'?`<div class="row"><button class="btn" onclick="decide('${esc(x.id)}','approve')">Approve</button><button class="btn secondary" onclick="decide('${esc(x.id)}','reject')">Reject</button></div>`:''}</div>`).join('')}catch(e){$('requests').innerHTML='<div class="empty">Error: '+esc(e.message)+'</div>'}};
+$('load').onclick=async()=>{const token=$('ownerToken').value.trim();if(!token){$('requests').innerHTML='<div class="empty">Owner token enter karein.</div>';return}localStorage.setItem('rkdw_owner_token',token);$('requests').innerHTML='<div class="empty">Loading…</div>';try{const r=await fetch('/api/owner/requests',{headers:{Authorization:'Bearer '+token}});const data=await r.json();if(!r.ok)throw Error(data.error||'Could not load');if(!data.length){$('requests').innerHTML='<div class="empty">Koi request nahi hai.</div>';return}$('requests').innerHTML=data.map(x=>`<div class="item"><div class="itemtop"><div><h3>${esc(x.originalName)} • ${esc(x.id)}</h3><div class="meta">${esc(new Date(x.createdAt).toLocaleString('en-IN'))}\n${esc(x.settings.paper)}, ${esc(x.settings.orientation)}, ${esc(x.settings.copies)} copy/copies • ${esc(x.settings.color)}\nFit: ${esc(x.settings.fit)} • ${esc(x.settings.sides)}\nNote: ${esc(x.settings.note||'—')}</div></div><span class="status ${esc(x.status.toLowerCase().replaceAll(' ','-'))}">${esc(x.status)}</span></div>${x.jobType==='id-card'?`<div class="row"><button class="btn secondary" onclick="previewJob('${esc(x.id)}')">Preview final A4</button></div>`:''}${x.status==='Pending approval'?`<div class="row"><button class="btn" onclick="decide('${esc(x.id)}','approve')">Approve</button><button class="btn secondary" onclick="decide('${esc(x.id)}','reject')">Reject</button></div>`:''}</div>`).join('')}catch(e){$('requests').innerHTML='<div class="empty">Error: '+esc(e.message)+'</div>'}};
 window.decide=async(id,decision)=>{const token=$('ownerToken').value.trim();try{const r=await fetch('/api/owner/requests/'+encodeURIComponent(id)+'/decision',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({decision})});const d=await r.json();if(!r.ok)throw Error(d.error||'Failed');$('load').click()}catch(e){alert(e.message)}};
 $('logout').onclick=()=>{$('ownerToken').value='';localStorage.removeItem('rkdw_owner_token');$('requests').innerHTML='<div class="empty">Token clear kar diya gaya.</div>'};
 $('year').textContent=new Date().getFullYear();const url=location.href;const qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=12&data='+encodeURIComponent(url);$('qr').src=qrUrl;$('qrtext').textContent=url;$('downloadQR').onclick=()=>{const a=document.createElement('a');a.href=qrUrl;a.download='rk-digital-world-smart-print-qr.png';a.target='_blank';a.click()};
 const tok=localStorage.getItem('rkdw_owner_token');if(tok)$('ownerToken').value=tok;
-</script></body></html>
+</script>
+<script>
+(function(){
+"use strict";
+const byId = id => document.getElementById(id);
+const card = {
+  front:{image:null, objectUrl:null, originalName:"", rotation:0, canvas:null, corners:null, cropData:null},
+  back:{image:null, objectUrl:null, originalName:"", rotation:0, canvas:null, corners:null, cropData:null}
+};
+let activeSide = "front";
+let viewMap = null;
+let draggingCorner = -1;
+let previewPdf = null;
+let previewCrops = null;
+let ownerObjectUrl = null;
+
+function status(message){byId("idEditorStatus").textContent=message;}
+function invalidatePreview(){
+  previewPdf=null;
+  previewCrops=null;
+  byId("idSend").disabled=true;
+  byId("idPreviewWrap").classList.add("hidden");
+}
+function getActive(){return card[activeSide];}
+function sideReady(s){return !!(s && s.image && s.canvas && s.corners);}
+function updateButtons(){
+  byId("idBuildPreview").disabled=!(sideReady(card.front)&&sideReady(card.back));
+  byId("idSend").disabled=!previewPdf;
+  byId("editFront").classList.toggle("active",activeSide==="front");
+  byId("editBack").classList.toggle("active",activeSide==="back");
+}
+function distance(a,b){const x=a.x-b.x,y=a.y-b.y;return Math.sqrt(x*x+y*y);}
+function defaultCorners(w,h){
+  let cw=Math.min(w*.84,h*.84*(85.6/54));
+  let ch=cw/(85.6/54);
+  const cx=w/2,cy=h/2;
+  return [{x:cx-cw/2,y:cy-ch/2},{x:cx+cw/2,y:cy-ch/2},{x:cx+cw/2,y:cy+ch/2},{x:cx-cw/2,y:cy+ch/2}];
+}
+function makeOriented(s){
+  const im=s.image;
+  const r=((s.rotation%360)+360)%360;
+  const swap=r===90||r===270;
+  const scale=Math.min(1,1800/Math.max(im.naturalWidth,im.naturalHeight));
+  const naturalW=Math.round(im.naturalWidth*scale),naturalH=Math.round(im.naturalHeight*scale);
+  const c=document.createElement("canvas");
+  c.width=swap?naturalH:naturalW;
+  c.height=swap?naturalW:naturalH;
+  const ctx=c.getContext("2d",{willReadFrequently:true});
+  if(r===90){ctx.translate(c.width,0);ctx.rotate(Math.PI/2);}
+  else if(r===180){ctx.translate(c.width,c.height);ctx.rotate(Math.PI);}
+  else if(r===270){ctx.translate(0,c.height);ctx.rotate(-Math.PI/2);}
+  ctx.drawImage(im,0,0,naturalW,naturalH);
+  s.canvas=c;
+  if(!s.corners)s.corners=defaultCorners(c.width,c.height);
+  else s.corners=s.corners.map(p=>({x:Math.min(c.width,Math.max(0,p.x)),y:Math.min(c.height,Math.max(0,p.y))}));
+  s.cropData=null;
+  invalidatePreview();
+}
+function loadSide(sideName,file){
+  const s=card[sideName];
+  if(!file)return;
+  if(s.objectUrl)URL.revokeObjectURL(s.objectUrl);
+  s.objectUrl=URL.createObjectURL(file);
+  s.originalName=file.name;
+  s.rotation=0;s.canvas=null;s.corners=null;s.cropData=null;
+  const img=new Image();
+  img.onload=function(){
+    s.image=img;
+    makeOriented(s);
+    byId(sideName==="front"?"idFrontLabel":"idBackLabel").textContent=file.name;
+    activeSide=sideName;
+    updateButtons();drawCropCanvas();
+    status((sideName==="front"?"Front":"Back")+" photo loaded. Auto-detection ki koshish ho rahi hai; zaroorat par corners manually drag karein.");
+    status((sideName==="front"?"Front":"Back")+" photo ready. Auto Detect button se edges check karein, ya blue corners manually adjust karein.");
+  };
+  img.onerror=function(){status("Photo load nahi hui. JPG, PNG ya WEBP file dobara choose karein.");};
+  img.src=s.objectUrl;
+}
+byId("idFrontFile").addEventListener("change",e=>loadSide("front",e.target.files[0]));
+byId("idBackFile").addEventListener("change",e=>loadSide("back",e.target.files[0]));
+byId("editFront").onclick=()=>{activeSide="front";updateButtons();drawCropCanvas();status(sideReady(card.front)?"Front photo ke corners adjust karein.":"Pehle Front photo choose karein.");};
+byId("editBack").onclick=()=>{activeSide="back";updateButtons();drawCropCanvas();status(sideReady(card.back)?"Back photo ke corners adjust karein.":"Pehle Back photo choose karein.");};
+byId("idRotate").onclick=()=>{
+  const s=getActive();if(!s.image){status("Pehle active side ki photo choose karein.");return;}
+  s.rotation=(s.rotation+90)%360;s.corners=null;makeOriented(s);s.corners=defaultCorners(s.canvas.width,s.canvas.height);
+  updateButtons();drawCropCanvas();status("Photo 90° rotate hui. Zaroorat par corners adjust karein.");
+};
+byId("idResetCorners").onclick=()=>{
+  const s=getActive();if(!s.canvas){status("Pehle photo choose karein.");return;}
+  s.corners=defaultCorners(s.canvas.width,s.canvas.height);s.cropData=null;invalidatePreview();drawCropCanvas();status("Crop corners default position par reset kar diye gaye.");
+};
+byId("idAutoDetect").onclick=()=>autoDetect(activeSide,true);
+
+function drawCropCanvas(){
+  const canvas=byId("idCropCanvas"),ctx=canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#f8fafc";ctx.fillRect(0,0,canvas.width,canvas.height);
+  const s=getActive();
+  if(!sideReady(s)){viewMap=null;ctx.fillStyle="#647087";ctx.font="bold 20px system-ui";ctx.textAlign="center";ctx.fillText("Selected side ki photo choose karein",canvas.width/2,canvas.height/2);return;}
+  const pad=28,scale=Math.min((canvas.width-pad*2)/s.canvas.width,(canvas.height-pad*2)/s.canvas.height);
+  const dw=s.canvas.width*scale,dh=s.canvas.height*scale,dx=(canvas.width-dw)/2,dy=(canvas.height-dh)/2;
+  viewMap={dx:dx,dy:dy,dw:dw,dh:dh,sourceW:s.canvas.width,sourceH:s.canvas.height};
+  ctx.drawImage(s.canvas,dx,dy,dw,dh);
+  const pts=s.corners.map(p=>({x:dx+p.x/s.canvas.width*dw,y:dy+p.y/s.canvas.height*dh}));
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();
+  ctx.fillStyle="rgba(63,81,181,.12)";ctx.fill();ctx.lineWidth=3;ctx.strokeStyle="#304ffe";ctx.stroke();
+  pts.forEach((p,i)=>{ctx.beginPath();ctx.arc(p.x,p.y,10,0,Math.PI*2);ctx.fillStyle="#304ffe";ctx.fill();ctx.lineWidth=2;ctx.strokeStyle="#fff";ctx.stroke();ctx.fillStyle="#fff";ctx.font="bold 10px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(String(i+1),p.x,p.y);});
+}
+function canvasPoint(e){
+  const c=byId("idCropCanvas"),r=c.getBoundingClientRect();
+  return {x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};
+}
+byId("idCropCanvas").addEventListener("pointerdown",e=>{
+  const s=getActive();if(!sideReady(s)||!viewMap)return;
+  const p=canvasPoint(e),pts=s.corners.map(q=>({x:viewMap.dx+q.x/viewMap.sourceW*viewMap.dw,y:viewMap.dy+q.y/viewMap.sourceH*viewMap.dh}));
+  let nearest=-1,dist=Infinity;pts.forEach((q,i)=>{const d=distance(q,p);if(d<dist){dist=d;nearest=i;}});
+  if(dist<24){draggingCorner=nearest;byId("idCropCanvas").setPointerCapture(e.pointerId);e.preventDefault();}
+});
+byId("idCropCanvas").addEventListener("pointermove",e=>{
+  if(draggingCorner<0||!viewMap)return;
+  const s=getActive(),p=canvasPoint(e);
+  s.corners[draggingCorner]={
+    x:Math.max(0,Math.min(viewMap.sourceW,(p.x-viewMap.dx)/viewMap.dw*viewMap.sourceW)),
+    y:Math.max(0,Math.min(viewMap.sourceH,(p.y-viewMap.dy)/viewMap.dh*viewMap.sourceH))
+  };
+  s.cropData=null;invalidatePreview();drawCropCanvas();
+});
+function stopDragging(){draggingCorner=-1;}
+byId("idCropCanvas").addEventListener("pointerup",stopDragging);
+byId("idCropCanvas").addEventListener("pointercancel",stopDragging);
+byId("idCropCanvas").addEventListener("lostpointercapture",stopDragging);
+
+function smoothProjection(values,radius=2){
+  const out=new Float32Array(values.length);
+  for(let i=0;i<values.length;i++){
+    let sum=0,count=0;
+    for(let j=Math.max(0,i-radius);j<=Math.min(values.length-1,i+radius);j++){sum+=values[j];count++;}
+    out[i]=sum/Math.max(1,count);
+  }
+  return out;
+}
+function projectionPeaks(values,from,to,limit){
+  const peaks=[];
+  for(let i=Math.max(2,from);i<Math.min(values.length-2,to);i++){
+    if(values[i]>=values[i-1]&&values[i]>=values[i+1])peaks.push({pos:i,val:values[i]});
+  }
+  peaks.sort((a,b)=>b.val-a.val);
+  const selected=[];
+  for(const p of peaks){
+    if(selected.every(q=>Math.abs(q.pos-p.pos)>Math.max(5,Math.round(values.length*.025)))){
+      selected.push(p);if(selected.length>=limit)break;
+    }
+  }
+  return selected;
+}
+function autoDetect(sideName,report){
+  const s=card[sideName];
+  if(!s.canvas){if(report)status("Pehle is side ki photo choose karein.");return;}
+  if(report)status("Photo scan ho rahi hai… agar detection sahi na ho to neele corners manually adjust karein.");
+  try{
+    // Work only on a small preview-sized canvas so this never scans a full-resolution phone photo.
+    const maxSide=320,scale=Math.min(1,maxSide/Math.max(s.canvas.width,s.canvas.height));
+    const w=Math.max(32,Math.round(s.canvas.width*scale)),h=Math.max(32,Math.round(s.canvas.height*scale));
+    const small=document.createElement("canvas");small.width=w;small.height=h;
+    const ctx=small.getContext("2d",{willReadFrequently:true});ctx.drawImage(s.canvas,0,0,w,h);
+    const pixels=ctx.getImageData(0,0,w,h).data;
+    const gray=new Uint8Array(w*h);
+    for(let i=0,j=0;i<pixels.length;i+=4,j++)gray[j]=Math.round(.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2]);
+    const rows=new Float32Array(h),cols=new Float32Array(w);
+    for(let y=1;y<h-1;y++){
+      const rowBase=y*w;
+      for(let x=1;x<w-1;x++){
+        const idx=rowBase+x;
+        const gx=Math.abs(gray[idx+1]-gray[idx-1]);
+        const gy=Math.abs(gray[idx+w]-gray[idx-w]);
+        const edge=gx+gy;
+        rows[y]+=edge;cols[x]+=edge;
+      }
+    }
+    const smRows=smoothProjection(rows,2),smCols=smoothProjection(cols,2);
+    const xPeaks=projectionPeaks(smCols,Math.round(w*.025),Math.round(w*.975),16);
+    const yPeaks=projectionPeaks(smRows,Math.round(h*.025),Math.round(h*.975),16);
+    const xMean=smCols.reduce((a,b)=>a+b,0)/w||1,yMean=smRows.reduce((a,b)=>a+b,0)/h||1;
+    const xPairs=[],yPairs=[];
+    for(let i=0;i<xPeaks.length;i++)for(let j=i+1;j<xPeaks.length;j++){
+      const left=Math.min(xPeaks[i].pos,xPeaks[j].pos),right=Math.max(xPeaks[i].pos,xPeaks[j].pos),span=right-left;
+      if(span<w*.25||span>w*.97)continue;
+      const edgeScore=(smCols[left]+smCols[right])/(2*xMean);
+      xPairs.push({left,right,span,edgeScore});
+    }
+    for(let i=0;i<yPeaks.length;i++)for(let j=i+1;j<yPeaks.length;j++){
+      const top=Math.min(yPeaks[i].pos,yPeaks[j].pos),bottom=Math.max(yPeaks[i].pos,yPeaks[j].pos),span=bottom-top;
+      if(span<h*.14||span>h*.97)continue;
+      const edgeScore=(smRows[top]+smRows[bottom])/(2*yMean);
+      yPairs.push({top,bottom,span,edgeScore});
+    }
+    let best=null,bestScore=-Infinity;
+    for(const xp of xPairs)for(const yp of yPairs){
+      const ratio=xp.span/yp.span;
+      // Detect a landscape ID-card outline, approximately 1.59:1.
+      if(ratio<1.15||ratio>2.35)continue;
+      const area=(xp.span*yp.span)/(w*h);
+      if(area<.12)continue;
+      const aspectPenalty=Math.abs(Math.log(ratio/1.586));
+      const score=(xp.edgeScore+yp.edgeScore)*Math.sqrt(area)-aspectPenalty*1.35;
+      if(score>bestScore){bestScore=score;best={left:xp.left,right:xp.right,top:yp.top,bottom:yp.bottom,area,ratio,edgeStrength:xp.edgeScore+yp.edgeScore};}
+    }
+    if(best&&best.area>=.16&&best.edgeStrength>=1.15){
+      s.corners=[
+        {x:best.left/scale,y:best.top/scale},
+        {x:best.right/scale,y:best.top/scale},
+        {x:best.right/scale,y:best.bottom/scale},
+        {x:best.left/scale,y:best.bottom/scale}
+      ].map(p=>({x:Math.max(0,Math.min(s.canvas.width,p.x)),y:Math.max(0,Math.min(s.canvas.height,p.y))}));
+      s.cropData=null;invalidatePreview();drawCropCanvas();
+      status((sideName==="front"?"Front":"Back")+" ka approximate outline mil gaya. Ye quick scan hai—blue corners ko card ke exact corners par check/adjust karein.");
+    }else{
+      status("Clear card outline nahi mila. Page hang nahi hona chahiye; ab 4 blue corners ko manually card ke corners par drag karein, ya photo ko rotate karke dobara try karein.");
+    }
+  }catch(err){
+    status("Quick auto-detect complete nahi ho saka. Page refresh kiye bina manual blue corners aur Rotate use kar sakte hain.");
+  }
+}
+function solveLinear(A,b){
+  const n=b.length,mat=A.map((row,i)=>row.slice().concat([b[i]]));
+  for(let col=0;col<n;col++){
+    let pivot=col;
+    for(let r=col+1;r<n;r++)if(Math.abs(mat[r][col])>Math.abs(mat[pivot][col]))pivot=r;
+    if(Math.abs(mat[pivot][col])<1e-10)throw new Error("Crop corners overlap; adjust them and try again.");
+    const temp=mat[col];mat[col]=mat[pivot];mat[pivot]=temp;
+    const div=mat[col][col];for(let j=col;j<=n;j++)mat[col][j]/=div;
+    for(let r=0;r<n;r++){if(r===col)continue;const f=mat[r][col];for(let j=col;j<=n;j++)mat[r][j]-=f*mat[col][j];}
+  }
+  return mat.map(row=>row[n]);
+}
+function perspectiveMatrix(srcPts,dstPts){
+  const A=[],b=[];
+  for(let i=0;i<4;i++){
+    const x=dstPts[i].x,y=dstPts[i].y,u=srcPts[i].x,v=srcPts[i].y;
+    A.push([x,y,1,0,0,0,-u*x,-u*y]);b.push(u);
+    A.push([0,0,0,x,y,1,-v*x,-v*y]);b.push(v);
+  }
+  return solveLinear(A,b);
+}
+async function warpCard(s){
+  if(s.cropData)return s.cropData;
+  const targetW=Math.round(85.6/25.4*300),targetH=Math.round(54/25.4*300);
+  const down=Math.min(1,2200/Math.max(s.canvas.width,s.canvas.height));
+  const sw=Math.max(2,Math.round(s.canvas.width*down)),sh=Math.max(2,Math.round(s.canvas.height*down));
+  const sourceCanvas=document.createElement("canvas");sourceCanvas.width=sw;sourceCanvas.height=sh;
+  const sourceCtx=sourceCanvas.getContext("2d",{willReadFrequently:true});sourceCtx.drawImage(s.canvas,0,0,sw,sh);
+  const source=sourceCtx.getImageData(0,0,sw,sh);
+  const sp=s.corners.map(p=>({x:p.x*down,y:p.y*down}));
+  const dp=[{x:0,y:0},{x:targetW-1,y:0},{x:targetW-1,y:targetH-1},{x:0,y:targetH-1}];
+  const H=perspectiveMatrix(sp,dp);
+  const outputCanvas=document.createElement("canvas");outputCanvas.width=targetW;outputCanvas.height=targetH;
+  const outCtx=outputCanvas.getContext("2d");const out=outCtx.createImageData(targetW,targetH);
+  const src=source.data,dst=out.data;
+  for(let yStart=0;yStart<targetH;yStart+=24){
+    const yEnd=Math.min(targetH,yStart+24);
+    for(let y=yStart;y<yEnd;y++){
+      for(let x=0;x<targetW;x++){
+        const den=H[6]*x+H[7]*y+1;
+        const sx=(H[0]*x+H[1]*y+H[2])/den,sy=(H[3]*x+H[4]*y+H[5])/den;
+        const oi=(y*targetW+x)*4;
+        if(!Number.isFinite(sx)||!Number.isFinite(sy)||sx<0||sy<0||sx>sw-1||sy>sh-1){dst[oi]=255;dst[oi+1]=255;dst[oi+2]=255;dst[oi+3]=255;continue;}
+        const x0=Math.floor(sx),y0=Math.floor(sy),x1=Math.min(sw-1,x0+1),y1=Math.min(sh-1,y0+1),fx=sx-x0,fy=sy-y0;
+        const i00=(y0*sw+x0)*4,i10=(y0*sw+x1)*4,i01=(y1*sw+x0)*4,i11=(y1*sw+x1)*4;
+        for(let c=0;c<3;c++){
+          const a=src[i00+c]*(1-fx)+src[i10+c]*fx;
+          const b=src[i01+c]*(1-fx)+src[i11+c]*fx;
+          dst[oi+c]=Math.round(a*(1-fy)+b*fy);
+        }
+        dst[oi+3]=255;
+      }
+    }
+    await new Promise(resolve=>setTimeout(resolve,0));
+  }
+  outCtx.putImageData(out,0,0);
+  s.cropData=outputCanvas.toDataURL("image/jpeg",.94);
+  return s.cropData;
+}
+function drawA4Preview(backUrl,frontUrl){
+  const c=byId("idA4Preview"),ctx=c.getContext("2d");
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);
+  const scaleX=c.width/210,scaleY=c.height/297;
+  const xLeft=8*scaleX,y=8*scaleY,w=85.6*scaleX,h=54*scaleY;
+  const xRight=(210-8-85.6)*scaleX;
+  const backImage=new Image(),frontImage=new Image();
+  return new Promise((resolve,reject)=>{
+    let count=0;
+    const done=()=>{count++;if(count===2){ctx.drawImage(frontImage,xLeft,y,w,h);ctx.drawImage(backImage,xRight,y,w,h);resolve();}};
+    backImage.onload=done;frontImage.onload=done;backImage.onerror=reject;frontImage.onerror=reject;
+    backImage.src=backUrl;frontImage.src=frontUrl;
+  });
+}
+let jsPdfLoadPromise=null;
+function waitForJsPDF(timeoutMs){
+  if(window.jspdf&&typeof window.jspdf.jsPDF==="function")return Promise.resolve(window.jspdf);
+  if(jsPdfLoadPromise)return jsPdfLoadPromise;
+  jsPdfLoadPromise=new Promise((resolve,reject)=>{
+    const started=Date.now();
+    let settled=false;
+    let script=document.querySelector('script[data-rkdw-jspdf-loader="true"]');
+    const finish=(err,value)=>{
+      if(settled)return;settled=true;
+      if(err){jsPdfLoadPromise=null;reject(err);}else resolve(value);
+    };
+    if(!script){
+      script=document.createElement("script");
+      script.src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";
+      script.async=true;
+      script.dataset.rkdwJspdfLoader="true";
+      script.onerror=()=>finish(new Error("PDF library download nahi hui. Internet connection check karein."));
+      document.head.appendChild(script);
+    }
+    (function check(){
+      if(window.jspdf&&typeof window.jspdf.jsPDF==="function"){finish(null,window.jspdf);return;}
+      if(Date.now()-started>timeoutMs){finish(new Error("PDF library load nahi hui. Page refresh karke dobara try karein."));return;}
+      setTimeout(check,200);
+    })();
+  });
+  return jsPdfLoadPromise;
+}
+async function buildPreview(){
+  if(!sideReady(card.front)||!sideReady(card.back)){status("Front aur Back dono photos upload karein.");return false;}
+  byId("idBuildPreview").disabled=true;byId("idSend").disabled=true;
+  status("Perspective crop aur A4 PDF tayyar ho raha hai...");
+  try{
+    const backUrl=await warpCard(card.back),frontUrl=await warpCard(card.front);
+    await drawA4Preview(backUrl,frontUrl);
+    status("PDF file ban rahi hai...");
+    const jspdf=await waitForJsPDF(20000);
+    const PDF=jspdf.jsPDF;
+    const doc=new PDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});
+    doc.addImage(frontUrl,"JPEG",8,8,85.6,54,undefined,"FAST");
+    doc.addImage(backUrl,"JPEG",210-8-85.6,8,85.6,54,undefined,"FAST");
+    const blob=doc.output("blob");
+    previewPdf=new File([blob],"ID-Card-Front-Back.pdf",{type:"application/pdf"});
+    previewCrops={back:backUrl,front:frontUrl};
+    byId("idPreviewWrap").classList.remove("hidden");
+    updateButtons();
+    status("A4 preview taiyar hai. Front upar baayein, Back upar daayein. Preview check karke approval ke liye bhejein.");
+    return true;
+  }catch(e){
+    previewPdf=null;updateButtons();status("Preview nahi bana: "+e.message);return false;
+  }finally{byId("idBuildPreview").disabled=!(sideReady(card.front)&&sideReady(card.back));}
+}
+byId("idBuildPreview").onclick=buildPreview;
+byId("idSend").onclick=async()=>{
+  if(!previewPdf){const ok=await buildPreview();if(!ok)return;}
+  const copies=Math.max(1,Math.min(20,parseInt(byId("idCopies").value||"1",10)||1));
+  const fd=new FormData();fd.append("file",previewPdf,"ID-Card-Front-Back.pdf");fd.append("jobType","id-card");
+  fd.append("paper","A4");fd.append("orientation","Portrait");fd.append("copies",String(copies));
+  fd.append("color",byId("idColor").value);fd.append("fit","Actual size");fd.append("sides","Single-sided");
+  fd.append("note","ID Card Front left, Back right — one A4 page");
+  byId("idSend").disabled=true;byId("idUploadResult").textContent="A4 PDF upload ho raha hai...";
+  try{
+    const response=await fetch("/api/requests",{method:"POST",body:fd});
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||"Upload failed");
+    byId("idUploadResult").textContent="Request ID: "+data.id+" • "+data.message+" Owner approval se pehle exact A4 PDF preview available hoga.";
+  }catch(e){byId("idUploadResult").textContent="Upload error: "+e.message;}
+  finally{byId("idSend").disabled=!previewPdf;}
+};
+window.previewJob=async function(id){
+  const token=byId("ownerToken").value.trim();
+  if(!token){alert("Owner token enter karke Load requests karein.");return;}
+  const modal=byId("ownerPreviewModal"),frame=byId("ownerPreviewFrame");
+  modal.classList.remove("hidden");frame.removeAttribute("src");
+  frame.title="Loading final A4 print preview";
+  try{
+    const response=await fetch("/api/owner/requests/"+encodeURIComponent(id)+"/preview",{headers:{Authorization:"Bearer "+token}});
+    if(!response.ok){let msg="Preview load nahi hui.";try{const d=await response.json();msg=d.error||msg;}catch(e){}throw new Error(msg);}
+    const blob=await response.blob();
+    if(ownerObjectUrl)URL.revokeObjectURL(ownerObjectUrl);
+    ownerObjectUrl=URL.createObjectURL(blob);frame.src=ownerObjectUrl;frame.title="Exact final A4 print PDF";
+  }catch(e){frame.removeAttribute("src");alert(e.message);modal.classList.add("hidden");}
+};
+byId("closeOwnerPreview").onclick=()=>{
+  byId("ownerPreviewModal").classList.add("hidden");
+  byId("ownerPreviewFrame").removeAttribute("src");
+  if(ownerObjectUrl){URL.revokeObjectURL(ownerObjectUrl);ownerObjectUrl=null;}
+};
+byId("ownerPreviewModal").addEventListener("click",e=>{if(e.target===byId("ownerPreviewModal"))byId("closeOwnerPreview").click();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!byId("ownerPreviewModal").classList.contains("hidden"))byId("closeOwnerPreview").click();});
+drawCropCanvas();updateButtons();
+})();
+</script>
+
+</body></html>
