@@ -265,7 +265,7 @@ async function autoDetect(sideName,report){
         const area=Math.abs(cvlib.contourArea(approx));
         if(area>bestArea){
           const points=[];
-          for(let j=0;j<4;j++)points.push({x:approx.intAt(j,0),y:approx.intAt(j,1)});
+          const pointData=approx.data32S;for(let j=0;j<4;j++)points.push({x:pointData[j*2],y:pointData[j*2+1]});
           const ordered=orderQuad(points);
           const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
           const w=(dist(ordered[0],ordered[1])+dist(ordered[3],ordered[2]))/2;
