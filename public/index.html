@@ -27,15 +27,15 @@
 
 <section id="idcard" class="card hidden">
 <h2>A4 ID Card — Front + Back</h2>
-<p class="sub">Dono photos ek hi A4 page par banengi. Back upar baayein aur Front upar daayein rahega. Preview check karne ke baad hi approval ke liye bhejein.</p>
+<p class="sub">Dono photos ek hi A4 page par banengi. Front upar baayein aur Back upar daayein rahega. Preview check karne ke baad hi approval ke liye bhejein.</p>
 <div class="notice">ID/Aadhaar photo ko seedha rakhkar, card ke chaaron kinare frame mein capture karein. Auto-detect galat ho to neeche chaar neele corner handles ko drag karke adjust karein. Sensitive ID images sirf zaroorat par upload karein.</div>
 <div class="grid id-choose">
-  <div class="field"><label>Front photo (print par upar daayein)</label><label class="id-upload-label" for="idFrontFile"><b id="idFrontLabel">Front photo choose karein</b><small>JPG, PNG ya WEBP • Photo of card front</small></label><input id="idFrontFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
-  <div class="field"><label>Back photo (print par upar baayein)</label><label class="id-upload-label" for="idBackFile"><b id="idBackLabel">Back photo choose karein</b><small>JPG, PNG ya WEBP • Photo of card back</small></label><input id="idBackFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+  <div class="field"><label>Front photo (print par upar baayein)</label><label class="id-upload-label" for="idFrontFile"><b id="idFrontLabel">Front photo choose karein</b><small>JPG, PNG ya WEBP • Photo of card front</small></label><input id="idFrontFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+  <div class="field"><label>Back photo (print par upar daayein)</label><label class="id-upload-label" for="idBackFile"><b id="idBackLabel">Back photo choose karein</b><small>JPG, PNG ya WEBP • Photo of card back</small></label><input id="idBackFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
 </div>
 <div class="id-editor">
   <b>Photo crop & straighten</b>
-  <div class="side-tabs"><button type="button" id="editFront" class="side-tab active">Edit Front (right)</button><button type="button" id="editBack" class="side-tab">Edit Back (left)</button></div>
+  <div class="side-tabs"><button type="button" id="editFront" class="side-tab active">Edit Front (left)</button><button type="button" id="editBack" class="side-tab">Edit Back (right)</button></div>
   <div class="id-tools"><button type="button" id="idAutoDetect" class="btn secondary">Auto Detect &amp; Straighten</button><button type="button" id="idRotate" class="btn secondary">Rotate 90°</button><button type="button" id="idResetCorners" class="btn secondary">Reset corners</button></div>
   <canvas id="idCropCanvas" class="id-crop-canvas" width="900" height="500" aria-label="Crop editor with four draggable corners"></canvas>
   <p class="id-help">Photo upload ke baad auto-detection ki koshish hogi. Chaar corner handles ko card ke corners par drag karein. Rotate button har click par photo ko 90° ghumata hai. Perspective correction ke liye editor mein OpenCV load hona zaroori hai; nahi hua to manual crop ka rectangular fallback diya jayega.</p>
@@ -49,7 +49,7 @@
 <p id="idUploadResult" class="fine" aria-live="polite"></p>
 <div id="idPreviewWrap" class="hidden">
   <h2>Final A4 Print Preview</h2>
-  <p class="sub">Back = top-left • Front = top-right. Yehi layout PDF mein upload hoga aur Owner approval par dikhaya jayega.</p>
+  <p class="sub">Front = top-left • Back = top-right. Yehi layout PDF mein upload hoga aur Owner approval par dikhaya jayega.</p>
   <canvas id="idA4Preview" class="id-a4-preview" width="840" height="1188"></canvas>
 </div>
 </section>
@@ -352,7 +352,7 @@ function drawA4Preview(backUrl,frontUrl){
   const backImage=new Image(),frontImage=new Image();
   return new Promise((resolve,reject)=>{
     let count=0;
-    const done=()=>{count++;if(count===2){ctx.drawImage(backImage,xLeft,y,w,h);ctx.drawImage(frontImage,xRight,y,w,h);resolve();}};
+    const done=()=>{count++;if(count===2){ctx.drawImage(frontImage,xLeft,y,w,h);ctx.drawImage(backImage,xRight,y,w,h);resolve();}};
     backImage.onload=done;frontImage.onload=done;backImage.onerror=reject;frontImage.onerror=reject;
     backImage.src=backUrl;frontImage.src=frontUrl;
   });
@@ -367,14 +367,14 @@ async function buildPreview(){
     if(!window.jspdf||!window.jspdf.jsPDF)throw new Error("PDF library load nahi hui. Internet connection check karke page refresh karein.");
     const PDF=window.jspdf.jsPDF;
     const doc=new PDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});
-    doc.addImage(backUrl,"JPEG",8,8,85.6,54,undefined,"FAST");
-    doc.addImage(frontUrl,"JPEG",210-8-85.6,8,85.6,54,undefined,"FAST");
+    doc.addImage(frontUrl,"JPEG",8,8,85.6,54,undefined,"FAST");
+    doc.addImage(backUrl,"JPEG",210-8-85.6,8,85.6,54,undefined,"FAST");
     const blob=doc.output("blob");
     previewPdf=new File([blob],"ID-Card-Front-Back.pdf",{type:"application/pdf"});
     previewCrops={back:backUrl,front:frontUrl};
     byId("idPreviewWrap").classList.remove("hidden");
     updateButtons();
-    status("A4 preview taiyar hai. Back upar baayein, Front upar daayein. Preview check karke approval ke liye bhejein.");
+    status("A4 preview taiyar hai. Front upar baayein, Back upar daayein. Preview check karke approval ke liye bhejein.");
     return true;
   }catch(e){
     previewPdf=null;updateButtons();status("Preview nahi bana: "+e.message);return false;
@@ -387,7 +387,7 @@ byId("idSend").onclick=async()=>{
   const fd=new FormData();fd.append("file",previewPdf,"ID-Card-Front-Back.pdf");fd.append("jobType","id-card");
   fd.append("paper","A4");fd.append("orientation","Portrait");fd.append("copies",String(copies));
   fd.append("color",byId("idColor").value);fd.append("fit","Actual size");fd.append("sides","Single-sided");
-  fd.append("note","ID Card Front right, Back left — one A4 page");
+  fd.append("note","ID Card Front left, Back right — one A4 page");
   byId("idSend").disabled=true;byId("idUploadResult").textContent="A4 PDF upload ho raha hai...";
   try{
     const response=await fetch("/api/requests",{method:"POST",body:fd});
