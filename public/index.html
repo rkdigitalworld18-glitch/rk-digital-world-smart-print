@@ -86,7 +86,6 @@ $('logout').onclick=()=>{$('ownerToken').value='';localStorage.removeItem('rkdw_
 $('year').textContent=new Date().getFullYear();const url=location.href;const qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=12&data='+encodeURIComponent(url);$('qr').src=qrUrl;$('qrtext').textContent=url;$('downloadQR').onclick=()=>{const a=document.createElement('a');a.href=qrUrl;a.download='rk-digital-world-smart-print-qr.png';a.target='_blank';a.click()};
 const tok=localStorage.getItem('rkdw_owner_token');if(tok)$('ownerToken').value=tok;
 </script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
 (function(){
 "use strict";
@@ -128,14 +127,16 @@ function makeOriented(s){
   const im=s.image;
   const r=((s.rotation%360)+360)%360;
   const swap=r===90||r===270;
+  const scale=Math.min(1,1800/Math.max(im.naturalWidth,im.naturalHeight));
+  const naturalW=Math.round(im.naturalWidth*scale),naturalH=Math.round(im.naturalHeight*scale);
   const c=document.createElement("canvas");
-  c.width=swap?im.naturalHeight:im.naturalWidth;
-  c.height=swap?im.naturalWidth:im.naturalHeight;
+  c.width=swap?naturalH:naturalW;
+  c.height=swap?naturalW:naturalH;
   const ctx=c.getContext("2d",{willReadFrequently:true});
   if(r===90){ctx.translate(c.width,0);ctx.rotate(Math.PI/2);}
   else if(r===180){ctx.translate(c.width,c.height);ctx.rotate(Math.PI);}
   else if(r===270){ctx.translate(0,c.height);ctx.rotate(-Math.PI/2);}
-  ctx.drawImage(im,0,0);
+  ctx.drawImage(im,0,0,naturalW,naturalH);
   s.canvas=c;
   if(!s.corners)s.corners=defaultCorners(c.width,c.height);
   else s.corners=s.corners.map(p=>({x:Math.min(c.width,Math.max(0,p.x)),y:Math.min(c.height,Math.max(0,p.y))}));
@@ -326,7 +327,7 @@ function perspectiveMatrix(srcPts,dstPts){
   }
   return solveLinear(A,b);
 }
-function warpCard(s){
+async function warpCard(s){
   if(s.cropData)return s.cropData;
   const targetW=Math.round(85.6/25.4*300),targetH=Math.round(54/25.4*300);
   const down=Math.min(1,2200/Math.max(s.canvas.width,s.canvas.height));
@@ -340,21 +341,25 @@ function warpCard(s){
   const outputCanvas=document.createElement("canvas");outputCanvas.width=targetW;outputCanvas.height=targetH;
   const outCtx=outputCanvas.getContext("2d");const out=outCtx.createImageData(targetW,targetH);
   const src=source.data,dst=out.data;
-  for(let y=0;y<targetH;y++){
-    for(let x=0;x<targetW;x++){
-      const den=H[6]*x+H[7]*y+1;
-      const sx=(H[0]*x+H[1]*y+H[2])/den,sy=(H[3]*x+H[4]*y+H[5])/den;
-      const oi=(y*targetW+x)*4;
-      if(!Number.isFinite(sx)||!Number.isFinite(sy)||sx<0||sy<0||sx>sw-1||sy>sh-1){dst[oi]=255;dst[oi+1]=255;dst[oi+2]=255;dst[oi+3]=255;continue;}
-      const x0=Math.floor(sx),y0=Math.floor(sy),x1=Math.min(sw-1,x0+1),y1=Math.min(sh-1,y0+1),fx=sx-x0,fy=sy-y0;
-      const i00=(y0*sw+x0)*4,i10=(y0*sw+x1)*4,i01=(y1*sw+x0)*4,i11=(y1*sw+x1)*4;
-      for(let c=0;c<3;c++){
-        const a=src[i00+c]*(1-fx)+src[i10+c]*fx;
-        const b=src[i01+c]*(1-fx)+src[i11+c]*fx;
-        dst[oi+c]=Math.round(a*(1-fy)+b*fy);
+  for(let yStart=0;yStart<targetH;yStart+=24){
+    const yEnd=Math.min(targetH,yStart+24);
+    for(let y=yStart;y<yEnd;y++){
+      for(let x=0;x<targetW;x++){
+        const den=H[6]*x+H[7]*y+1;
+        const sx=(H[0]*x+H[1]*y+H[2])/den,sy=(H[3]*x+H[4]*y+H[5])/den;
+        const oi=(y*targetW+x)*4;
+        if(!Number.isFinite(sx)||!Number.isFinite(sy)||sx<0||sy<0||sx>sw-1||sy>sh-1){dst[oi]=255;dst[oi+1]=255;dst[oi+2]=255;dst[oi+3]=255;continue;}
+        const x0=Math.floor(sx),y0=Math.floor(sy),x1=Math.min(sw-1,x0+1),y1=Math.min(sh-1,y0+1),fx=sx-x0,fy=sy-y0;
+        const i00=(y0*sw+x0)*4,i10=(y0*sw+x1)*4,i01=(y1*sw+x0)*4,i11=(y1*sw+x1)*4;
+        for(let c=0;c<3;c++){
+          const a=src[i00+c]*(1-fx)+src[i10+c]*fx;
+          const b=src[i01+c]*(1-fx)+src[i11+c]*fx;
+          dst[oi+c]=Math.round(a*(1-fy)+b*fy);
+        }
+        dst[oi+3]=255;
       }
-      dst[oi+3]=255;
     }
+    await new Promise(resolve=>setTimeout(resolve,0));
   }
   outCtx.putImageData(out,0,0);
   s.cropData=outputCanvas.toDataURL("image/jpeg",.94);
@@ -374,15 +379,44 @@ function drawA4Preview(backUrl,frontUrl){
     backImage.src=backUrl;frontImage.src=frontUrl;
   });
 }
+let jsPdfLoadPromise=null;
+function waitForJsPDF(timeoutMs){
+  if(window.jspdf&&typeof window.jspdf.jsPDF==="function")return Promise.resolve(window.jspdf);
+  if(jsPdfLoadPromise)return jsPdfLoadPromise;
+  jsPdfLoadPromise=new Promise((resolve,reject)=>{
+    const started=Date.now();
+    let settled=false;
+    let script=document.querySelector('script[data-rkdw-jspdf-loader="true"]');
+    const finish=(err,value)=>{
+      if(settled)return;settled=true;
+      if(err){jsPdfLoadPromise=null;reject(err);}else resolve(value);
+    };
+    if(!script){
+      script=document.createElement("script");
+      script.src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";
+      script.async=true;
+      script.dataset.rkdwJspdfLoader="true";
+      script.onerror=()=>finish(new Error("PDF library download nahi hui. Internet connection check karein."));
+      document.head.appendChild(script);
+    }
+    (function check(){
+      if(window.jspdf&&typeof window.jspdf.jsPDF==="function"){finish(null,window.jspdf);return;}
+      if(Date.now()-started>timeoutMs){finish(new Error("PDF library load nahi hui. Page refresh karke dobara try karein."));return;}
+      setTimeout(check,200);
+    })();
+  });
+  return jsPdfLoadPromise;
+}
 async function buildPreview(){
   if(!sideReady(card.front)||!sideReady(card.back)){status("Front aur Back dono photos upload karein.");return false;}
   byId("idBuildPreview").disabled=true;byId("idSend").disabled=true;
   status("Perspective crop aur A4 PDF tayyar ho raha hai...");
   try{
-    const backUrl=warpCard(card.back),frontUrl=warpCard(card.front);
+    const backUrl=await warpCard(card.back),frontUrl=await warpCard(card.front);
     await drawA4Preview(backUrl,frontUrl);
-    if(!window.jspdf||!window.jspdf.jsPDF)throw new Error("PDF library load nahi hui. Internet connection check karke page refresh karein.");
-    const PDF=window.jspdf.jsPDF;
+    status("PDF file ban rahi hai...");
+    const jspdf=await waitForJsPDF(20000);
+    const PDF=jspdf.jsPDF;
     const doc=new PDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});
     doc.addImage(frontUrl,"JPEG",8,8,85.6,54,undefined,"FAST");
     doc.addImage(backUrl,"JPEG",210-8-85.6,8,85.6,54,undefined,"FAST");
