@@ -38,7 +38,7 @@
   <div class="side-tabs"><button type="button" id="editFront" class="side-tab active">Edit Front (left)</button><button type="button" id="editBack" class="side-tab">Edit Back (right)</button></div>
   <div class="id-tools"><button type="button" id="idAutoDetect" class="btn secondary">Auto Detect &amp; Straighten</button><button type="button" id="idRotate" class="btn secondary">Rotate 90°</button><button type="button" id="idResetCorners" class="btn secondary">Reset corners</button></div>
   <canvas id="idCropCanvas" class="id-crop-canvas" width="900" height="500" aria-label="Crop editor with four draggable corners"></canvas>
-  <p class="id-help">Photo upload ke baad page halka rakhne ke liye auto-detect apne aap nahi chalega. Auto Detect button se card edges check karein. Chaar corner handles ko card ke corners par drag karein. Rotate button har click par photo ko 90° ghumata hai. Perspective correction ke liye editor mein OpenCV load hona zaroori hai; nahi hua to manual crop ka rectangular fallback diya jayega.</p>
+  <p class="id-help">Auto Detect ek quick lightweight edge scan hai; har photo par exact result guaranteed nahi hai. Chaar corner handles ko card ke exact corners par drag karke correct karein. Auto Detect button page ko heavy library se load nahi karta. Rotate button har click par photo ko 90° ghumata hai. Perspective correction ke liye editor mein OpenCV load hona zaroori hai; nahi hua to manual crop ka rectangular fallback diya jayega.</p>
   <p id="idEditorStatus" class="id-status" aria-live="polite">Pehle Front aur Back photos choose karein. Auto Detect zaroorat par button se chalayen.</p>
 </div>
 <div class="grid id-settings">
@@ -216,94 +216,95 @@ byId("idCropCanvas").addEventListener("pointerup",stopDragging);
 byId("idCropCanvas").addEventListener("pointercancel",stopDragging);
 byId("idCropCanvas").addEventListener("lostpointercapture",stopDragging);
 
-let openCvLoadPromise=null;
-function waitForOpenCV(timeoutMs){
-  if(window.cv && typeof window.cv.Mat==="function")return Promise.resolve(window.cv);
-  if(openCvLoadPromise)return openCvLoadPromise;
-  openCvLoadPromise=new Promise((resolve,reject)=>{
-    const started=Date.now();
-    let settled=false;
-    const finish=(err,value)=>{
-      if(settled)return;settled=true;
-      if(err){openCvLoadPromise=null;reject(err);}else resolve(value);
-    };
-    let script=document.querySelector('script[data-rkdw-opencv-loader="true"]');
-    if(!script){
-      script=document.createElement("script");
-      script.src="https://docs.opencv.org/4.x/opencv.js";
-      script.async=true;
-      script.dataset.rkdwOpencvLoader="true";
-      script.onerror=()=>finish(new Error("OpenCV library download nahi hui."));
-      document.head.appendChild(script);
-    }
-    (function check(){
-      if(window.cv && typeof window.cv.Mat==="function"){finish(null,window.cv);return;}
-      if(Date.now()-started>timeoutMs){finish(new Error("OpenCV load hone mein samay laga. Aap manual crop aur Rotate se aage badh sakte hain."));return;}
-      setTimeout(check,250);
-    })();
-  });
-  return openCvLoadPromise;
-}
-function orderQuad(points){
-  const sums=points.map(p=>p.x+p.y),diffs=points.map(p=>p.y-p.x);
-  const tl=points[sums.indexOf(Math.min.apply(null,sums))];
-  const br=points[sums.indexOf(Math.max.apply(null,sums))];
-  const tr=points[diffs.indexOf(Math.min.apply(null,diffs))];
-  const bl=points[diffs.indexOf(Math.max.apply(null,diffs))];
-  let out=[tl,tr,br,bl];
-  const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-  const top=(d(out[0],out[1])+d(out[3],out[2]))/2;
-  const side=(d(out[1],out[2])+d(out[0],out[3]))/2;
-  if(top<side)out=[out[3],out[0],out[1],out[2]];
+function smoothProjection(values,radius=2){
+  const out=new Float32Array(values.length);
+  for(let i=0;i<values.length;i++){
+    let sum=0,count=0;
+    for(let j=Math.max(0,i-radius);j<=Math.min(values.length-1,i+radius);j++){sum+=values[j];count++;}
+    out[i]=sum/Math.max(1,count);
+  }
   return out;
 }
-async function autoDetect(sideName,report){
-  const s=card[sideName];
-  if(!s.canvas){if(report)status("Pehle photo choose karein.");return;}
-  if(!s.corners)s.corners=defaultCorners(s.canvas.width,s.canvas.height);
-  if(report)status("Card ke edges detect ho rahe hain. Zaroorat par manually bhi corners drag kar sakte hain.");
-  drawCropCanvas();
-  let src=null,gray=null,blur=null,edges=null,dilated=null,kernel=null,contours=null,hierarchy=null;
-  try{
-    const cvlib=await waitForOpenCV(15000);
-    const maxSide=1100,scale=Math.min(1,maxSide/Math.max(s.canvas.width,s.canvas.height));
-    const small=document.createElement("canvas");small.width=Math.max(1,Math.round(s.canvas.width*scale));small.height=Math.max(1,Math.round(s.canvas.height*scale));
-    small.getContext("2d").drawImage(s.canvas,0,0,small.width,small.height);
-    src=cvlib.imread(small);gray=new cvlib.Mat();blur=new cvlib.Mat();edges=new cvlib.Mat();dilated=new cvlib.Mat();kernel=cvlib.Mat.ones(3,3,cvlib.CV_8U);contours=new cvlib.MatVector();hierarchy=new cvlib.Mat();
-    cvlib.cvtColor(src,gray,cvlib.COLOR_RGBA2GRAY);
-    cvlib.GaussianBlur(gray,blur,new cvlib.Size(5,5),0,0,cvlib.BORDER_DEFAULT);
-    cvlib.Canny(blur,edges,50,150);
-    cvlib.dilate(edges,dilated,kernel);
-    cvlib.findContours(dilated,contours,hierarchy,cvlib.RETR_LIST,cvlib.CHAIN_APPROX_SIMPLE);
-    let best=null,bestArea=small.width*small.height*.08;
-    for(let i=0;i<contours.size();i++){
-      const contour=contours.get(i),perimeter=cvlib.arcLength(contour,true),approx=new cvlib.Mat();
-      cvlib.approxPolyDP(contour,approx,.02*perimeter,true);
-      if(approx.rows===4&&cvlib.isContourConvex(approx)){
-        const area=Math.abs(cvlib.contourArea(approx));
-        if(area>bestArea){
-          const points=[];
-          const pointData=approx.data32S;for(let j=0;j<4;j++)points.push({x:pointData[j*2],y:pointData[j*2+1]});
-          const ordered=orderQuad(points);
-          const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-          const w=(dist(ordered[0],ordered[1])+dist(ordered[3],ordered[2]))/2;
-          const h=(dist(ordered[1],ordered[2])+dist(ordered[0],ordered[3]))/2;
-          if(Math.max(w,h)/Math.max(1,Math.min(w,h))>1.15){bestArea=area;best=ordered;}
-        }
-      }
-      approx.delete();contour.delete();
+function projectionPeaks(values,from,to,limit){
+  const peaks=[];
+  for(let i=Math.max(2,from);i<Math.min(values.length-2,to);i++){
+    if(values[i]>=values[i-1]&&values[i]>=values[i+1])peaks.push({pos:i,val:values[i]});
+  }
+  peaks.sort((a,b)=>b.val-a.val);
+  const selected=[];
+  for(const p of peaks){
+    if(selected.every(q=>Math.abs(q.pos-p.pos)>Math.max(5,Math.round(values.length*.025)))){
+      selected.push(p);if(selected.length>=limit)break;
     }
-    if(best){
-      s.corners=best.map(p=>({x:Math.max(0,Math.min(s.canvas.width,p.x/scale)),y:Math.max(0,Math.min(s.canvas.height,p.y/scale))}));
+  }
+  return selected;
+}
+function autoDetect(sideName,report){
+  const s=card[sideName];
+  if(!s.canvas){if(report)status("Pehle is side ki photo choose karein.");return;}
+  if(report)status("Photo scan ho rahi hai… agar detection sahi na ho to neele corners manually adjust karein.");
+  try{
+    // Work only on a small preview-sized canvas so this never scans a full-resolution phone photo.
+    const maxSide=320,scale=Math.min(1,maxSide/Math.max(s.canvas.width,s.canvas.height));
+    const w=Math.max(32,Math.round(s.canvas.width*scale)),h=Math.max(32,Math.round(s.canvas.height*scale));
+    const small=document.createElement("canvas");small.width=w;small.height=h;
+    const ctx=small.getContext("2d",{willReadFrequently:true});ctx.drawImage(s.canvas,0,0,w,h);
+    const pixels=ctx.getImageData(0,0,w,h).data;
+    const gray=new Uint8Array(w*h);
+    for(let i=0,j=0;i<pixels.length;i+=4,j++)gray[j]=Math.round(.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2]);
+    const rows=new Float32Array(h),cols=new Float32Array(w);
+    for(let y=1;y<h-1;y++){
+      const rowBase=y*w;
+      for(let x=1;x<w-1;x++){
+        const idx=rowBase+x;
+        const gx=Math.abs(gray[idx+1]-gray[idx-1]);
+        const gy=Math.abs(gray[idx+w]-gray[idx-w]);
+        const edge=gx+gy;
+        rows[y]+=edge;cols[x]+=edge;
+      }
+    }
+    const smRows=smoothProjection(rows,2),smCols=smoothProjection(cols,2);
+    const xPeaks=projectionPeaks(smCols,Math.round(w*.025),Math.round(w*.975),16);
+    const yPeaks=projectionPeaks(smRows,Math.round(h*.025),Math.round(h*.975),16);
+    const xMean=smCols.reduce((a,b)=>a+b,0)/w||1,yMean=smRows.reduce((a,b)=>a+b,0)/h||1;
+    const xPairs=[],yPairs=[];
+    for(let i=0;i<xPeaks.length;i++)for(let j=i+1;j<xPeaks.length;j++){
+      const left=Math.min(xPeaks[i].pos,xPeaks[j].pos),right=Math.max(xPeaks[i].pos,xPeaks[j].pos),span=right-left;
+      if(span<w*.25||span>w*.97)continue;
+      const edgeScore=(smCols[left]+smCols[right])/(2*xMean);
+      xPairs.push({left,right,span,edgeScore});
+    }
+    for(let i=0;i<yPeaks.length;i++)for(let j=i+1;j<yPeaks.length;j++){
+      const top=Math.min(yPeaks[i].pos,yPeaks[j].pos),bottom=Math.max(yPeaks[i].pos,yPeaks[j].pos),span=bottom-top;
+      if(span<h*.14||span>h*.97)continue;
+      const edgeScore=(smRows[top]+smRows[bottom])/(2*yMean);
+      yPairs.push({top,bottom,span,edgeScore});
+    }
+    let best=null,bestScore=-Infinity;
+    for(const xp of xPairs)for(const yp of yPairs){
+      const ratio=xp.span/yp.span;
+      // Detect a landscape ID-card outline, approximately 1.59:1.
+      if(ratio<1.15||ratio>2.35)continue;
+      const area=(xp.span*yp.span)/(w*h);
+      if(area<.12)continue;
+      const aspectPenalty=Math.abs(Math.log(ratio/1.586));
+      const score=(xp.edgeScore+yp.edgeScore)*Math.sqrt(area)-aspectPenalty*1.35;
+      if(score>bestScore){bestScore=score;best={left:xp.left,right:xp.right,top:yp.top,bottom:yp.bottom,area,ratio,edgeStrength:xp.edgeScore+yp.edgeScore};}
+    }
+    if(best&&best.area>=.16&&best.edgeStrength>=1.15){
+      s.corners=[
+        {x:best.left/scale,y:best.top/scale},
+        {x:best.right/scale,y:best.top/scale},
+        {x:best.right/scale,y:best.bottom/scale},
+        {x:best.left/scale,y:best.bottom/scale}
+      ].map(p=>({x:Math.max(0,Math.min(s.canvas.width,p.x)),y:Math.max(0,Math.min(s.canvas.height,p.y))}));
       s.cropData=null;invalidatePreview();drawCropCanvas();
-      status((sideName==="front"?"Front":"Back")+" card detect ho gaya. Blue handles ko zaroorat par adjust karein.");
+      status((sideName==="front"?"Front":"Back")+" ka approximate outline mil gaya. Ye quick scan hai—blue corners ko card ke exact corners par check/adjust karein.");
     }else{
-      if(report)status("Card ke clear 4 edges detect nahi hue. Default crop diya hai—chaaron blue corners manually card ke edges par drag karein.");
+      status("Clear card outline nahi mila. Page hang nahi hona chahiye; ab 4 blue corners ko manually card ke corners par drag karein, ya photo ko rotate karke dobara try karein.");
     }
   }catch(err){
-    if(report)status("Auto-detect/perspective module load nahi hua. Manual corner handles aur Rotate use karein; basic crop kaam karta rahega.");
-  }finally{
-    [src,gray,blur,edges,dilated,kernel,contours,hierarchy].forEach(m=>{if(m&&typeof m.delete==="function")try{m.delete();}catch(e){}});
+    status("Quick auto-detect complete nahi ho saka. Page refresh kiye bina manual blue corners aur Rotate use kar sakte hain.");
   }
 }
 function solveLinear(A,b){
