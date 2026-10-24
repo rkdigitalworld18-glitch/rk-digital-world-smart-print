@@ -105,6 +105,12 @@
 
 /* ChatGPT-style left navigation: full-size options, one main panel at a time */
 
+/* Distinct colors for Document Upload and ID Card Upload; selected option turns white */
+#printPortal.tabs .tab-customer{background:linear-gradient(115deg,#d9f3ff,#8bdcff)!important;color:#075985!important;border:1px solid #38bdf8!important;box-shadow:0 5px 14px #0ea5e91c!important}
+#printPortal.tabs .tab-idcard{background:linear-gradient(115deg,#e8ffe9,#a7f3c0)!important;color:#166534!important;border:1px solid #4ade80!important;box-shadow:0 5px 14px #22c55e1c!important}
+#printPortal.tabs .tab-customer.active,
+#printPortal.tabs .tab-idcard.active{background:#fff!important;color:#202944!important;border:2px solid #cbd5e1!important;box-shadow:inset 0 0 0 1px #fff,0 4px 14px #101b3a12!important}
+
 /* Bright, prominent third sidebar option for Image & PDF Tools */
 #printPortal.tabs .tab-image-tools{background:linear-gradient(115deg,#ffcf33 0%,#ff8a24 48%,#ff4d8d 100%)!important;color:#24133f!important;border:2px solid #ffad35!important;box-shadow:0 7px 20px #ff7b353d!important;font-weight:950!important;min-height:54px!important}
 #printPortal.tabs .tab-image-tools:hover{background:linear-gradient(115deg,#ffe36a,#ff9d35,#ff70a5)!important;box-shadow:0 9px 24px #ff7b3555!important;transform:translateY(-1px)}
