@@ -104,6 +104,11 @@
 }
 
 /* ChatGPT-style left navigation: full-size options, one main panel at a time */
+
+/* Bright, prominent third sidebar option for Image & PDF Tools */
+#printPortal.tabs .tab-image-tools{background:linear-gradient(115deg,#ffcf33 0%,#ff8a24 48%,#ff4d8d 100%)!important;color:#24133f!important;border:2px solid #ffad35!important;box-shadow:0 7px 20px #ff7b353d!important;font-weight:950!important;min-height:54px!important}
+#printPortal.tabs .tab-image-tools:hover{background:linear-gradient(115deg,#ffe36a,#ff9d35,#ff70a5)!important;box-shadow:0 9px 24px #ff7b3555!important;transform:translateY(-1px)}
+#printPortal.tabs .tab-image-tools:before{content:"✨";margin-right:8px}
 /* Respect hidden owner tab on the customer page; owner mode explicitly reveals it */
 #printPortal.tabs #ownerTab[style*="display:none"]{display:none!important}
 
@@ -134,10 +139,10 @@ header .wrap{max-width:1000px}
 <div id="printPortal" class="tabs">
 <button class="tab tab-customer active" data-view="customer">📄 Document Upload</button>
 <button class="tab tab-idcard" data-view="idcard">🪪 ID Card Upload</button>
+<a class="tab tab-image-tools" href="/image-pdf-tools.html" style="text-decoration:none;display:inline-flex">🖼️ Image &amp; PDF Tools</a>
 <button class="tab" data-view="owner" id="ownerTab" style="display:none">Owner Approval</button>
 <button class="tab" data-view="shop">Shop Details</button>
 <button class="tab tab-products" data-view="products">🛍️ Available Products</button>
-<a class="tab" href="/image-pdf-tools.html" style="text-decoration:none;display:inline-block">🖼️ Image &amp; PDF Tools</a>
 </div>
 <section id="customer" class="card upload-section customer-upload-section">
 <div class="upload-section-heading"><span class="upload-section-icon">📄</span><div><span class="upload-kicker customer-kicker">STEP 1 • DOCUMENT UPLOAD</span><h2>Document / PDF Upload</h2><p class="sub">PDF ya photo upload karein — maximum 20 MB. Neeche bade box par tap karke file chunein.</p></div></div>
