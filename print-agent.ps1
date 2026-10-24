@@ -55,16 +55,11 @@ while ($true) {
     # dpi=300 is an assumed raster-image DPI hint; it does NOT override a PDF's own page dimensions
     # or force the physical printer's DPI. Actual print quality is set in the Windows printer driver.
     $paper = switch -Regex ($job.settings.paper) {
-      '^A4
- { 'A4'; break }
-      '^A5
- { 'A5'; break }
-      '^A3
- { 'A3'; break }
-      '^Letter
- { 'Letter'; break }
-      '^Legal
- { 'Legal'; break }
+      '^A4$' { 'A4'; break }
+      '^A5$' { 'A5'; break }
+      '^A3$' { 'A3'; break }
+      '^Letter$' { 'Letter'; break }
+      '^Legal$' { 'Legal'; break }
       default { 'A4' }
     }
     $fit = if ($job.settings.fit -eq "Actual size") { "noscale" } else { "fit" }
