@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rk-digital-world-smart-print.onrender.com/sitemap.xml
