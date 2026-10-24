@@ -41,8 +41,16 @@ Open the website > Owner Approval > enter the exact `OWNER_TOKEN` > Load request
 3. In Windows Settings > Bluetooth & devices > Printers & scanners, copy the exact installed printer name.
 4. Edit `agent/print-agent.ps1`: set `SERVER_URL`, `AGENT_TOKEN`, `PRINTER_NAME`, and the actual SumatraPDF path.
 5. Run PowerShell in the project folder and launch:
-   `.\agent\print-agent.ps1`
+   `.\print-agent.ps1`
 6. Test using non-sensitive sample PDF and image files. Verify paper size, fit, monochrome/color, and copies. Custom photo sizes and duplex behavior may need driver-specific adjustment.
+
+## Print speed and quality (Windows 11 / HP Smart Tank)
+- The updated agent checks for the next approved job every 1 second while the queue is idle (previously 4 seconds).
+- Agent logs separately show queue-poll time, download time, and Sumatra/driver handoff time. If a delay repeats, use these measurements to tell whether it is the server, download, or Windows printing stage.
+- Raster uploads receive a `dpi=300` assumed-DPI hint in SumatraPDF. Sumatra ignores this hint for PDFs that already contain their own page dimensions; it is not a command to force printer hardware resolution.
+- To improve actual output quality, open Windows Settings > Bluetooth & devices > Printers & scanners > HP Smart Tank > Printing preferences > Paper/Quality, select **Best** (or **Maximum DPI**, if the installed HP driver offers it), and set the paper type to the paper actually loaded. HP notes that Best / Maximum DPI can use more ink and print more slowly: https://support.hp.com/in-en/document/ish_14282292-14066381-16
+- The ID-card A4 PDF is prepared from a 300-DPI-sized crop. A low-resolution or blurry source photo cannot be restored by upscaling; capture the card clearly, with good light and all four edges visible.
+- The printer's advertised maximum output is not the same as the image's effective DPI. For this printer family, HP lists up to 1200 × 1200 rendered dpi black and up to 4800 × 1200 optimized dpi color with 1200-dpi input: https://support.hp.com/in-en/product/product-specs/hp-smart-tank-580-all-in-one-printer/2100992726
 
 ## QR code
 After deployment, open the live website URL and download/print the QR code displayed on the page. Do not print a QR code made from localhost: it only works on the laptop.
