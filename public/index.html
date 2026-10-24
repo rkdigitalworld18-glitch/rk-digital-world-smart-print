@@ -165,7 +165,8 @@ function makeOriented(s){
   const im=s.image;
   const r=((s.rotation%360)+360)%360;
   const swap=r===90||r===270;
-  const scale=Math.min(1,1800/Math.max(im.naturalWidth,im.naturalHeight));
+  // Preserve more original pixels for high-quality print crops; processing is still bounded for mobile devices.
+  const scale=Math.min(1,3000/Math.max(im.naturalWidth,im.naturalHeight));
   const naturalW=Math.round(im.naturalWidth*scale),naturalH=Math.round(im.naturalHeight*scale);
   const c=document.createElement("canvas");
   c.width=swap?naturalH:naturalW;
@@ -537,8 +538,11 @@ function perspectiveMatrix(srcPts,dstPts){
 }
 async function warpCard(s){
   if(s.cropData)return s.cropData;
-  const targetW=Math.round(85.6/25.4*300),targetH=Math.round(54/25.4*300);
-  const down=Math.min(1,2200/Math.max(s.canvas.width,s.canvas.height));
+  // Standard ID card at 600 pixels per inch: 85.6 x 54 mm.
+  const CROP_DPI=600;
+  const targetW=Math.round(85.6/25.4*CROP_DPI),targetH=Math.round(54/25.4*CROP_DPI);
+  // Source canvas is already capped at 3000px on its longest side; avoid downscaling unless necessary.
+  const down=Math.min(1,3200/Math.max(s.canvas.width,s.canvas.height));
   const sw=Math.max(2,Math.round(s.canvas.width*down)),sh=Math.max(2,Math.round(s.canvas.height*down));
   const sourceCanvas=document.createElement("canvas");sourceCanvas.width=sw;sourceCanvas.height=sh;
   const sourceCtx=sourceCanvas.getContext("2d",{willReadFrequently:true});sourceCtx.drawImage(s.canvas,0,0,sw,sh);
@@ -570,7 +574,8 @@ async function warpCard(s){
     await new Promise(resolve=>setTimeout(resolve,0));
   }
   outCtx.putImageData(out,0,0);
-  s.cropData=outputCanvas.toDataURL("image/jpeg",.94);
+  // High JPEG quality reduces artifacts around small text and ID card borders.
+  s.cropData=outputCanvas.toDataURL("image/jpeg",.98);
   return s.cropData;
 }
 function drawA4Preview(backUrl,frontUrl){
@@ -618,7 +623,7 @@ function waitForJsPDF(timeoutMs){
 async function buildPreview(){
   if(!sideReady(card.front)||!sideReady(card.back)){status("Front aur Back dono photos upload karein.");return false;}
   byId("idBuildPreview").disabled=true;byId("idSend").disabled=true;
-  status("Perspective crop aur A4 PDF tayyar ho raha hai...");
+  status("High-resolution 600 DPI crop aur A4 PDF tayyar ho raha hai...");
   try{
     const backUrl=await warpCard(card.back),frontUrl=await warpCard(card.front);
     await drawA4Preview(backUrl,frontUrl);
@@ -633,7 +638,7 @@ async function buildPreview(){
     previewCrops={back:backUrl,front:frontUrl};
     byId("idPreviewWrap").classList.remove("hidden");
     updateButtons();
-    status("A4 preview taiyar hai. Front upar baayein, Back upar daayein. Preview check karke approval ke liye bhejein.");
+    status("600 DPI crop ke saath A4 preview taiyar hai. Front upar baayein, Back upar daayein. Preview check karke approval ke liye bhejein.");
     return true;
   }catch(e){
     previewPdf=null;updateButtons();status("Preview nahi bana: "+e.message);return false;
