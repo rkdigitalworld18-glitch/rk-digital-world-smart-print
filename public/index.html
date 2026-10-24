@@ -18,21 +18,85 @@
 @media(max-width:700px){.shop-info-grid{grid-template-columns:1fr}.shop-services{grid-template-columns:1fr}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.shop-symbol{font-size:36px}}
 @media(max-width:480px){.product-grid{grid-template-columns:1fr}.product-tile-photo{aspect-ratio:4/3}.shop-head{padding:16px}.products-hero{padding:20px}.products-highlights span{font-size:10px}}
 
+
+/* Bigger, colourful and easy-to-understand upload cards */
+.tab-customer,.tab-idcard{font-size:14px;font-weight:900;padding:14px 17px;border-width:2px;transition:transform .15s ease,box-shadow .15s ease}
+.tab-customer{color:#075985;border-color:#7dd3fc;background:linear-gradient(135deg,#ecfeff,#eff6ff)}
+.tab-customer.active{color:#fff!important;border-color:#0284c7!important;background:linear-gradient(120deg,#0284c7,#2563eb)!important;box-shadow:0 7px 18px #0284c733}
+.tab-idcard{color:#6b21a8;border-color:#d8b4fe;background:linear-gradient(135deg,#faf5ff,#fdf2f8)}
+.tab-idcard.active{color:#fff!important;border-color:#9333ea!important;background:linear-gradient(120deg,#7c3aed,#c026d3)!important;box-shadow:0 7px 18px #9333ea35}
+.upload-section{position:relative;overflow:hidden;padding:clamp(20px,4vw,30px)}
+.upload-section:before{content:"";position:absolute;top:0;left:0;right:0;height:7px}
+.customer-upload-section{border:2px solid #7dd3fc!important;background:linear-gradient(150deg,#effaff 0%,#fff 40%);box-shadow:0 12px 30px #0284c710}
+.customer-upload-section:before{background:linear-gradient(90deg,#06b6d4,#2563eb,#38bdf8)}
+.idcard-upload-section{border:2px solid #d8b4fe!important;background:linear-gradient(150deg,#fcf5ff 0%,#fff 42%);box-shadow:0 12px 30px #9333ea10}
+.idcard-upload-section:before{background:linear-gradient(90deg,#7c3aed,#c026d3,#f472b6)}
+.upload-section-heading{display:flex;align-items:center;gap:16px;margin:4px 0 15px}
+.upload-section-icon{width:70px;height:70px;flex:0 0 70px;display:flex;align-items:center;justify-content:center;border-radius:20px;font-size:37px;box-shadow:0 7px 17px #17255415}
+.customer-upload-section .upload-section-icon{background:linear-gradient(135deg,#cffafe,#bfdbfe)}
+.idcard-upload-section .upload-section-icon{background:linear-gradient(135deg,#ede9fe,#f5d0fe)}
+.upload-kicker{display:block;font-size:11px;font-weight:950;letter-spacing:.1em;margin-bottom:5px}
+.customer-kicker{color:#0369a1}.idcard-kicker{color:#7e22ce}
+.upload-section-heading h2{font-size:clamp(22px,4vw,30px);line-height:1.15;margin:0 0 7px;color:#18264c}
+.upload-section-heading .sub{font-size:14px;line-height:1.6;margin:0;color:#596780}
+.upload-quick-guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0 12px}
+.upload-quick-guide span{display:flex;align-items:center;justify-content:center;text-align:center;min-height:47px;padding:10px;border-radius:12px;font-size:12px;font-weight:850;line-height:1.4}
+.customer-upload-section .upload-quick-guide span{background:#e0f2fe;border:1px solid #bae6fd;color:#075985}
+.idcard-upload-section .upload-quick-guide span{background:#f3e8ff;border:1px solid #e9d5ff;color:#6b21a8}
+.drop.customer-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:220px;padding:28px 18px;border:3px dashed #38bdf8;border-radius:20px;background:linear-gradient(140deg,#ecfeff,#eff6ff,#fff);margin:10px 0 22px;box-shadow:inset 0 0 0 5px #fff9;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.drop.customer-drop:hover{border-color:#2563eb;box-shadow:0 8px 24px #0284c71c;transform:translateY(-1px)}
+.drop.customer-drop .upload-big-icon{display:flex;align-items:center;justify-content:center;width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0284c7,#4f46e5);color:#fff;font-size:42px;box-shadow:0 8px 18px #2563eb35}
+.drop.customer-drop b{font-size:clamp(18px,3vw,23px);line-height:1.35;color:#164e8a}
+.drop.customer-drop small{font-size:13px;line-height:1.6;color:#536782;max-width:520px}
+.id-choose{gap:16px;margin-top:16px}
+.id-choose .field>label:first-child{font-size:13px;font-weight:950;color:#30345d}
+.id-choose .id-upload-label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-height:190px;text-align:center;padding:22px 16px;margin-top:8px;border-width:2px;border-radius:18px;transition:transform .15s ease,box-shadow .15s ease}
+.id-front-upload{border-color:#38bdf8;background:linear-gradient(145deg,#ecfeff,#eff6ff)}
+.id-back-upload{border-color:#c084fc;background:linear-gradient(145deg,#faf5ff,#fdf2f8)}
+.id-choose .id-upload-label:hover{transform:translateY(-2px);box-shadow:0 8px 20px #312e8118}
+.id-upload-emoji{display:flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:18px;font-size:34px;background:#fff;box-shadow:0 4px 14px #17255412}
+.id-front-upload .id-upload-emoji{border:1px solid #bae6fd}.id-back-upload .id-upload-emoji{border:1px solid #e9d5ff}
+.id-choose .id-upload-label b{font-size:19px;line-height:1.35}
+.id-front-upload b{color:#075985}.id-back-upload b{color:#7e22ce}
+.id-choose .id-upload-label small{font-size:12px;line-height:1.55;color:#596780;max-width:290px}
+#send,#idSend{min-height:54px;padding:15px 20px;font-size:15px;border-radius:14px;font-weight:950;box-shadow:0 6px 15px #17255418}
+#send{background:linear-gradient(120deg,#059669,#0d9488)}
+#idSend{background:linear-gradient(120deg,#7c3aed,#c026d3)}
+#idBuildPreview{min-height:50px;background:linear-gradient(120deg,#0284c7,#4f46e5)}
+.btn:focus-visible,.tab:focus-visible,.drop:focus-visible,.id-upload-label:focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:600px){
+ .upload-section{padding:20px 14px}
+ .upload-section-heading{align-items:flex-start;gap:12px}
+ .upload-section-icon{width:54px;height:54px;flex-basis:54px;border-radius:16px;font-size:30px}
+ .upload-section-heading h2{font-size:22px}
+ .upload-section-heading .sub{font-size:13px}
+ .upload-quick-guide{grid-template-columns:1fr;gap:7px;margin:14px 0 10px}
+ .upload-quick-guide span{justify-content:flex-start;min-height:40px;text-align:left;padding:10px 12px}
+ .drop.customer-drop{min-height:185px;padding:23px 12px}
+ .drop.customer-drop .upload-big-icon{width:58px;height:58px;font-size:34px}
+ .drop.customer-drop b{font-size:19px}
+ .drop.customer-drop small{font-size:12px}
+ .id-choose.grid{grid-template-columns:1fr}
+ .id-choose .id-upload-label{min-height:155px}
+ #send,#idSend{width:100%}
+}
+
 </style></head><body>
 <header><div class="wrap"><div class="brand-lockup"><svg class="brand-mark" viewBox="0 0 64 64" role="img" aria-label="RK Digital World logo"><defs><linearGradient id="rkLogoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#5145d8"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="18" fill="url(#rkLogoGrad)" stroke="#ffffff" stroke-opacity=".8" stroke-width="2"/><path d="M11 14h42v36H11z" fill="#111a42" fill-opacity=".24" rx="8"/><text x="32" y="41" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="25" font-weight="900" fill="#ffffff">RK</text><circle cx="50" cy="13" r="4" fill="#a7f3d0" stroke="#fff" stroke-width="1.5"/></svg><div class="brand-copy"><div class="brand">RK DIGITAL WORLD</div><div class="tag">DIGITAL SEVA • MOBILE REPAIR • SMART PRINT</div></div></div></div></header>
 <main>
 
 <div class="notice"><b>Privacy & Print Safety:</b> Aadhaar, PAN ya doosre sensitive documents sirf zaroori hone par upload karein. Shop approval se pehle job print nahi hoti. Public use ke liye document access aur deletion policy ko shop owner ko maintain karna chahiye.</div>
 <div id="printPortal" class="tabs">
-<button class="tab active" data-view="customer">Customer Upload</button>
-<button class="tab" data-view="idcard">ID Card Upload</button>
+<button class="tab tab-customer active" data-view="customer">📄 Customer Upload</button>
+<button class="tab tab-idcard" data-view="idcard">🪪 ID Card Upload</button>
 <button class="tab" data-view="owner">Owner Approval</button>
 <button class="tab" data-view="shop">Shop Details</button>
 <button class="tab tab-products" data-view="products">🛍️ Available Products</button>
 </div>
-<section id="customer" class="card">
-<h2>File upload karein</h2><p class="sub">PDF, JPG, PNG ya WEBP • Maximum 20 MB</p>
-<label class="drop" for="file"><b id="fileLabel">↑ File choose karein</b><small>Tap karke apne phone/laptop se file select karein</small></label><input id="file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp">
+<section id="customer" class="card upload-section customer-upload-section">
+<div class="upload-section-heading"><span class="upload-section-icon">📄</span><div><span class="upload-kicker customer-kicker">STEP 1 • FILE UPLOAD</span><h2>Customer Print Upload</h2><p class="sub">PDF ya photo upload karein — maximum 20 MB. Neeche bade box par tap karke file chunein.</p></div></div>
+<div class="upload-quick-guide"><span>1️⃣ File chunein</span><span>2️⃣ Print setting set karein</span><span>3️⃣ Approval ke liye bhejein</span></div>
+<label class="drop customer-drop" for="file"><span class="upload-big-icon">⬆️</span><b id="fileLabel">Yahan tap karein — PDF / Photo chunein</b><small>📁 Phone ya laptop se file select karein • PDF, JPG, PNG, WEBP • 20 MB tak</small></label><input id="file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp">
 <div class="grid">
 <div class="field"><label>Paper size</label><select id="paper"><option>A4</option><option>A3</option><option>A5</option><option>Letter</option><option>Legal</option><option>Photo 4×6</option><option>Photo 5×7</option></select></div>
 <div class="field"><label>Orientation</label><select id="orientation"><option>Portrait</option><option>Landscape</option></select></div>
@@ -45,13 +109,13 @@
 <p id="result" class="fine" aria-live="polite"></p>
 </section>
 
-<section id="idcard" class="card hidden">
-<h2>A4 ID Card — Front + Back</h2>
-<p class="sub">Dono photos ek hi A4 page par banengi. Front upar baayein aur Back upar daayein rahega. Preview check karne ke baad hi approval ke liye bhejein.</p>
+<section id="idcard" class="card hidden upload-section idcard-upload-section">
+<div class="upload-section-heading"><span class="upload-section-icon">🪪</span><div><span class="upload-kicker idcard-kicker">STEP 1 • ID CARD PHOTOS</span><h2>ID Card Upload — Front + Back</h2><p class="sub">Card ki dono sides ki photo chunein. Dono photos ek A4 page par set hongi; bhejne se pehle preview check karein.</p></div></div>
+<div class="upload-quick-guide"><span>1️⃣ Front photo chunein</span><span>2️⃣ Back photo chunein</span><span>3️⃣ Preview dekhkar bhejein</span></div>
 <div class="notice">ID/Aadhaar photo ko seedha rakhkar, card ke chaaron kinare frame mein capture karein. Auto-detect galat ho to neeche chaar neele corner handles ko drag karke adjust karein. Sensitive ID images sirf zaroorat par upload karein.</div>
 <div class="grid id-choose">
-  <div class="field"><label>Front photo (print par upar baayein)</label><label class="id-upload-label" for="idFrontFile"><b id="idFrontLabel">Front photo choose karein</b><small>JPG, PNG ya WEBP • Photo of card front</small></label><input id="idFrontFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
-  <div class="field"><label>Back photo (print par upar daayein)</label><label class="id-upload-label" for="idBackFile"><b id="idBackLabel">Back photo choose karein</b><small>JPG, PNG ya WEBP • Photo of card back</small></label><input id="idBackFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+  <div class="field"><label>🟦 FRONT SIDE — saamne ki side</label><label class="id-upload-label id-front-upload" for="idFrontFile"><span class="id-upload-emoji">📷</span><b id="idFrontLabel">Front Photo Chunein</b><small>ID card ki saamne wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idFrontFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+  <div class="field"><label>🟪 BACK SIDE — peeche ki side</label><label class="id-upload-label id-back-upload" for="idBackFile"><span class="id-upload-emoji">📸</span><b id="idBackLabel">Back Photo Chunein</b><small>ID card ki peeche wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idBackFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
 </div>
 <div class="id-editor">
   <b>Photo crop & straighten</b>
@@ -89,7 +153,7 @@
 <section id="shop" class="card hidden">
   <div class="shop-head"><div><span class="promo-eyebrow shop-eyebrow">WELCOME TO OUR SHOP</span><h2 class="shop-title">RK Digital World</h2><p class="sub">Digital seva, mobile repair, accessories aur printing — sab ek jagah.</p></div><div class="shop-symbol" aria-hidden="true">🏬</div></div>
   <div class="shop-info-grid">
-    <article class="shop-info-card"><span class="shop-info-icon">👤</span><div><b>Shop Name</b><p id="shopOwnerText">Owner name update hona baaki hai.</p></div></article>
+    <article class="shop-info-card"><span class="shop-info-icon">👤</span><div><b>Shop Owner</b><p id="shopOwnerText">Owner name update hona baaki hai.</p></div></article>
     <article class="shop-info-card"><span class="shop-info-icon">📍</span><div><b>Shop Address</b><p id="shopAddressText">Shop address update hona baaki hai.</p></div></article>
     <article class="shop-info-card"><span class="shop-info-icon">💬</span><div><b>WhatsApp Orders</b><p id="shopWhatsappText">Order ke liye WhatsApp number update hona baaki hai.</p></div></article>
   </div>
