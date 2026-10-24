@@ -66,10 +66,16 @@ while ($true) {
     $mode = if ($job.settings.color -eq "Black & White") { "monochrome" } else { "color" }
     $copies = [Math]::Max(1, [Math]::Min(20, [int]$job.settings.copies))
     $printSettings = "paper=$paper,$fit,$mode,$($copies)x"
-    $args = @("-silent", "-print-to", $PRINTER_NAME, "-print-settings", $printSettings, $filePath)
+    # Start-Process joins ArgumentList arrays into one command line. Quote values containing spaces
+    # so the printer name and local PDF path arrive as single arguments in Windows PowerShell 5.1.
+    $quotedPrinter = '"' + $PRINTER_NAME.Replace('"', '\"') + '"'
+    $quotedSettings = '"' + $printSettings.Replace('"', '\"') + '"'
+    $quotedFilePath = '"' + $filePath.Replace('"', '\"') + '"'
+    $argumentLine = "-silent -print-to $quotedPrinter -print-settings $quotedSettings $quotedFilePath"
 
+    Write-Host "$(Get-Date -Format T) Sending job to Windows printer: $PRINTER_NAME"
     $printWatch = [Diagnostics.Stopwatch]::StartNew()
-    $proc = Start-Process -FilePath $SUMATRA -ArgumentList $args -Wait -PassThru
+    $proc = Start-Process -FilePath $SUMATRA -ArgumentList $argumentLine -Wait -PassThru
     $printWatch.Stop()
     Write-Host "$(Get-Date -Format T) Sumatra/driver handoff took $([Math]::Round($printWatch.Elapsed.TotalSeconds,2)) s (exit $($proc.ExitCode))."
     if ($proc.ExitCode -eq 0) {
