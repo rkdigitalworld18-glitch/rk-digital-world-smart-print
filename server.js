@@ -42,7 +42,7 @@ const upload = multer({
     destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
     filename: (_req, file, cb) => cb(null, crypto.randomUUID() + path.extname(file.originalname).toLowerCase())
   }),
-  limits: { fileSize: 20 * 1024 * 1024, files: 1 },
+  limits: { fileSize: 20 * 1024 * 1024, files: 3 },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     const allowed = [".pdf", ".jpg", ".jpeg", ".png", ".webp"];
@@ -53,9 +53,23 @@ const upload = multer({
 
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "RK Digital World Smart Print" }));
 
-// Customer submits one file. Public endpoint is rate-limit-ready; add a production rate limiter/WAF before launch.
-app.post("/api/requests", upload.single("file"), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "Please attach a file." });
+// Customer submits a print file. ID-card requests may also keep the original front/back photos
+// privately so the owner can fix the crop when a customer cannot edit it correctly.
+const customerUploadFields = upload.fields([
+  { name: "file", maxCount: 1 },
+  { name: "idFrontPhoto", maxCount: 1 },
+  { name: "idBackPhoto", maxCount: 1 }
+]);
+app.post("/api/requests", customerUploadFields, (req, res) => {
+  const mainFile = req.files && req.files.file && req.files.file[0];
+  const frontPhoto = req.files && req.files.idFrontPhoto && req.files.idFrontPhoto[0];
+  const backPhoto = req.files && req.files.idBackPhoto && req.files.idBackPhoto[0];
+  if (!mainFile) {
+    [frontPhoto, backPhoto].filter(Boolean).forEach(f => fs.unlink(f.path, () => {}));
+    return res.status(400).json({ error: "Please attach a file." });
+  }
+  const isIdCard = req.body.jobType === "id-card";
+  const hasBothPhotos = !!(frontPhoto && backPhoto && isIdCard);
   const copies = Math.max(1, Math.min(20, Number.parseInt(req.body.copies || "1", 10) || 1));
   const settings = {
     paper: String(req.body.paper || "A4").slice(0, 40),
@@ -63,30 +77,44 @@ app.post("/api/requests", upload.single("file"), (req, res) => {
     copies,
     color: req.body.color === "Color" ? "Color" : "Black & White",
     fit: ["Fit to page", "Actual size", "Fill page"].includes(req.body.fit) ? req.body.fit : "Fit to page",
-    sides: req.body.sides === "Double-sided" ? "Double-sided" : "Single-sided",
+    sides: req.body.sides === "Double-sided" ? req.body.sides : "Single-sided",
     note: String(req.body.note || "").slice(0, 180)
   };
   const row = {
     id: "RK-" + crypto.randomBytes(4).toString("hex").toUpperCase(),
-    originalName: path.basename(req.file.originalname).slice(0, 160),
-    storedName: req.file.filename,
-    mimeType: req.file.mimetype,
-    bytes: req.file.size,
+    originalName: path.basename(mainFile.originalname).slice(0, 160),
+    storedName: mainFile.filename,
+    mimeType: mainFile.mimetype,
+    bytes: mainFile.size,
     settings,
-    jobType: req.body.jobType === "id-card" ? "id-card" : "standard",
+    jobType: isIdCard ? "id-card" : "standard",
+    ...(hasBothPhotos ? { idCardPhotos: {
+      frontStoredName: frontPhoto.filename,
+      frontOriginalName: path.basename(frontPhoto.originalname).slice(0, 160),
+      frontMimeType: frontPhoto.mimetype,
+      backStoredName: backPhoto.filename,
+      backOriginalName: path.basename(backPhoto.originalname).slice(0, 160),
+      backMimeType: backPhoto.mimetype
+    } } : {}),
     status: "Pending approval",
     createdAt: new Date().toISOString(),
     approvedAt: null,
     agentClaimedAt: null,
     printedAt: null
   };
+  if (isIdCard && !hasBothPhotos && (frontPhoto || backPhoto)) {
+    [frontPhoto, backPhoto].filter(Boolean).forEach(f => fs.unlink(f.path, () => {}));
+  }
   const db = readDb(); db.unshift(row); writeDb(db);
   res.status(201).json({ id: row.id, status: row.status, message: "Upload received. Wait for shop approval." });
 });
 
 // Owner dashboard APIs
 app.get("/api/owner/requests", auth(OWNER_TOKEN), (_req, res) => {
-  res.json(readDb().map(({ storedName, ...r }) => r));
+  res.json(readDb().map(({ storedName, idCardPhotos, ...r }) => ({
+    ...r,
+    hasIdCardPhotos: !!(idCardPhotos && idCardPhotos.frontStoredName && idCardPhotos.backStoredName)
+  })));
 });
 
 // Return the exact ID-card A4 PDF uploaded by the customer for owner review.
@@ -103,6 +131,94 @@ app.get("/api/owner/requests/:id/preview", auth(OWNER_TOKEN), (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   res.sendFile(filePath);
 });
+// Return an original front/back photo only to an authenticated owner, for manual crop correction.
+app.get("/api/owner/requests/:id/id-card-photos/:side", auth(OWNER_TOKEN), (req, res) => {
+  const row = readDb().find(x => x.id === req.params.id);
+  if (!row || row.jobType !== "id-card" || row.status !== "Pending approval" || !row.idCardPhotos) {
+    return res.status(404).json({ error: "Original ID-card photos are unavailable for editing." });
+  }
+  const side = req.params.side === "front" ? "front" : req.params.side === "back" ? "back" : null;
+  if (!side) return res.status(400).json({ error: "Side must be front or back." });
+  const storedName = row.idCardPhotos[side + "StoredName"];
+  const mimeType = row.idCardPhotos[side + "MimeType"];
+  if (!storedName) return res.status(404).json({ error: "Original photo not found." });
+  const filePath = path.join(UPLOAD_DIR, path.basename(storedName));
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: "Original photo file is missing." });
+  res.setHeader("Content-Type", mimeType || "application/octet-stream");
+  res.setHeader("Content-Disposition", 'inline; filename="id-card-' + side + '"');
+  res.setHeader("Cache-Control", "no-store");
+  res.sendFile(filePath);
+});
+
+// Owner saves a corrected A4 ID-card PDF. Only pending ID-card jobs can be edited.
+const ownerIdCardReplaceFields = upload.fields([
+  { name: "file", maxCount: 1 },
+  { name: "idFrontPhoto", maxCount: 1 },
+  { name: "idBackPhoto", maxCount: 1 }
+]);
+app.post("/api/owner/requests/:id/replace-id-card-pdf", auth(OWNER_TOKEN), ownerIdCardReplaceFields, (req, res) => {
+  const mainFile = req.files && req.files.file && req.files.file[0];
+  const frontPhoto = req.files && req.files.idFrontPhoto && req.files.idFrontPhoto[0];
+  const backPhoto = req.files && req.files.idBackPhoto && req.files.idBackPhoto[0];
+  const cleanupIncoming = () => [mainFile, frontPhoto, backPhoto].filter(Boolean).forEach(f => fs.unlink(f.path, () => {}));
+  if (!mainFile || path.extname(mainFile.originalname).toLowerCase() !== ".pdf") {
+    cleanupIncoming();
+    return res.status(400).json({ error: "Corrected print file must be a PDF." });
+  }
+  if (!!frontPhoto !== !!backPhoto) {
+    cleanupIncoming();
+    return res.status(400).json({ error: "Upload both front and back photos together." });
+  }
+  const db = readDb();
+  const row = db.find(x => x.id === req.params.id);
+  if (!row || row.jobType !== "id-card") {
+    cleanupIncoming();
+    return res.status(404).json({ error: "ID-card request not found." });
+  }
+  if (row.status !== "Pending approval") {
+    cleanupIncoming();
+    return res.status(409).json({ error: "Only pending requests can be edited. Reject or create a new request if needed." });
+  }
+  const previousPdf = row.storedName;
+  const previousPhotos = row.idCardPhotos;
+  row.storedName = mainFile.filename;
+  row.originalName = "ID-Card-Front-Back.pdf";
+  row.mimeType = mainFile.mimetype;
+  row.bytes = mainFile.size;
+  row.settings = {
+    ...row.settings,
+    copies: Math.max(1, Math.min(20, Number.parseInt(req.body.copies || String(row.settings.copies || 1), 10) || 1)),
+    color: req.body.color === "Color" ? "Color" : "Black & White",
+    fit: "Actual size",
+    paper: "A4",
+    orientation: "Portrait",
+    sides: "Single-sided",
+    note: "Owner-corrected ID Card Front left, Back right"
+  };
+  if (frontPhoto && backPhoto) {
+    row.idCardPhotos = {
+      frontStoredName: frontPhoto.filename,
+      frontOriginalName: path.basename(frontPhoto.originalname).slice(0, 160),
+      frontMimeType: frontPhoto.mimetype,
+      backStoredName: backPhoto.filename,
+      backOriginalName: path.basename(backPhoto.originalname).slice(0, 160),
+      backMimeType: backPhoto.mimetype
+    };
+  }
+  writeDb(db);
+  [previousPdf].filter(Boolean).forEach(name => {
+    const oldPath = path.join(UPLOAD_DIR, path.basename(name));
+    if (oldPath !== mainFile.path && fs.existsSync(oldPath)) fs.unlink(oldPath, () => {});
+  });
+  if (frontPhoto && backPhoto && previousPhotos) {
+    [previousPhotos.frontStoredName, previousPhotos.backStoredName].filter(Boolean).forEach(name => {
+      const oldPath = path.join(UPLOAD_DIR, path.basename(name));
+      if (oldPath !== frontPhoto.path && oldPath !== backPhoto.path && fs.existsSync(oldPath)) fs.unlink(oldPath, () => {});
+    });
+  }
+  res.json({ id: row.id, status: row.status, message: "Corrected ID-card PDF saved. Review the preview, then approve the request." });
+});
+
 app.post("/api/owner/requests/:id/decision", auth(OWNER_TOKEN), (req, res) => {
   const decision = req.body && req.body.decision;
   if (!["approve", "reject"].includes(decision)) return res.status(400).json({ error: "Decision must be approve or reject." });
