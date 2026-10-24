@@ -170,7 +170,7 @@ $('load').onclick=async()=>{const token=$('ownerToken').value.trim();if(!token){
 window.decide=async(id,decision)=>{const token=$('ownerToken').value.trim();try{const r=await fetch('/api/owner/requests/'+encodeURIComponent(id)+'/decision',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({decision})});const d=await r.json();if(!r.ok)throw Error(d.error||'Failed');$('load').click()}catch(e){alert(e.message)}};
 $('logout').onclick=()=>{$('ownerToken').value='';localStorage.removeItem('rkdw_owner_token');$('requests').innerHTML='<div class="empty">Token clear kar diya gaya.</div>'};
 // Add the shop name, physical address and WhatsApp number here once the owner shares them.
-const RK_SHOP_INFO = { ownerName: "RK Digital World", address: "शनिचरी बंगाली कॉलोनी, निमाई चौक, West Champaran, Bihar", whatsapp: "7562914692" };
+const RK_SHOP_INFO = { ownerName: "Rajeev Kumar", address: "शनिचरी बंगाली कॉलोनी, निमाई चौक, West Champaran, Bihar", whatsapp: "7562914692" };
 // Product photos, names, details and prices will be added to this catalogue when supplied.
 const RK_PRODUCT_CATALOG = [];
 function shopWhatsAppNumber(){const digits=String(RK_SHOP_INFO.whatsapp||"").replace(/\D/g,"");return digits.length===10?"91"+digits:digits;}
