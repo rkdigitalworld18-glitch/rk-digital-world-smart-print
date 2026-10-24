@@ -235,8 +235,17 @@ window.decide=async(id,decision)=>{const token=$('ownerToken').value.trim();try{
 $('logout').onclick=()=>{$('ownerToken').value='';localStorage.removeItem('rkdw_owner_token');$('requests').innerHTML='<div class="empty">Token clear kar diya gaya.</div>'};
 // Add the shop name, physical address and WhatsApp number here once the owner shares them.
 const RK_SHOP_INFO = { ownerName: "Rajeev Kumar", address: "शनिचरी बंगाली कॉलोनी, निमाई चौक, West Champaran, Bihar", whatsapp: "7562914692" };
-// Product photos, names, details and prices will be added to this catalogue when supplied.
-const RK_PRODUCT_CATALOG = [];
+// Product catalogue uses prices supplied by the shop owner and enhanced package photos.
+const RK_PRODUCT_CATALOG = [
+  {id:"t110-ultra",name:"T110 Ultra Smart Watch",category:"Smart Watch",caption:"2.09-inch infinite display • Smart watch",details:"T110 Ultra smartwatch with a 2.09-inch infinite display. Price ₹649. Colour and available features can be confirmed at the shop.",price:649,photoUrl:"/products/t110-ultra.webp",availability:"Shop pickup • Availability confirm karein"},
+  {id:"airpods-pro-2",name:"AirPods Pro 2 Style TWS Earbuds",category:"Earbuds",caption:"Wireless earbuds with charging case",details:"AirPods Pro 2 style TWS earbuds with charging case. Listing aapki bheji hui package photo aur price par based hai; original Apple product hone ka claim nahi kiya gaya hai.",price:220,photoUrl:"/products/airpods-pro-2.webp",availability:"Shop pickup • Availability confirm karein"},
+  {id:"hf-05-handsfree",name:"HF-05 Type-C Handsfree",category:"Handsfree",caption:"Wired handsfree • Type-C connector",details:"HF-05 handsfree with Type-C connector. Price ₹200. Phone compatibility shop par confirm kar lein.",price:200,photoUrl:"/products/hf-05-handsfree.webp",availability:"Shop pickup • Availability confirm karein"},
+  {id:"oppo-supervooc-125w",name:"OPPO SUPERVOOC 125W Charger",category:"Charger",caption:"125W fast-charging adapter",details:"OPPO SUPERVOOC 125W adapter package as shown in the photo. Charger compatibility aur product authenticity shop par confirm karein.",price:399,photoUrl:"/products/oppo-supervooc-125w.webp",availability:"Shop pickup • Availability confirm karein"},
+  {id:"vivo-44w",name:"vivo FlashCharge 44W Adapter",category:"Charger",caption:"44W FlashCharge adapter",details:"vivo FlashCharge 44W charging adapter. Apne phone model ke saath compatibility shop par confirm karein.",price:699,photoUrl:"/products/vivo-44w.webp",availability:"Shop pickup • Availability confirm karein"},
+  {id:"ubon-ch670-65w",name:"UBON CH-670 65W Champion Charger",category:"Charger",caption:"65W Champion-series charger",details:"UBON CH-670 Champion 65W charger. Supported devices aur compatibility shop par confirm karein.",price:649,photoUrl:"/products/ubon-ch670-65w.webp",availability:"Shop pickup • Availability confirm karein"},
+  {id:"ubon-sp85",name:"UBON SP-85 30W Party Speaker",category:"Speaker",caption:"30W party speaker • Portable audio",details:"UBON SP-85 30W party speaker. Current stock aur included accessories shop par confirm karein.",price:1549,photoUrl:"/products/ubon-sp85.webp",availability:"Shop pickup • Availability confirm karein"},
+  {id:"boat-220h",name:"boAt 220H Bluetooth Neckband",category:"Neckband",caption:"Bluetooth neckband • Wireless audio",details:"boAt 220H Bluetooth neckband as shown on the product package. Price ₹229.",price:229,photoUrl:"/products/boat-220h.webp",availability:"Shop pickup • Availability confirm karein"}
+];
 function shopWhatsAppNumber(){const digits=String(RK_SHOP_INFO.whatsapp||"").replace(/\D/g,"");return digits.length===10?"91"+digits:digits;}
 function refreshShopDetails(){
   $("shopOwnerText").textContent=RK_SHOP_INFO.ownerName.trim()||"Owner name update hona baaki hai.";
