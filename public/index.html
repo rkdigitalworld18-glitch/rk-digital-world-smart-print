@@ -104,6 +104,9 @@
 }
 
 /* ChatGPT-style left navigation: full-size options, one main panel at a time */
+/* Respect hidden owner tab on the customer page; owner mode explicitly reveals it */
+#printPortal.tabs #ownerTab[style*="display:none"]{display:none!important}
+
 body{padding-left:248px}
 header{padding-left:calc(16px + 248px)}
 #printPortal.tabs{position:fixed;z-index:100;left:0;top:0;bottom:0;width:248px;margin:0;padding:22px 14px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:8px;overflow-y:auto;background:#fff;border-right:1px solid #e1e6f0;box-shadow:5px 0 22px #101b3a08;border-radius:0}
