@@ -47,17 +47,17 @@ $('optBtn').onclick=async()=>{try{const f=file('optFile');if(!f||!window.PDFLib)
 $('rotateBtn').onclick=async()=>{try{const f=file('rotateFile');if(!f||!window.PDFLib)throw Error('PDF chunein; internet bhi check karein');const d=await PDFLib.PDFDocument.load(await f.arrayBuffer()),n=+$('rotatePage').value;if(n<1||n>d.getPageCount())throw Error('Page 1 se '+d.getPageCount()+' ke beech rakhein');const p=d.getPage(n-1);p.setRotation(PDFLib.degrees((p.getRotation().angle+90)%360));download(new Blob([await d.save()],{type:'application/pdf'}),name(f.name)+'-rotated.pdf');out('rotateOut','Page rotate ho gaya')}catch(e){out('rotateOut',e.message)}};
 
 // Free browser-side passport photo: MediaPipe selfie segmentation, no server upload.
-let aiPassReady=null, aiPassBlob=null;
+let aiPassSeg=null, aiPassBlob=null;
 function loadScript(src){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=()=>reject(Error('AI model load nahi hua. Internet connection check karke dobara try karein.'));document.head.appendChild(s)})}
 $('aiPassGenerate').onclick=async()=>{
  try{
   const f=file('aiPassFile');if(!f)throw Error('Pehle customer ki photo chunein.');
   out('aiPassOut','AI model load ho raha hai…');$('aiPassGenerate').disabled=true;$('aiPassDownload').disabled=true;
   if(!window.SelfieSegmentation)await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js');
-  if(!aiPassReady){const seg=new SelfieSegmentation({locateFile:(file)=>'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/'+file});seg.setOptions({modelSelection:1});aiPassReady=new Promise((resolve,reject)=>{seg.onResults(resolve);aiPassReady={seg,resolve,reject}})}
+  if(!aiPassSeg){aiPassSeg=new SelfieSegmentation({locateFile:(file)=>'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/'+file});aiPassSeg.setOptions({modelSelection:1})}
   const i=await img(f),rot=+$('aiPassRotate').value,rotC=document.createElement('canvas'),rctx=rotC.getContext('2d');
   rotC.width=(rot%180?i.height:i.width);rotC.height=(rot%180?i.width:i.height);rctx.translate(rotC.width/2,rotC.height/2);rctx.rotate(rot*Math.PI/180);rctx.drawImage(i,-i.width/2,-i.height/2);
-  const seg=aiPassReady.seg;const result=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('AI process time out. Dobara try karein.')),30000);seg.onResults(res=>{clearTimeout(timer);resolve(res)});seg.send({image:rotC}).catch(reject)});
+  const seg=aiPassSeg;const result=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('AI process time out. Dobara try karein.')),30000);seg.onResults(res=>{clearTimeout(timer);resolve(res)});seg.send({image:rotC}).catch(err=>{clearTimeout(timer);reject(err)})});
   const [w,h]=$('aiPassSize').value.split('x').map(Number),final=document.createElement('canvas');final.width=w;final.height=h;const ctx=final.getContext('2d');
   ctx.fillStyle=$('aiPassBg').value;ctx.fillRect(0,0,w,h);
   const mask=document.createElement('canvas');mask.width=rotC.width;mask.height=rotC.height;const mctx=mask.getContext('2d');mctx.drawImage(result.segmentationMask,0,0,mask.width,mask.height);mctx.globalCompositeOperation='source-in';mctx.drawImage(rotC,0,0);mctx.globalCompositeOperation='source-over';
