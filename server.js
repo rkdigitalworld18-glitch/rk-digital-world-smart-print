@@ -25,6 +25,44 @@ app.use(express.static(path.join(__dirname, "public")));
 
 function readDb() { try { return JSON.parse(fs.readFileSync(DB_FILE, "utf8")); } catch { return []; } }
 function writeDb(rows) { fs.writeFileSync(DB_FILE, JSON.stringify(rows, null, 2), "utf8"); }
+
+const UPLOAD_RETENTION_MS = 24 * 60 * 60 * 1000;
+function cleanupExpiredUploads() {
+  const cutoff = Date.now() - UPLOAD_RETENTION_MS;
+  const rows = readDb();
+  const kept = [];
+  const removeStored = (storedName) => {
+    if (!storedName) return;
+    const safeName = path.basename(storedName);
+    const fullPath = path.join(UPLOAD_DIR, safeName);
+    if (fullPath.startsWith(UPLOAD_DIR + path.sep) && fs.existsSync(fullPath)) {
+      try { fs.unlinkSync(fullPath); } catch (err) { console.error("Could not delete expired upload:", safeName, err.message); }
+    }
+  };
+  for (const row of rows) {
+    const created = Date.parse(row.createdAt || "");
+    if (Number.isFinite(created) && created <= cutoff) {
+      removeStored(row.storedName);
+      if (row.idCardPhotos) {
+        removeStored(row.idCardPhotos.frontStoredName);
+        removeStored(row.idCardPhotos.backStoredName);
+      }
+    } else {
+      kept.push(row);
+    }
+  }
+  if (kept.length !== rows.length) writeDb(kept);
+  // Also remove untracked/orphaned uploads after 24 hours (e.g. interrupted uploads).
+  for (const entry of fs.readdirSync(UPLOAD_DIR, { withFileTypes: true })) {
+    if (!entry.isFile()) continue;
+    const fullPath = path.join(UPLOAD_DIR, entry.name);
+    try {
+      if (fs.statSync(fullPath).mtimeMs <= cutoff) fs.unlinkSync(fullPath);
+    } catch (err) {
+      console.error("Could not clean old upload:", entry.name, err.message);
+    }
+  }
+}
 function safeEqual(a, b) {
   if (!a || !b) return false;
   const aa = Buffer.from(String(a)), bb = Buffer.from(String(b));
@@ -268,4 +306,6 @@ app.use((err, _req, res, _next) => {
   const status = err instanceof multer.MulterError ? 400 : 400;
   res.status(status).json({ error: err.message || "Request failed." });
 });
+cleanupExpiredUploads();
+setInterval(cleanupExpiredUploads, 15 * 60 * 1000).unref();
 app.listen(PORT, () => console.log(`RK Smart Print server listening on port ${PORT}`));
