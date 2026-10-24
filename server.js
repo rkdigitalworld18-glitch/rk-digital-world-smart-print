@@ -117,18 +117,18 @@ app.get("/api/owner/requests", auth(OWNER_TOKEN), (_req, res) => {
   })));
 });
 
-// Return the exact ID-card A4 PDF uploaded by the customer for owner review.
-// This route is protected with the same owner token as the approval dashboard.
+// Serve any uploaded PDF for authenticated owner preview (standard print and ID-card jobs).
 app.get("/api/owner/requests/:id/preview", auth(OWNER_TOKEN), (req, res) => {
   const row = readDb().find(x => x.id === req.params.id);
-  if (!row || row.jobType !== "id-card" || path.extname(row.originalName).toLowerCase() !== ".pdf") {
-    return res.status(404).json({ error: "ID-card preview not found." });
+  if (!row || path.extname(row.originalName).toLowerCase() !== ".pdf") {
+    return res.status(404).json({ error: "PDF preview not found." });
   }
   const filePath = path.join(UPLOAD_DIR, path.basename(row.storedName));
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: "Preview file missing." });
   res.setHeader("Content-Type", "application/pdf");
-  res.setHeader("Content-Disposition", 'inline; filename="ID-Card-Front-Back.pdf"');
+  res.setHeader("Content-Disposition", 'inline; filename="document-preview.pdf"');
   res.setHeader("Cache-Control", "no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
   res.sendFile(filePath);
 });
 // Return an original front/back photo only to an authenticated owner, for manual crop correction.
