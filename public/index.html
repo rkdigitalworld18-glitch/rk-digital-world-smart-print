@@ -102,6 +102,27 @@
  #printPortal.tabs .tab,
  #printPortal.tabs>a.tab{font-size:10px!important;padding:7px 8px!important;flex:0 1 auto}
 }
+
+/* ChatGPT-style left navigation: full-size options, one main panel at a time */
+body{padding-left:248px}
+header{padding-left:calc(16px + 248px)}
+#printPortal.tabs{position:fixed;z-index:100;left:0;top:0;bottom:0;width:248px;margin:0;padding:22px 14px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:8px;overflow-y:auto;background:#fff;border-right:1px solid #e1e6f0;box-shadow:5px 0 22px #101b3a08;border-radius:0}
+#printPortal.tabs .tab,#printPortal.tabs>a.tab{display:flex!important;align-items:center;justify-content:flex-start;text-align:left;width:100%;min-height:46px;padding:12px 14px!important;flex:0 0 auto;white-space:normal;font-size:14px!important;line-height:1.35!important;font-weight:750!important;border:1px solid transparent!important;border-radius:12px!important;background:transparent;color:#36415a;text-decoration:none;box-shadow:none}
+#printPortal.tabs .tab:hover,#printPortal.tabs>a.tab:hover{background:#f1f3f9}
+#printPortal.tabs .tab.active{background:#e9e8ff!important;border-color:#d8d5ff!important;color:#4338ca!important}
+#printPortal.tabs .tab-customer.active{background:#e5f5ff!important;color:#075985!important;border-color:#bae6fd!important}
+#printPortal.tabs .tab-idcard.active{background:#f5eaff!important;color:#7e22ce!important;border-color:#e9d5ff!important}
+#printPortal.tabs .tab-products{background:linear-gradient(120deg,#5b43dd,#a52bd8,#ef7f31)!important;color:#fff!important;border-color:transparent!important}
+#printPortal.tabs .tab-products.active{box-shadow:0 5px 15px #7439c833}
+main{max-width:1000px;margin:24px auto 40px;padding:0 18px}
+header .wrap{max-width:1000px}
+@media(max-width:760px){
+ body{padding-left:0}
+ header{padding-left:16px}
+ #printPortal.tabs{position:relative;top:auto;bottom:auto;left:auto;width:auto;display:flex;flex-direction:row;flex-wrap:wrap;padding:10px;margin:0 0 15px;border:1px solid #e1e6f0;border-radius:14px;box-shadow:none}
+ #printPortal.tabs .tab,#printPortal.tabs>a.tab{width:auto;min-height:44px;flex:1 1 145px;padding:11px 12px!important}
+ main{margin:18px auto 35px;padding:0 12px}
+}
 </style></head><body>
 <header><div class="wrap"><div class="brand-lockup"><svg class="brand-mark" viewBox="0 0 64 64" role="img" aria-label="RK Digital World logo"><defs><linearGradient id="rkLogoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#5145d8"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="18" fill="url(#rkLogoGrad)" stroke="#ffffff" stroke-opacity=".8" stroke-width="2"/><path d="M11 14h42v36H11z" fill="#111a42" fill-opacity=".24" rx="8"/><text x="32" y="41" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="25" font-weight="900" fill="#ffffff">RK</text><circle cx="50" cy="13" r="4" fill="#a7f3d0" stroke="#fff" stroke-width="1.5"/></svg><div class="brand-copy"><div class="brand">RK DIGITAL WORLD</div><div class="tag">DIGITAL SEVA • MOBILE REPAIR • SMART PRINT</div></div></div></div></header>
 <main>
