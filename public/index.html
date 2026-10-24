@@ -160,15 +160,53 @@
 </main>
 <script>
 const $=id=>document.getElementById(id);let file=null;
-function tab(v){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));['customer','owner','idcard'].forEach(id=>$(id).classList.toggle('hidden',id!==v))}
+function tab(v){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));['customer','idcard','owner','shop','products'].forEach(id=>$(id).classList.toggle('hidden',id!==v))}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>tab(b.dataset.view));
 $('file').onchange=()=>{file=$('file').files[0]||null;$('fileLabel').textContent=file?file.name+' ('+(file.size/1048576).toFixed(2)+' MB)':'↑ File choose karein';$('send').disabled=!file};
 $('clear').onclick=()=>{file=null;$('file').value='';$('fileLabel').textContent='↑ File choose karein';$('send').disabled=true;$('result').textContent='';['note'].forEach(id=>$(id).value='')};
 $('send').onclick=async()=>{if(!file)return;const fd=new FormData();fd.append('file',file);['paper','orientation','copies','color','fit','sides','note'].forEach(id=>fd.append(id,$(id).value));$('send').disabled=true;$('result').textContent='Uploading…';try{const r=await fetch('/api/requests',{method:'POST',body:fd});const data=await r.json();if(!r.ok)throw Error(data.error||'Upload failed');$('result').textContent='Request ID: '+data.id+' • '+data.message;file=null;$('file').value='';$('fileLabel').textContent='↑ File choose karein'}catch(e){$('result').textContent='Error: '+e.message+' (Server start/deploy hua hai?)'}finally{$('send').disabled=!file}};
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-$('load').onclick=async()=>{const token=$('ownerToken').value.trim();if(!token){$('requests').innerHTML='<div class="empty">Owner token enter karein.</div>';return}localStorage.setItem('rkdw_owner_token',token);$('requests').innerHTML='<div class="empty">Loading…</div>';try{const r=await fetch('/api/owner/requests',{headers:{Authorization:'Bearer '+token}});const data=await r.json();if(!r.ok)throw Error(data.error||'Could not load');if(!data.length){$('requests').innerHTML='<div class="empty">Koi request nahi hai.</div>';return}$('requests').innerHTML=data.map(x=>`<div class="item"><div class="itemtop"><div><h3>${esc(x.originalName)} • ${esc(x.id)}</h3><div class="meta">${esc(new Date(x.createdAt).toLocaleString('en-IN'))}\n${esc(x.settings.paper)}, ${esc(x.settings.orientation)}, ${esc(x.settings.copies)} copy/copies • ${esc(x.settings.color)}\nFit: ${esc(x.settings.fit)} • ${esc(x.settings.sides)}\nNote: ${esc(x.settings.note||'—')}</div></div><span class="status ${esc(x.status.toLowerCase().replaceAll(' ','-'))}">${esc(x.status)}</span></div>${x.jobType==='id-card'?`<div class="row"><button class="btn secondary" onclick="previewJob('${esc(x.id)}')">Preview final A4</button></div>`:''}${x.status==='Pending approval'?`<div class="row"><button class="btn" onclick="decide('${esc(x.id)}','approve')">Approve</button><button class="btn secondary" onclick="decide('${esc(x.id)}','reject')">Reject</button></div>`:''}</div>`).join('')}catch(e){$('requests').innerHTML='<div class="empty">Error: '+esc(e.message)+'</div>'}};
+$('load').onclick=async()=>{const token=$('ownerToken').value.trim();if(!token){$('requests').innerHTML='<div class="empty">Owner token enter karein.</div>';return}localStorage.setItem('rkdw_owner_token',token);$('requests').innerHTML='<div class="empty">Loading…</div>';try{const r=await fetch('/api/owner/requests',{headers:{Authorization:'Bearer '+token}});const data=await r.json();if(!r.ok)throw Error(data.error||'Could not load');if(!data.length){$('requests').innerHTML='<div class="empty">Koi request nahi hai.</div>';return}$('requests').innerHTML=data.map(x=>`<div class="item"><div class="itemtop"><div><h3>${esc(x.originalName)} • ${esc(x.id)}</h3><div class="meta">${esc(new Date(x.createdAt).toLocaleString('en-IN'))}\n${esc(x.settings.paper)}, ${esc(x.settings.orientation)}, ${esc(x.settings.copies)} copy/copies • ${esc(x.settings.color)}\nFit: ${esc(x.settings.fit)} • ${esc(x.settings.sides)}\nNote: ${esc(x.settings.note||'—')}</div></div><span class="status ${esc(x.status.toLowerCase().replaceAll(' ','-'))}">${esc(x.status)}</span></div>${x.jobType==='id-card'?`<div class="row"><button class="btn secondary" onclick="previewJob('${esc(x.id)}')">Preview final A4</button><button class="btn" onclick="window.prepareOwnerIdEdit('${esc(x.id)}',${x.hasIdCardPhotos?'true':'false'},${Number(x.settings.copies)||1},'${x.settings.color==='Color'?'Color':'Black & White'}')">Edit / straighten ID card</button></div>`:''}${x.status==='Pending approval'?`<div class="row"><button class="btn" onclick="decide('${esc(x.id)}','approve')">Approve</button><button class="btn secondary" onclick="decide('${esc(x.id)}','reject')">Reject</button></div>`:''}</div>`).join('')}catch(e){$('requests').innerHTML='<div class="empty">Error: '+esc(e.message)+'</div>'}};
 window.decide=async(id,decision)=>{const token=$('ownerToken').value.trim();try{const r=await fetch('/api/owner/requests/'+encodeURIComponent(id)+'/decision',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({decision})});const d=await r.json();if(!r.ok)throw Error(d.error||'Failed');$('load').click()}catch(e){alert(e.message)}};
 $('logout').onclick=()=>{$('ownerToken').value='';localStorage.removeItem('rkdw_owner_token');$('requests').innerHTML='<div class="empty">Token clear kar diya gaya.</div>'};
+// Add the shop name, physical address and WhatsApp number here once the owner shares them.
+const RK_SHOP_INFO = { ownerName: "", address: "", whatsapp: "" };
+// Product photos, names, details and prices will be added to this catalogue when supplied.
+const RK_PRODUCT_CATALOG = [];
+function shopWhatsAppNumber(){return String(RK_SHOP_INFO.whatsapp||"").replace(/\\D/g,"");}
+function refreshShopDetails(){
+  $("shopOwnerText").textContent=RK_SHOP_INFO.ownerName.trim()||"Owner name update hona baaki hai.";
+  $("shopAddressText").textContent=RK_SHOP_INFO.address.trim()||"Shop address update hona baaki hai.";
+  const number=shopWhatsAppNumber();
+  $("shopWhatsappText").textContent=number?"+"+number:"Order ke liye WhatsApp number update hona baaki hai.";
+  if(number){$("shopWhatsappButton").href="https://wa.me/"+number;$("shopWhatsappButton").classList.remove("hidden");$("shopContactHint").classList.add("hidden");}
+  else{$("shopWhatsappButton").classList.add("hidden");$("shopContactHint").textContent="Shop owner ka naam, poora address aur WhatsApp number milte hi yahan dikhega."; }
+}
+function productPrice(p){return p.priceLabel||("₹"+p.price);}
+function renderProductCatalog(){
+  if(!RK_PRODUCT_CATALOG.length)return;
+  $("productEmpty").classList.add("hidden");$("productGrid").classList.remove("hidden");
+  $("productGrid").innerHTML=RK_PRODUCT_CATALOG.map(p=>"<article class=\"product-tile\" tabindex=\"0\" role=\"button\" data-product-id=\""+esc(p.id)+"\" aria-label=\"View "+esc(p.name)+" details\"><img class=\"product-tile-photo\" src=\""+esc(p.photoUrl)+"\" alt=\""+esc(p.name)+"\" loading=\"lazy\"><div class=\"product-tile-copy\"><h3>"+esc(p.name)+"</h3><p>"+esc(p.caption||p.details||"Tap to view product details")+"</p><div class=\"product-price\">"+esc(productPrice(p))+"</div><span class=\"product-tile-cta\">View details &nbsp;→</span></div></article>").join("");
+}
+function openProductDetails(id){
+  const p=RK_PRODUCT_CATALOG.find(x=>String(x.id)===String(id));if(!p)return;
+  $("productDetailTitle").textContent=p.name;$("productDetailPhoto").src=p.photoUrl;$("productDetailPhoto").alt=p.name;
+  $("productDetailCategory").textContent=p.category||"RK Digital World Store";$("productDetailPrice").textContent=productPrice(p);
+  $("productDetailDescription").textContent=p.details||p.caption||"";$("productDetailAvailability").textContent=p.availability||"Availability shop par confirm karein.";
+  $("productOrderButton").onclick=()=>orderProduct(p.id);$("productDetailModal").classList.remove("hidden");
+}
+function orderProduct(id){
+  const p=RK_PRODUCT_CATALOG.find(x=>String(x.id)===String(id));if(!p)return;const number=shopWhatsAppNumber();
+  if(!number){alert("Shop ka WhatsApp number website mein set hona baaki hai.");return;}
+  const message="Namaste RK Digital World, mujhe "+p.name+" order karna hai. Price: "+productPrice(p)+". Please availability confirm karein.";
+  window.open("https://wa.me/"+number+"?text="+encodeURIComponent(message),"_blank","noopener,noreferrer");
+}
+window.openProductDetails=openProductDetails;window.orderProduct=orderProduct;
+$("productGrid").addEventListener("click",e=>{const tile=e.target.closest(".product-tile");if(tile)openProductDetails(tile.dataset.productId);});
+$("productGrid").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){const tile=e.target.closest(".product-tile");if(tile){e.preventDefault();openProductDetails(tile.dataset.productId);}}});
+$("closeProductDetails").onclick=()=>$("productDetailModal").classList.add("hidden");
+$("productDetailModal").addEventListener("click",e=>{if(e.target===$("productDetailModal"))$("productDetailModal").classList.add("hidden");});
+refreshShopDetails();renderProductCatalog();
 $('year').textContent=new Date().getFullYear();const url=location.href;const qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=12&data='+encodeURIComponent(url);$('qr').src=qrUrl;$('qrtext').textContent=url;$('downloadQR').onclick=()=>{const a=document.createElement('a');a.href=qrUrl;a.download='rk-digital-world-smart-print-qr.png';a.target='_blank';a.click()};
 const tok=localStorage.getItem('rkdw_owner_token');if(tok)$('ownerToken').value=tok;
 </script>
