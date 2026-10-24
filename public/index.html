@@ -215,9 +215,10 @@ const tok=localStorage.getItem('rkdw_owner_token');if(tok)$('ownerToken').value=
 "use strict";
 const byId = id => document.getElementById(id);
 const card = {
-  front:{image:null, objectUrl:null, originalName:"", rotation:0, canvas:null, corners:null, cropData:null},
-  back:{image:null, objectUrl:null, originalName:"", rotation:0, canvas:null, corners:null, cropData:null}
+  front:{image:null, objectUrl:null, originalName:"", file:null, rotation:0, canvas:null, corners:null, cropData:null},
+  back:{image:null, objectUrl:null, originalName:"", file:null, rotation:0, canvas:null, corners:null, cropData:null}
 };
+let ownerEditingRequestId = null;
 let activeSide = "front";
 let viewMap = null;
 let draggingCorner = -1;
@@ -275,22 +276,25 @@ function makeOriented(s){
 }
 function loadSide(sideName,file){
   const s=card[sideName];
-  if(!file)return;
+  if(!file)return Promise.resolve(false);
   if(s.objectUrl)URL.revokeObjectURL(s.objectUrl);
   s.objectUrl=URL.createObjectURL(file);
-  s.originalName=file.name;
+  s.originalName=file.name;s.file=file;
   s.rotation=0;s.canvas=null;s.corners=null;s.cropData=null;
   const img=new Image();
-  img.onload=function(){
-    s.image=img;
-    makeOriented(s);
-    byId(sideName==="front"?"idFrontLabel":"idBackLabel").textContent=file.name;
-    activeSide=sideName;editorZoom=1;editorPan={x:0,y:0};byId("idZoom").value="100";byId("idZoomValue").textContent="100%";
-    updateButtons();drawCropCanvas();
-    status((sideName==="front"?"Front":"Back")+" photo ready. Auto Detect try karein; result galat ho to zoom karke corners manually set karein.");
-  };
-  img.onerror=function(){status("Photo load nahi hui. JPG, PNG ya WEBP file dobara choose karein.");};
-  img.src=s.objectUrl;
+  return new Promise(resolve=>{
+    img.onload=function(){
+      s.image=img;
+      makeOriented(s);
+      byId(sideName==="front"?"idFrontLabel":"idBackLabel").textContent=file.name;
+      activeSide=sideName;editorZoom=1;editorPan={x:0,y:0};byId("idZoom").value="100";byId("idZoomValue").textContent="100%";
+      updateButtons();drawCropCanvas();
+      status((sideName==="front"?"Front":"Back")+" photo ready. Auto Detect try karein; result galat ho to zoom karke corners manually set karein.");
+      resolve(true);
+    };
+    img.onerror=function(){status("Photo load nahi hui. JPG, PNG ya WEBP file dobara choose karein.");resolve(false);};
+    img.src=s.objectUrl;
+  });
 }
 byId("idFrontFile").addEventListener("change",e=>loadSide("front",e.target.files[0]));
 byId("idBackFile").addEventListener("change",e=>loadSide("back",e.target.files[0]));
@@ -711,6 +715,50 @@ function waitForJsPDF(timeoutMs){
   });
   return jsPdfLoadPromise;
 }
+function resetOwnerEditor(){
+  ["front","back"].forEach(sideName=>{
+    const s=card[sideName];if(s.objectUrl)URL.revokeObjectURL(s.objectUrl);
+    s.image=null;s.objectUrl=null;s.originalName="";s.file=null;s.rotation=0;s.canvas=null;s.corners=null;s.cropData=null;
+  });
+  byId("idFrontFile").value="";byId("idBackFile").value="";
+  byId("idFrontLabel").textContent="Front photo choose karein";byId("idBackLabel").textContent="Back photo choose karein";
+  invalidatePreview();activeSide="front";resetEditorView();updateButtons();drawCropCanvas();
+}
+window.prepareOwnerIdEdit=async function(id,hasPhotos,copies,color){
+  const token=byId("ownerToken").value.trim();
+  if(!token){alert("Owner Approval mein apna token enter karke Load requests dabayein.");return;}
+  ownerEditingRequestId=String(id);
+  byId("idSend").textContent="Save corrected ID card →";
+  byId("idUploadResult").textContent="Owner edit mode: corrected PDF isi pending request mein save hoga.";
+  byId("idCopies").value=String(Math.max(1,Math.min(20,Number(copies)||1)));
+  byId("idColor").value=color==="Color"?"Color":"Black & White";
+  document.querySelector('.tab[data-view="idcard"]').click();
+  resetOwnerEditor();
+  byId("idSend").textContent="Save corrected ID card →";
+  status("Owner edit mode. Customer ki ID photo ko yahin crop, rotate, straighten aur zoom karke theek kar sakte hain.");
+  if(!hasPhotos){
+    byId("idUploadResult").textContent="Is purani request ke saath original photos save nahi hain. Neeche se Front aur Back photos select karke corrected PDF bana sakte hain.";
+    return;
+  }
+  try{
+    const loadPhoto=async sideName=>{
+      const response=await fetch("/api/owner/requests/"+encodeURIComponent(id)+"/id-card-photos/"+sideName,{headers:{Authorization:"Bearer "+token}});
+      if(!response.ok){let msg="Original photo load nahi hui.";try{const data=await response.json();msg=data.error||msg;}catch(e){}throw new Error(msg);}
+      const blob=await response.blob();
+      const ext=(blob.type||"image/jpeg").toLowerCase().includes("png")?".png":(blob.type||"").toLowerCase().includes("webp")?".webp":".jpg";
+      return new File([blob],"owner-"+sideName+ext,{type:blob.type||"image/jpeg"});
+    };
+    const files=await Promise.all([loadPhoto("front"),loadPhoto("back")]);
+    const loaded=await Promise.all([loadSide("front",files[0]),loadSide("back",files[1])]);
+    if(!loaded.every(Boolean))throw new Error("Photo open nahi hui. Dono images manual choose karein.");
+    activeSide="front";resetEditorView();updateButtons();drawCropCanvas();
+    status("Original Front aur Back photos load ho gayi. Corners adjust karein ya Auto Detect & Straighten use karein.");
+    byId("idUploadResult").textContent="Original photos loaded. Crop/straighten karein, Preview A4 page banayein, phir Save corrected ID card dabayein.";
+  }catch(error){
+    resetOwnerEditor();byId("idSend").textContent="Save corrected ID card →";
+    byId("idUploadResult").textContent="Original photos load nahi hui: "+error.message+". Ab Front aur Back photos manually select karein.";
+  }
+};
 async function buildPreview(){
   if(!sideReady(card.front)||!sideReady(card.back)){status("Front aur Back dono photos upload karein.");return false;}
   byId("idBuildPreview").disabled=true;byId("idSend").disabled=true;
@@ -738,17 +786,34 @@ async function buildPreview(){
 byId("idBuildPreview").onclick=buildPreview;
 byId("idSend").onclick=async()=>{
   if(!previewPdf){const ok=await buildPreview();if(!ok)return;}
+  if(!card.front.file||!card.back.file){status("Front aur Back dono original photo files choose karein.");return;}
   const copies=Math.max(1,Math.min(20,parseInt(byId("idCopies").value||"1",10)||1));
-  const fd=new FormData();fd.append("file",previewPdf,"ID-Card-Front-Back.pdf");fd.append("jobType","id-card");
+  const fd=new FormData();fd.append("file",previewPdf,"ID-Card-Front-Back.pdf");
+  fd.append("idFrontPhoto",card.front.file,card.front.originalName||"id-front.jpg");
+  fd.append("idBackPhoto",card.back.file,card.back.originalName||"id-back.jpg");
   fd.append("paper","A4");fd.append("orientation","Portrait");fd.append("copies",String(copies));
   fd.append("color",byId("idColor").value);fd.append("fit","Actual size");fd.append("sides","Single-sided");
   fd.append("note","ID Card Front left, Back right — one A4 page");
-  byId("idSend").disabled=true;byId("idUploadResult").textContent="A4 PDF upload ho raha hai...";
+  byId("idSend").disabled=true;
   try{
-    const response=await fetch("/api/requests",{method:"POST",body:fd});
-    const data=await response.json();
-    if(!response.ok)throw new Error(data.error||"Upload failed");
-    byId("idUploadResult").textContent="Request ID: "+data.id+" • "+data.message+" Owner approval se pehle exact A4 PDF preview available hoga.";
+    if(ownerEditingRequestId){
+      const token=byId("ownerToken").value.trim();
+      if(!token)throw new Error("Owner token enter karein. Owner edit mode khula raha hai.");
+      fd.append("copies",String(copies));fd.append("color",byId("idColor").value);
+      byId("idUploadResult").textContent="Corrected A4 PDF aur original photos save ho rahe hain...";
+      const response=await fetch("/api/owner/requests/"+encodeURIComponent(ownerEditingRequestId)+"/replace-id-card-pdf",{method:"POST",headers:{Authorization:"Bearer "+token},body:fd});
+      const data=await response.json();if(!response.ok)throw new Error(data.error||"Correction save failed");
+      byId("idUploadResult").textContent="Saved: "+data.id+" • "+data.message;
+      ownerEditingRequestId=null;byId("idSend").textContent="Send ID card for approval →";
+      document.querySelector('.tab[data-view="owner"]').click();
+      byId("load").click();
+    }else{
+      fd.append("jobType","id-card");
+      byId("idUploadResult").textContent="A4 PDF aur original photos upload ho rahe hain...";
+      const response=await fetch("/api/requests",{method:"POST",body:fd});
+      const data=await response.json();if(!response.ok)throw new Error(data.error||"Upload failed");
+      byId("idUploadResult").textContent="Request ID: "+data.id+" • "+data.message+" Original photos owner ke private editing ke liye securely saved hain.";
+    }
   }catch(e){byId("idUploadResult").textContent="Upload error: "+e.message;}
   finally{byId("idSend").disabled=!previewPdf;}
 };
