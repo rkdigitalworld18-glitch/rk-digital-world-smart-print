@@ -10,7 +10,7 @@ $WORK = Join-Path $env:LOCALAPPDATA "RKDigitalWorld\PrintQueue"
 $POLL_SECONDS = 1
 $ERROR_RETRY_SECONDS = 2
 $POLL_TIMEOUT_SECONDS = 30
-$RASTER_DPI_HINT = 300
+$RASTER_SOURCE_DPI_TARGET = 300
 New-Item -ItemType Directory -Force -Path $WORK | Out-Null
 
 if (!(Test-Path $SUMATRA)) {
@@ -24,7 +24,7 @@ if ($SERVER_URL -match "YOUR-HOSTED-DOMAIN" -or $AGENT_TOKEN -match "REPLACE_WIT
 }
 $headers = @{ Authorization = "Bearer $AGENT_TOKEN" }
 Write-Host "RK Digital World Print Agent running. Press Ctrl+C to stop."
-Write-Host "Queue polling: every $POLL_SECONDS second. Raster DPI hint: $RASTER_DPI_HINT (printer driver controls actual output quality)."
+Write-Host "Queue polling: every $POLL_SECONDS second. Raster source target: $RASTER_SOURCE_DPI_TARGET DPI; Windows printer driver controls actual print quality."
 Write-Host "For better quality, set Windows printer Printing preferences > Paper/Quality > Best and select the paper type you actually loaded."
 $lastIdleLog = Get-Date
 while ($true) {
@@ -52,8 +52,8 @@ while ($true) {
     Write-Host "$(Get-Date -Format T) Downloaded $($fileInfo.Length) bytes in $([Math]::Round($downloadWatch.Elapsed.TotalSeconds,2)) s."
 
     # SumatraPDF settings: paper size + fit/actual size + color mode + copies.
-    # dpi=300 is an assumed raster-image DPI hint; it does NOT override a PDF's own page dimensions
-    # or force the physical printer's DPI. Actual print quality is set in the Windows printer driver.
+    # Do not pass dpi=300 here: SumatraPDF does not document dpi as a command-line print-settings token.
+    # Actual print quality is set in the Windows printer driver.
     $paper = switch -Regex ($job.settings.paper) {
       '^A4$' { 'A4'; break }
       '^A5$' { 'A5'; break }
@@ -65,7 +65,7 @@ while ($true) {
     $fit = if ($job.settings.fit -eq "Actual size") { "noscale" } else { "fit" }
     $mode = if ($job.settings.color -eq "Black & White") { "monochrome" } else { "color" }
     $copies = [Math]::Max(1, [Math]::Min(20, [int]$job.settings.copies))
-    $printSettings = "paper=$paper,$fit,dpi=$RASTER_DPI_HINT,$mode,$($copies)x"
+    $printSettings = "paper=$paper,$fit,$mode,$($copies)x"
     $args = @("-silent", "-print-to", $PRINTER_NAME, "-print-settings", $printSettings, $filePath)
 
     $printWatch = [Diagnostics.Stopwatch]::StartNew()
@@ -78,6 +78,7 @@ while ($true) {
     } else {
       $body = @{ success = $false; message = "SumatraPDF exited with code $($proc.ExitCode)" } | ConvertTo-Json -Compress
       Invoke-RestMethod -Method Post -Uri "$SERVER_URL/api/agent/complete/$($job.id)" -Headers $headers -ContentType "application/json" -Body $body | Out-Null
+      if ($proc.ExitCode -eq 5) { Write-Host "Printer driver/device failed. Check exact Windows printer name, queue status, HP driver, paper settings, and test with an ordinary PDF from SumatraPDF." -ForegroundColor Yellow }
       Write-Host "Print error for $($job.id)" -ForegroundColor Red
     }
     Remove-Item -LiteralPath $filePath -Force -ErrorAction SilentlyContinue
