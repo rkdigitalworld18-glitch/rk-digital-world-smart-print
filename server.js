@@ -117,16 +117,24 @@ app.get("/api/owner/requests", auth(OWNER_TOKEN), (_req, res) => {
   })));
 });
 
-// Serve any uploaded PDF for authenticated owner preview (standard print and ID-card jobs).
+// Serve uploaded PDFs and images for authenticated owner preview.
 app.get("/api/owner/requests/:id/preview", auth(OWNER_TOKEN), (req, res) => {
   const row = readDb().find(x => x.id === req.params.id);
-  if (!row || path.extname(row.originalName).toLowerCase() !== ".pdf") {
-    return res.status(404).json({ error: "PDF preview not found." });
-  }
+  if (!row) return res.status(404).json({ error: "Preview request not found." });
+  const ext = path.extname(row.originalName).toLowerCase();
+  const mimeTypes = {
+    ".pdf": "application/pdf",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp"
+  };
+  const contentType = mimeTypes[ext];
+  if (!contentType) return res.status(415).json({ error: "Preview is only available for PDF, JPG, PNG, and WEBP files." });
   const filePath = path.join(UPLOAD_DIR, path.basename(row.storedName));
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: "Preview file missing." });
-  res.setHeader("Content-Type", "application/pdf");
-  res.setHeader("Content-Disposition", 'inline; filename="document-preview.pdf"');
+  res.setHeader("Content-Type", contentType);
+  res.setHeader("Content-Disposition", 'inline; filename="upload-preview' + ext + '"');
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.sendFile(filePath);
