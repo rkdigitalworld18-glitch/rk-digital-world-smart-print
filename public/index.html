@@ -1194,7 +1194,7 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
    ctx.shadowBlur=0;
    const extra=[];
    for(let i=sparks.length-1;i>=0;i--){
-     const p=sparks[i];p.x+=p.vx;p.y+=p.vy;p.vy+=p.glitter?.035:.045;p.vx*=.991;p.life--;
+     const p=sparks[i];p.x+=p.vx;p.y+=p.vy;p.vy+=p.glitter ? 0.035 : 0.045;p.vx*=.991;p.life--;
      const alpha=Math.max(0,p.life/p.max);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*1.65,p.y-p.vy*1.65);
      ctx.strokeStyle='hsla('+p.hue+',100%,'+(p.glitter?82:67)+'%,'+alpha+')';ctx.lineWidth=p.glitter?1:1.7;ctx.shadowBlur=p.glitter?4:7;ctx.shadowColor='hsl('+p.hue+',100%,68%)';ctx.stroke();
      if(!p.glitter&&Math.random()<.012)extra.push({x:p.x,y:p.y,vx:rand(-1.1,1.1),vy:rand(-1.4,.6),life:Math.floor(rand(8,19)),max:19,hue:rand(40,58),size:1,glitter:true});
