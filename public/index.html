@@ -201,13 +201,13 @@ header .wrap{max-width:1000px}
   </div>
   <canvas id="idCropCanvas" class="id-crop-canvas" width="900" height="500" aria-label="Large photo editor with zoom, pan, and four draggable crop corners"></canvas>
   <p class="id-help">Auto Detect tilted card ke corners bhi dhoondhne ki koshish karta hai, lekin plain background aur achchi roshni mein result behtar hota hai. Result ko manually check zaroor karein. Agar detection galat ho, 100% zoom par Fit photo dabayein, phir chaar neele corners ko card ke exact corners par drag karein. Rotate photo ko 90° ghumata hai. Editor perspective correction karke card ko standard ID-card size mein seedha karta hai.</p>
-  <p id="idEditorStatus" class="id-status" aria-live="polite">Pehle Front aur Back photos choose karein. Auto Detect zaroorat par button se chalayen.</p>
+  <p id="idEditorStatus" class="id-status" aria-live="polite">Photo upload hote hi manual crop corners set karein. Front aur Back crop confirm karte hi A4 preview automatic banega.</p>
 </div>
 <div class="grid id-settings">
   <div class="field"><label>Copies</label><input id="idCopies" type="number" min="1" max="20" value="1"></div>
   <div class="field"><label>Print type</label><select id="idColor"><option>Black &amp; White</option><option>Color</option></select></div>
 </div>
-<div class="row"><button id="idBuildPreview" class="btn" type="button" disabled>Preview A4 page</button><button id="idSend" class="btn" type="button" disabled>Send ID card for approval →</button></div>
+<div class="row"><button id="idCropNext" class="btn" type="button" disabled>Confirm Front Crop → Continue</button><button id="idBuildPreview" class="btn secondary" type="button" disabled>Rebuild A4 Preview</button><button id="idSend" class="btn" type="button" disabled>Send ID card for approval →</button></div>
 <p id="idUploadResult" class="fine" aria-live="polite"></p>
 <div id="idPreviewWrap" class="hidden">
   <h2>Final A4 Print Preview</h2>
@@ -393,6 +393,7 @@ let editorPan = {x:0,y:0};
 let cropCanvasObserver = null;
 let previewPdf = null;
 let previewCrops = null;
+let cropConfirmed = {front:false,back:false};
 let ownerObjectUrl = null;
 
 function status(message){byId("idEditorStatus").textContent=message;}
@@ -405,7 +406,11 @@ function invalidatePreview(){
 function getActive(){return card[activeSide];}
 function sideReady(s){return !!(s && s.image && s.canvas && s.corners);}
 function updateButtons(){
-  byId("idBuildPreview").disabled=!(sideReady(card.front)&&sideReady(card.back));
+  const bothReady=sideReady(card.front)&&sideReady(card.back);
+  byId("idBuildPreview").disabled=!bothReady;
+  byId("idCropNext").disabled=!sideReady(card[activeSide]);
+  const otherSide=activeSide==="front"?"back":"front";
+  byId("idCropNext").textContent=(activeSide==="front"?"Confirm Front Crop":"Confirm Back Crop")+(cropConfirmed[otherSide]?" → Auto Preview":" → Continue");
   byId("idSend").disabled=!previewPdf;
   byId("editFront").classList.toggle("active",activeSide==="front");
   byId("editBack").classList.toggle("active",activeSide==="back");
@@ -444,6 +449,7 @@ function loadSide(sideName,file){
   if(s.objectUrl)URL.revokeObjectURL(s.objectUrl);
   s.objectUrl=URL.createObjectURL(file);
   s.originalName=file.name;s.file=file;
+  cropConfirmed[sideName]=false;
   s.rotation=0;s.canvas=null;s.corners=null;s.cropData=null;
   const img=new Image();
   return new Promise(resolve=>{
@@ -453,7 +459,7 @@ function loadSide(sideName,file){
       byId(sideName==="front"?"idFrontLabel":"idBackLabel").textContent=file.name;
       activeSide=sideName;editorZoom=1;editorPan={x:0,y:0};byId("idZoom").value="100";byId("idZoomValue").textContent="100%";
       updateButtons();drawCropCanvas();
-      status((sideName==="front"?"Front":"Back")+" photo ready. Auto Detect try karein; result galat ho to zoom karke corners manually set karein.");
+      status((sideName==="front"?"Front":"Back")+" photo ready. Chaar blue corners ko card ke kinare par manually set karein. Dono sides confirm hote hi A4 preview automatic banega.");
       resolve(true);
     };
     img.onerror=function(){status("Photo load nahi hui. JPG, PNG ya WEBP file dobara choose karein.");resolve(false);};
@@ -469,12 +475,12 @@ byId("editFront").onclick=()=>{activeSide="front";resetEditorView();updateButton
 byId("editBack").onclick=()=>{activeSide="back";resetEditorView();updateButtons();status(sideReady(card.back)?"Back photo ke corners adjust karein.":"Pehle Back photo choose karein.");};
 byId("idRotate").onclick=()=>{
   const s=getActive();if(!s.image){status("Pehle active side ki photo choose karein.");return;}
-  s.rotation=(s.rotation+90)%360;s.corners=null;makeOriented(s);s.corners=defaultCorners(s.canvas.width,s.canvas.height);
-  resetEditorView();updateButtons();status("Photo 90° rotate hui. Zaroorat par corners adjust karein.");
+  s.rotation=(s.rotation+90)%360;s.corners=null;makeOriented(s);s.corners=defaultCorners(s.canvas.width,s.canvas.height);cropConfirmed[activeSide]=false;invalidatePreview();
+  resetEditorView();updateButtons();status("Photo 90° rotate hui. Corners set karke is side ko dobara confirm karein.");
 };
 byId("idResetCorners").onclick=()=>{
   const s=getActive();if(!s.canvas){status("Pehle photo choose karein.");return;}
-  s.corners=defaultCorners(s.canvas.width,s.canvas.height);s.cropData=null;invalidatePreview();resetEditorView();status("Crop corners default position par reset kar diye gaye.");
+  s.corners=defaultCorners(s.canvas.width,s.canvas.height);s.cropData=null;cropConfirmed[activeSide]=false;invalidatePreview();resetEditorView();updateButtons();status("Crop corners reset ho gaye. Is side ko dobara confirm karein.");
 };
 byId("idAutoDetect").onclick=()=>autoDetect(activeSide,true);
 
@@ -529,7 +535,7 @@ byId("idCropCanvas").addEventListener("pointermove",e=>{
     x:Math.max(0,Math.min(viewMap.sourceW,(p.x-viewMap.dx)/viewMap.dw*viewMap.sourceW)),
     y:Math.max(0,Math.min(viewMap.sourceH,(p.y-viewMap.dy)/viewMap.dh*viewMap.sourceH))
   };
-  s.cropData=null;invalidatePreview();drawCropCanvas();
+  s.cropData=null;cropConfirmed[activeSide]=false;invalidatePreview();updateButtons();drawCropCanvas();
 });
 function stopDragging(){draggingCorner=-1;draggingPan=false;lastPanPoint=null;byId("idCropCanvas").style.cursor=editorZoom>1?"grab":"crosshair";}
 byId("idCropCanvas").addEventListener("pointerup",stopDragging);
@@ -700,6 +706,7 @@ function detectPerspectiveCard(sourceCanvas){
   }catch(e){return null;}
 }
 function autoDetect(sideName,report){
+  cropConfirmed[sideName]=false;invalidatePreview();updateButtons();
   const s=card[sideName];
   if(!s.canvas){if(report)status("Pehle is side ki photo choose karein.");return;}
   if(report)status("Photo scan ho rahi hai… agar detection sahi na ho to neele corners manually adjust karein.");
@@ -880,6 +887,7 @@ function waitForJsPDF(timeoutMs){
   return jsPdfLoadPromise;
 }
 function resetOwnerEditor(){
+  cropConfirmed={front:false,back:false};
   ["front","back"].forEach(sideName=>{
     const s=card[sideName];if(s.objectUrl)URL.revokeObjectURL(s.objectUrl);
     s.image=null;s.objectUrl=null;s.originalName="";s.file=null;s.rotation=0;s.canvas=null;s.corners=null;s.cropData=null;
@@ -948,6 +956,23 @@ async function buildPreview(){
   }finally{byId("idBuildPreview").disabled=!(sideReady(card.front)&&sideReady(card.back));}
 }
 byId("idBuildPreview").onclick=buildPreview;
+byId("idCropNext").onclick=async()=>{
+  const sideName=activeSide;
+  if(!sideReady(card[sideName])){status("Pehle "+(sideName==="front"?"Front":"Back")+" photo upload karein.");return;}
+  cropConfirmed[sideName]=true;
+  const otherSide=sideName==="front"?"back":"front";
+  if(!cropConfirmed[otherSide]){
+    if(sideReady(card[otherSide])){
+      activeSide=otherSide;resetEditorView();updateButtons();
+      status((sideName==="front"?"Front":"Back")+" crop confirm ho gaya. Ab "+(otherSide==="front"?"Front":"Back")+" ke chaar corners manually set karke button dabayein; phir preview automatic banega.");
+    }else{
+      updateButtons();status((sideName==="front"?"Front":"Back")+" crop confirm ho gaya. Ab "+(otherSide==="front"?"Front":"Back")+" photo upload karein aur uska crop set karein.");
+    }
+    return;
+  }
+  updateButtons();
+  await buildPreview();
+};
 byId("idSend").onclick=async()=>{
   if(!previewPdf){const ok=await buildPreview();if(!ok)return;}
   if(!card.front.file||!card.back.file){status("Front aur Back dono original photo files choose karein.");return;}
