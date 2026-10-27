@@ -141,8 +141,44 @@ header .wrap{max-width:1000px}
 }
 
 .file-editor{margin:14px 0 18px;padding:14px;border:1px solid #cfd8f7;border-radius:15px;background:linear-gradient(180deg,#fbfcff,#f3f6ff)}.file-editor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.file-editor-head h3{margin:0 0 4px;font-size:17px;color:#29346b}.file-editor-head p,.crop-settings p{font-size:12px;color:#657087;margin:0 0 10px;line-height:1.5}.hd-tag{background:#e0e7ff;color:#3730a3;padding:6px 9px;border-radius:8px;font-size:11px;font-weight:900;white-space:nowrap}.edit-preview{display:flex;justify-content:center;align-items:center;min-height:170px;max-height:65vh;overflow:auto;border:1px solid #dce3f0;border-radius:11px;background:#e8edf7;padding:8px}.edit-preview canvas{display:block;max-width:100%;max-height:62vh;width:auto;height:auto;object-fit:contain;background:#fff}#cropStage{position:relative;display:inline-block;line-height:0;max-width:100%;touch-action:none}#cropBox{position:absolute;left:8%;top:8%;width:84%;height:84%;border:2px solid #2563eb;box-shadow:0 0 0 9999px #11182750;box-sizing:border-box;cursor:move;touch-action:none}#cropBox:after{content:"CROP";position:absolute;left:6px;top:6px;padding:3px 5px;background:#2563eb;color:#fff;font:800 10px/1 sans-serif;border-radius:4px}.crop-handle{position:absolute;width:16px;height:16px;background:#fff;border:3px solid #2563eb;border-radius:50%;box-sizing:border-box;z-index:2}.crop-handle.tl{left:-8px;top:-8px;cursor:nwse-resize}.crop-handle.tr{right:-8px;top:-8px;cursor:nesw-resize}.crop-handle.bl{left:-8px;bottom:-8px;cursor:nesw-resize}.crop-handle.br{right:-8px;bottom:-8px;cursor:nwse-resize}.edit-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.crop-settings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px;background:#fff;border:1px solid #e0e6f2;border-radius:11px}.crop-settings strong,.crop-settings p{grid-column:1/-1}.crop-settings label{font-size:12px;font-weight:800;color:#46516a}.crop-settings input{width:100%;margin-top:5px;padding:9px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}.file-editor.hidden,.edit-preview.hidden{display:none!important}.submit-success{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px;border:1px solid #86efac;border-radius:12px;background:#f0fdf4;color:#166534;font-weight:700}.success-check{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#16a34a;color:#fff;font-size:24px;font-weight:900;box-shadow:0 2px 8px #16a34a30}@media(max-width:540px){.file-editor-head{flex-direction:column}.crop-settings{grid-template-columns:repeat(2,minmax(0,1fr))}.edit-toolbar .btn{flex:1}}
+
+/* Diwali–Chhath seasonal decorations for work views; automatically ends after 16 Nov 2026 */
+.rk-festival-frame{position:fixed;inset:0;z-index:998;pointer-events:none;overflow:hidden;isolation:isolate}
+.rk-festival-frame.hidden{display:none!important}
+.rk-festive-edge{position:absolute;left:248px;right:0;height:23px;padding:0 3px;display:flex;align-items:center;justify-content:space-around;gap:2px;overflow:hidden;white-space:nowrap;color:#fff2ad;background:linear-gradient(90deg,rgba(28,17,48,.97),rgba(117,39,66,.96),rgba(35,18,55,.97));border-color:#f7c85a;border-style:solid;box-shadow:0 0 10px rgba(245,158,11,.38);font-size:16px;line-height:1}
+.rk-festive-top{top:0;border-width:0 0 1px}
+.rk-festive-bottom{bottom:0;border-width:1px 0 0}
+.rk-festive-side{position:absolute;top:23px;bottom:23px;width:20px;display:flex;flex-direction:column;align-items:center;justify-content:space-around;overflow:hidden;color:#ffe6a0;background:linear-gradient(180deg,rgba(38,20,56,.95),rgba(132,47,51,.94),rgba(38,20,56,.95));border-color:#f7c85a;border-style:solid;box-shadow:0 0 10px rgba(245,158,11,.3)}
+.rk-festive-left{left:248px;border-width:0 1px 0 0}
+.rk-festive-right{right:0;border-width:0 0 0 1px}
+.rk-festival-frame .rk-diya{font-size:15px;filter:drop-shadow(0 0 4px #ffc85b);animation:rk-diya-glow 2s ease-in-out infinite alternate}
+.rk-festival-frame .rk-firecracker{position:absolute;left:1px;bottom:-30px;font-size:17px;filter:drop-shadow(0 0 4px #fbbf24);animation:rk-cracker-rise 4.4s linear infinite}
+.rk-festival-frame .rk-firecracker.b{left:2px;animation-delay:2.1s;animation-duration:4.8s}
+.rk-festive-right .rk-firecracker{animation-name:rk-cracker-rise-right}
+.rk-festive-right .rk-firecracker.b{animation-delay:1.6s}
+@keyframes rk-diya-glow{from{opacity:.68;transform:scale(.92)}to{opacity:1;transform:scale(1.08)}}
+@keyframes rk-cracker-rise{0%{transform:translate(0,0) rotate(12deg) scale(.65);opacity:0}12%{opacity:1}78%{opacity:1}100%{transform:translate(2px,-76vh) rotate(-15deg) scale(1);opacity:0}}
+@keyframes rk-cracker-rise-right{0%{transform:translate(0,0) rotate(-12deg) scale(.65);opacity:0}12%{opacity:1}78%{opacity:1}100%{transform:translate(-2px,-76vh) rotate(15deg) scale(1);opacity:0}}
+body.rk-festival-active header{padding-top:36px}
+@media(max-width:760px){
+ .rk-festive-edge{left:0;height:19px;font-size:13px}
+ .rk-festive-side{top:19px;bottom:19px;width:15px}
+ .rk-festive-left{left:0}
+ .rk-festival-frame .rk-diya{font-size:12px}
+ .rk-festival-frame .rk-firecracker{font-size:14px}
+ body.rk-festival-active header{padding-top:34px}
+}
+@media(prefers-reduced-motion:reduce){.rk-festival-frame .rk-diya,.rk-festival-frame .rk-firecracker{animation:none!important}}
+
 </style></head><body>
 <header><div class="wrap"><div class="brand-lockup"><svg class="brand-mark" viewBox="0 0 64 64" role="img" aria-label="RK Digital World logo"><defs><linearGradient id="rkLogoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#5145d8"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="18" fill="url(#rkLogoGrad)" stroke="#ffffff" stroke-opacity=".8" stroke-width="2"/><path d="M11 14h42v36H11z" fill="#111a42" fill-opacity=".24" rx="8"/><text x="32" y="41" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="25" font-weight="900" fill="#ffffff">RK</text><circle cx="50" cy="13" r="4" fill="#a7f3d0" stroke="#fff" stroke-width="1.5"/></svg><div class="brand-copy"><div class="brand">RK DIGITAL WORLD</div><div class="tag">DIGITAL SEVA • MOBILE REPAIR • SMART PRINT</div></div></div></div></header>
+
+<div id="rkFestivalFrame" class="rk-festival-frame hidden" aria-hidden="true">
+  <div class="rk-festive-edge rk-festive-top"><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span></div>
+  <div class="rk-festive-edge rk-festive-bottom"><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span></div>
+  <div class="rk-festive-side rk-festive-left"><span class="rk-diya">🪔</span><span class="rk-diya">✨</span><span class="rk-diya">🪔</span><span class="rk-diya">✨</span><span class="rk-diya">🪔</span><span class="rk-firecracker a">🎇</span><span class="rk-firecracker b">🧨</span></div>
+  <div class="rk-festive-side rk-festive-right"><span class="rk-diya">🪔</span><span class="rk-diya">✨</span><span class="rk-diya">🪔</span><span class="rk-diya">✨</span><span class="rk-diya">🪔</span><span class="rk-firecracker a">🎆</span><span class="rk-firecracker b">🧨</span></div>
+</div>
 <main>
 
 <div class="notice"><b>Privacy & Print Safety:</b> Aadhaar, PAN ya doosre sensitive documents sirf zaroori hone par upload karein. Shop approval se pehle job print nahi hoti. Public use ke liye document access aur deletion policy ko shop owner ko maintain karna chahiye.</div>
@@ -299,7 +335,21 @@ header .wrap{max-width:1000px}
 </main>
 <script>
 const $=id=>document.getElementById(id);let file=null;
-function tab(v){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));['customer','idcard','owner','shop','products'].forEach(id=>$(id).classList.toggle('hidden',id!==v))}
+const rkFestivalStartsAt=Date.parse('2026-10-27T00:00:00+05:30');
+const rkFestivalEndsAt=Date.parse('2026-11-17T00:00:00+05:30');
+let rkFestivalCurrentView='customer';
+function updateRkFestivalTheme(view){
+  rkFestivalCurrentView=view;
+  const now=Date.now();
+  const inSeason=now>=rkFestivalStartsAt&&now<rkFestivalEndsAt;
+  const show=inSeason&&['customer','idcard','owner'].includes(view);
+  document.body.classList.toggle('rk-festival-active',show);
+  const frame=$('rkFestivalFrame');
+  if(frame)frame.classList.toggle('hidden',!show);
+}
+function tab(v){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));['customer','idcard','owner','shop','products'].forEach(id=>$(id).classList.toggle('hidden',id!==v));updateRkFestivalTheme(v)}
+updateRkFestivalTheme('customer');
+setTimeout(()=>updateRkFestivalTheme(rkFestivalCurrentView),Math.max(0,rkFestivalEndsAt-Date.now()+100));
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>tab(b.dataset.view));
 let editedBlob=null,editedName='',rotationSteps=0,previewUrl=null,originalFile=null,cropRect={x:.08,y:.08,w:.84,h:.84};
 const isPdf=f=>!!f&&(f.type==='application/pdf'||/\.pdf$/i.test(f.name));
