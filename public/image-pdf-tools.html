@@ -134,7 +134,7 @@ async function ensureLibrary(name){
   tag.onerror=()=>reject(Error('Library download nahi hui. Internet connection check karke dobara try karein.'));
   document.head.appendChild(tag);
  });
- await lazyLibraryPromises[name];
+ try{await lazyLibraryPromises[name]}catch(error){delete lazyLibraryPromises[name];throw error;}
 }
 $('aiPassGenerate').onclick=async()=>{
  try{
