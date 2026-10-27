@@ -1038,7 +1038,7 @@ byId("idSend").onclick=async()=>{
       byId("idUploadResult").textContent="A4 PDF aur original photos upload ho rahe hain...";
       const response=await fetch("/api/requests",{method:"POST",body:fd});
       const data=await response.json();if(!response.ok)throw new Error(data.error||"Upload failed");
-      byId("idUploadResult").textContent="Request ID: "+data.id+" • "+data.message+" Original photos owner ke private editing ke liye securely saved hain.";
+      byId("idUploadResult").innerHTML='<div class="submit-success" role="status"><span class="success-check" aria-hidden="true">✓</span><div><strong>Request received successfully</strong><div style="margin-top:4px;font-weight:600">Request ID: '+esc(data.id)+'</div><div style="margin-top:4px;font-weight:500">Your request has been received. Please wait while our shop team reviews and approves it.</div><div style="margin-top:4px;font-size:12px;font-weight:500">Your original photos have been securely saved for private owner-side editing.</div></div></div>';
     }
   }catch(e){byId("idUploadResult").textContent="Upload error: "+e.message;}
   finally{byId("idSend").disabled=!previewPdf;}
