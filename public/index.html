@@ -65,7 +65,7 @@
 .id-front-upload{border-color:#38bdf8;background:linear-gradient(145deg,#ecfeff,#eff6ff)}
 .id-back-upload{border-color:#c084fc;background:linear-gradient(145deg,#faf5ff,#fdf2f8)}
 .id-choose .id-upload-label:hover{transform:translateY(-2px);box-shadow:0 8px 20px #312e8118}
-.id-upload-emoji{display:flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:18px;font-size:34px;background:#fff;box-shadow:0 4px 14px #17255412}.id-upload-emoji svg{width:34px;height:34px;stroke:currentColor}.id-front-upload .id-upload-emoji{color:#0284c7}.id-back-upload .id-upload-emoji{color:#9333ea}
+.id-upload-emoji{display:flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:18px;font-size:34px;background:#fff;box-shadow:0 4px 14px #17255412}.id-upload-emoji svg{width:34px;height:34px;stroke:currentColor}.id-upload-label{position:relative}.id-upload-check{position:absolute;top:12px;right:12px;width:30px;height:30px;align-items:center;justify-content:center;border-radius:50%;background:#16a34a;color:#fff;font-size:21px;font-weight:900;box-shadow:0 3px 10px #16a34a55}.id-upload-check:not([hidden]){display:flex}.id-front-upload .id-upload-emoji{color:#0284c7}.id-back-upload .id-upload-emoji{color:#9333ea}
 .id-front-upload .id-upload-emoji{border:1px solid #bae6fd}.id-back-upload .id-upload-emoji{border:1px solid #e9d5ff}
 .id-choose .id-upload-label b{font-size:19px;line-height:1.35}
 .id-front-upload b{color:#075985}.id-back-upload b{color:#7e22ce}
@@ -188,8 +188,8 @@ header .wrap{max-width:1000px}
 <div class="upload-quick-guide"><span>1️⃣ Front photo chunein</span><span>2️⃣ Back photo chunein</span><span>3️⃣ Preview dekhkar bhejein</span></div>
 <div class="notice">ID/Aadhaar photo ko seedha rakhkar, card ke chaaron kinare frame mein capture karein. Auto-detect galat ho to neeche chaar neele corner handles ko drag karke adjust karein. Sensitive ID images sirf zaroorat par upload karein.</div>
 <div class="grid id-choose">
-  <div class="field"><label>🟦 FRONT SIDE — saamne ki side</label><label class="id-upload-label id-front-upload" for="idFrontFile"><span class="id-upload-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><b id="idFrontLabel">सामने की फोटो चुनें</b><small style="font-size:12px">Choose Front Photo</small><small>ID card ki saamne wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idFrontFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
-  <div class="field"><label>🟪 BACK SIDE — peeche ki side</label><label class="id-upload-label id-back-upload" for="idBackFile"><span class="id-upload-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><b id="idBackLabel">पीछे की फोटो चुनें</b><small style="font-size:12px">Choose Back Photo</small><small>ID card ki peeche wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idBackFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+  <div class="field"><label>🟦 FRONT SIDE — saamne ki side</label><label class="id-upload-label id-front-upload" for="idFrontFile"><span class="id-upload-check" id="idFrontCheck" aria-label="Upload complete" hidden>✓</span><span class="id-upload-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><b id="idFrontLabel">सामने की फोटो चुनें</b><small style="font-size:12px">Choose Front Photo</small><small>ID card ki saamne wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idFrontFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+  <div class="field"><label>🟪 BACK SIDE — peeche ki side</label><label class="id-upload-label id-back-upload" for="idBackFile"><span class="id-upload-check" id="idBackCheck" aria-label="Upload complete" hidden>✓</span><span class="id-upload-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><b id="idBackLabel">पीछे की फोटो चुनें</b><small style="font-size:12px">Choose Back Photo</small><small>ID card ki peeche wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idBackFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
 </div>
 <div class="id-editor">
   <b>Photo crop & straighten</b>
@@ -451,6 +451,8 @@ function makeOriented(s){
 }
 function loadSide(sideName,file){
   const s=card[sideName];
+  const check=byId(sideName==="front"?"idFrontCheck":"idBackCheck");
+  if(check)check.hidden=true;
   if(!file)return Promise.resolve(false);
   if(s.objectUrl)URL.revokeObjectURL(s.objectUrl);
   s.objectUrl=URL.createObjectURL(file);
@@ -463,12 +465,13 @@ function loadSide(sideName,file){
       s.image=img;
       makeOriented(s);
       byId(sideName==="front"?"idFrontLabel":"idBackLabel").textContent=file.name;
+      if(check)check.hidden=false;
       activeSide=sideName;editorZoom=1;editorPan={x:0,y:0};byId("idZoom").value="100";byId("idZoomValue").textContent="100%";
       updateButtons();drawCropCanvas();
       status((sideName==="front"?"Front":"Back")+" photo ready. Chaar blue corners ko card ke kinare par manually set karein. Dono sides confirm hote hi A4 preview automatic banega.");
       resolve(true);
     };
-    img.onerror=function(){status("Photo load nahi hui. JPG, PNG ya WEBP file dobara choose karein.");resolve(false);};
+    img.onerror=function(){if(check)check.hidden=true;status("Photo load nahi hui. JPG, PNG ya WEBP file dobara choose karein.");resolve(false);};
     img.src=s.objectUrl;
   });
 }
@@ -925,6 +928,7 @@ function resetOwnerEditor(){
     s.image=null;s.objectUrl=null;s.originalName="";s.file=null;s.rotation=0;s.canvas=null;s.corners=null;s.cropData=null;
   });
   byId("idFrontFile").value="";byId("idBackFile").value="";
+  byId("idFrontCheck").hidden=true;byId("idBackCheck").hidden=true;
   byId("idFrontLabel").textContent="Front photo choose karein";byId("idBackLabel").textContent="Back photo choose karein";
   invalidatePreview();activeSide="front";resetEditorView();updateButtons();drawCropCanvas();
 }
