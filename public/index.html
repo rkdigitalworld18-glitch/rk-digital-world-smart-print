@@ -188,8 +188,8 @@ header .wrap{max-width:1000px}
 <div class="upload-quick-guide"><span>1️⃣ Front photo chunein</span><span>2️⃣ Back photo chunein</span><span>3️⃣ Preview dekhkar bhejein</span></div>
 <div class="notice">ID/Aadhaar photo ko seedha rakhkar, card ke chaaron kinare frame mein capture karein. Auto-detect galat ho to neeche chaar neele corner handles ko drag karke adjust karein. Sensitive ID images sirf zaroorat par upload karein.</div>
 <div class="grid id-choose">
-  <div class="field"><label>🟦 FRONT SIDE — saamne ki side</label><label class="id-upload-label id-front-upload" for="idFrontFile"><span class="id-upload-check" id="idFrontCheck" aria-label="Upload complete" hidden>✓</span><span class="id-upload-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><b id="idFrontLabel">सामने की फोटो चुनें</b><small style="font-size:12px">Choose Front Photo</small><small>ID card ki saamne wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idFrontFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
-  <div class="field"><label>🟪 BACK SIDE — peeche ki side</label><label class="id-upload-label id-back-upload" for="idBackFile"><span class="id-upload-check" id="idBackCheck" aria-label="Upload complete" hidden>✓</span><span class="id-upload-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><b id="idBackLabel">पीछे की फोटो चुनें</b><small style="font-size:12px">Choose Back Photo</small><small>ID card ki peeche wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idBackFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+  <div class="field"><label>🟦 FRONT SIDE — saamne ki side</label><label id="idFrontDropZone" class="id-upload-label id-front-upload" for="idFrontFile"><span class="id-upload-check" id="idFrontCheck" aria-label="Upload complete" hidden>✓</span><span class="id-upload-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><b id="idFrontLabel">सामने की फोटो चुनें</b><small style="font-size:12px">Choose Front Photo</small><small>ID card ki saamne wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idFrontFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+  <div class="field"><label>🟪 BACK SIDE — peeche ki side</label><label id="idBackDropZone" class="id-upload-label id-back-upload" for="idBackFile"><span class="id-upload-check" id="idBackCheck" aria-label="Upload complete" hidden>✓</span><span class="id-upload-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span><b id="idBackLabel">पीछे की फोटो चुनें</b><small style="font-size:12px">Choose Back Photo</small><small>ID card ki peeche wali side ki saaf photo • JPG, PNG ya WEBP</small></label><input id="idBackFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
 </div>
 <div class="id-editor">
   <b>Photo crop & straighten</b>
@@ -417,7 +417,7 @@ function updateButtons(){
   byId("idBuildPreview").disabled=!bothReady;
   byId("idCropNext").disabled=!sideReady(card[activeSide]);
   const otherSide=activeSide==="front"?"back":"front";
-  byId("idCropNext").textContent=(activeSide==="front"?"Confirm Front Crop":"Confirm Back Crop")+(cropConfirmed[otherSide]?" → Auto Preview":" → Continue");
+  byId("idCropNext").textContent=activeSide==="front"?"✓ Front सही है — Crop Confirm करें":"✓ Back सही है — Crop Confirm करें";
   byId("idSend").disabled=!previewPdf;
   byId("editFront").classList.toggle("active",activeSide==="front");
   byId("editBack").classList.toggle("active",activeSide==="back");
@@ -495,14 +495,14 @@ function bindIdCardDrop(zoneId,inputId,sideName){
     const valid=/\.(jpe?g|png|webp)$/i.test(dropped.name)||["image/jpeg","image/png","image/webp"].includes(dropped.type);
     if(!valid){status("ID card ki "+(sideName==="front"?"Front":"Back")+" side ke liye JPG, PNG ya WEBP photo drop karein.");return;}
     if(dropped.size>20*1024*1024){status("ID card photo 20 MB se chhoti honi chahiye.");return;}
-    const transfer=new DataTransfer();transfer.items.add(dropped);input.files=transfer.files;
-    input.dispatchEvent(new Event("change",{bubbles:true}));
-    status((sideName==="front"?"Front":"Back")+" photo drop ho gayi. Crop/rotate editor mein check karein; A4 preview banne ke baad hi Send for approval dabayein.");
-    byId("idEditor").scrollIntoView({behavior:"smooth",block:"start"});
+    try{const transfer=new DataTransfer();transfer.items.add(dropped);input.files=transfer.files;}catch(err){}
+    loadSide(sideName,dropped).then(ok=>{
+      if(ok){status((sideName==="front"?"Front":"Back")+" photo drop se load ho gayi. Corners check karein aur yahin ✓ Crop Confirm karein.");byId("idEditor").scrollIntoView({behavior:"smooth",block:"start"});}
+    });
   });
 }
-bindIdCardDrop("idFrontLabel","idFrontFile","front");
-bindIdCardDrop("idBackLabel","idBackFile","back");
+bindIdCardDrop("idFrontDropZone","idFrontFile","front");
+bindIdCardDrop("idBackDropZone","idBackFile","back");
 
 function resetEditorView(){editorZoom=1;editorPan={x:0,y:0};byId("idZoom").value="100";byId("idZoomValue").textContent="100%";drawCropCanvas();}
 byId("idZoom").addEventListener("input",e=>{editorZoom=(parseInt(e.target.value,10)||100)/100;editorPan={x:0,y:0};byId("idZoomValue").textContent=Math.round(editorZoom*100)+"%";drawCropCanvas();});
