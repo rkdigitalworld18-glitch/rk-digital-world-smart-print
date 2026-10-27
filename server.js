@@ -1,4 +1,5 @@
 const express = require("express");
+const compression = require("compression");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -20,6 +21,7 @@ fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, "[]", "utf8");
 
 app.disable("x-powered-by");
+app.use(compression({ threshold: 1024 }));
 app.use(express.json({ limit: "100kb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
