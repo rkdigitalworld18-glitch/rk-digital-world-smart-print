@@ -22,10 +22,20 @@ body.rk-festival-active header{padding-top:36px}
 @media(max-width:760px){.rk-festive-edge{height:19px;font-size:13px}.rk-festive-side{top:19px;bottom:19px;width:15px}.rk-festival-frame .rk-diya{font-size:12px}.rk-festival-frame .rk-firecracker{font-size:14px}body.rk-festival-active header{padding-top:34px}}
 @media(prefers-reduced-motion:reduce){.rk-festival-frame .rk-diya,.rk-festival-frame .rk-firecracker{animation:none!important}}
 
+
+/* High-impact full-screen fireworks and fuljhadi overlay */
+.rk-fireworks-canvas{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none;z-index:1;mix-blend-mode:screen}
+.rk-festive-edge,.rk-festive-side{z-index:2}
+.rk-festive-edge{height:25px;background:linear-gradient(90deg,#201027f7,#7a224cf5,#172a55f7,#7a224cf5,#201027f7);box-shadow:0 0 16px #ffbd3c77,inset 0 0 0 1px #ffe09b}
+.rk-festive-side{width:23px;background:linear-gradient(180deg,#201027f7,#762348f5,#1b2a57f7,#762348f5,#201027f7);box-shadow:0 0 15px #ffbd3c66,inset 0 0 0 1px #ffe09b}
+.rk-festival-frame .rk-diya{filter:drop-shadow(0 0 7px #ffc83c) drop-shadow(0 0 12px #ff8c27);font-size:17px}
+@media(max-width:760px){.rk-festive-edge{height:20px}.rk-festive-side{width:17px;top:20px;bottom:20px}.rk-festival-frame .rk-diya{font-size:14px}}
+
 </style></head><body>
 <header><div class="top"><strong>RK DIGITAL WORLD</strong><div style="font-size:12px;color:#dfe0ff;margin-top:4px">Smart Print Portal • Image & PDF Tools</div><a class="back" href="/">← Back to Main Portal</a></div></header>
 
 <div id="rkFestivalFrame" class="rk-festival-frame" aria-hidden="true" style="display:none">
+  <canvas id="rkFireworksCanvas" class="rk-fireworks-canvas"></canvas>
   <div class="rk-festive-edge rk-festive-top"><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span></div>
   <div class="rk-festive-edge rk-festive-bottom"><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span><span>✨</span><span>🪔</span></div>
   <div class="rk-festive-side rk-festive-left"><span class="rk-diya">🪔</span><span class="rk-diya">✨</span><span class="rk-diya">🪔</span><span class="rk-diya">✨</span><span class="rk-diya">🪔</span><span class="rk-firecracker a">🎇</span><span class="rk-firecracker b">🧨</span></div>
@@ -101,4 +111,101 @@ addEventListener('beforeunload',()=>{if(pdfUrl)URL.revokeObjectURL(pdfUrl)});
 })();
 </script><script>
 (()=>{const frame=document.getElementById('rkFestivalFrame');const startsAt=Date.parse('2026-10-27T00:00:00+05:30');const endsAt=Date.parse('2026-11-17T00:00:00+05:30');function updateTheme(){const show=Date.now()>=startsAt&&Date.now()<endsAt;document.body.classList.toggle('rk-festival-active',show);frame.style.display=show?'block':'none'}updateTheme();setTimeout(updateTheme,Math.max(0,endsAt-Date.now()+100))})();
-</script><footer style="max-width:1000px;margin:0 auto;padding:20px 14px;text-align:center;font-size:13px;color:#657087">© 2026 RK Digital World Smart Print<br><a href="/">Home</a> · <a href="/about.html">About Us</a> · <a href="/contact.html">Contact Us</a> · <a href="/privacy-policy.html">Privacy Policy</a> · <a href="/terms.html">Terms &amp; Conditions</a></footer></body></html>
+</script><footer style="max-width:1000px;margin:0 auto;padding:20px 14px;text-align:center;font-size:13px;color:#657087">© 2026 RK Digital World Smart Print<br><a href="/">Home</a> · <a href="/about.html">About Us</a> · <a href="/contact.html">Contact Us</a> · <a href="/privacy-policy.html">Privacy Policy</a> · <a href="/terms.html">Terms &amp; Conditions</a></footer><script>
+(()=> {
+ const canvas=document.getElementById('rkFireworksCanvas');
+ const frame=document.getElementById('rkFestivalFrame');
+ if(!canvas||!frame)return;
+ const ctx=canvas.getContext('2d',{alpha:true});
+ if(!ctx)return;
+ const reduceMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ let w=0,h=0,dpr=1,raf=0,launchTimer=0,secondRocketTimer=0,running=false;
+ let rockets=[],sparks=[],flashes=[];
+ const rand=(a,b)=>a+Math.random()*(b-a);
+ const palette=[42,48,195,205,270,325,355];
+ function resize(){
+   dpr=Math.min(window.devicePixelRatio||1,1.7);w=window.innerWidth;h=window.innerHeight;
+   canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+   canvas.style.width=w+'px';canvas.style.height=h+'px';
+   ctx.setTransform(dpr,0,0,dpr,0,0);
+ }
+ function isActive(){return !frame.classList.contains('hidden')&&getComputedStyle(frame).display!=='none'&&!document.hidden}
+ function launchRocket(){
+   if(!running)return;
+   const targetX=rand(w*.10,w*.90),startX=Math.max(w*.04,Math.min(w*.96,targetX+rand(-w*.16,w*.16)));
+   rockets.push({x:startX,y:h+8,prevX:startX,prevY:h+8,targetX,targetY:rand(h*.16,h*.63),vx:(targetX-startX)/48,vy:-rand(Math.max(7,h/105),Math.max(9,h/80)),hue:palette[Math.floor(Math.random()*palette.length)],tail:[]});
+ }
+ function explode(r){
+   flashes.push({x:r.x,y:r.y,life:9,max:9,hue:r.hue});
+   const total=Math.floor(rand(82,118));
+   for(let i=0;i<total;i++){
+     const a=rand(0,Math.PI*2),speed=Math.pow(Math.random(),.45)*rand(1.5,5.8);
+     sparks.push({x:r.x,y:r.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,life:Math.floor(rand(42,88)),max:88,hue:Math.random()<.36?rand(38,54):r.hue,size:rand(1,2.6),glitter:false});
+   }
+   // Fine golden sparks give the burst a phul-jhari / crackling finish.
+   for(let i=0;i<32;i++){
+     const a=rand(0,Math.PI*2),speed=rand(1.5,5.2);
+     sparks.push({x:r.x,y:r.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,life:Math.floor(rand(20,49)),max:49,hue:rand(38,58),size:rand(.7,1.5),glitter:true});
+   }
+ }
+ function launchWave(){
+   if(!running)return;
+   launchRocket();
+   secondRocketTimer=setTimeout(()=>{if(running)launchRocket()},650);
+   scheduleNext();
+ }
+ function scheduleNext(){
+   clearTimeout(launchTimer);
+   launchTimer=setTimeout(()=>{if(running)launchWave()},15000+Math.random()*5000);
+ }
+ function draw(){
+   if(!running)return;
+   ctx.clearRect(0,0,w,h);
+   ctx.globalCompositeOperation='lighter';
+   for(let i=rockets.length-1;i>=0;i--){
+     const r=rockets[i];r.prevX=r.x;r.prevY=r.y;r.x+=r.vx;r.y+=r.vy;r.vy+=.055;
+     r.tail.push({x:r.x,y:r.y});if(r.tail.length>8)r.tail.shift();
+     for(let j=1;j<r.tail.length;j++){
+       const a=j/r.tail.length;ctx.beginPath();ctx.moveTo(r.tail[j-1].x,r.tail[j-1].y);ctx.lineTo(r.tail[j].x,r.tail[j].y);
+       ctx.strokeStyle='hsla('+r.hue+',100%,70%,'+(a*.8)+')';ctx.lineWidth=1.2+a*1.2;ctx.shadowBlur=9;ctx.shadowColor='hsl('+r.hue+',100%,65%)';ctx.stroke();
+     }
+     ctx.beginPath();ctx.arc(r.x,r.y,2.1,0,Math.PI*2);ctx.fillStyle='#fff5cf';ctx.shadowBlur=15;ctx.shadowColor='hsl('+r.hue+',100%,66%)';ctx.fill();
+     if(r.y<=r.targetY||r.vy>=-1){explode(r);rockets.splice(i,1)}
+   }
+   ctx.shadowBlur=0;
+   const extra=[];
+   for(let i=sparks.length-1;i>=0;i--){
+     const p=sparks[i];p.x+=p.vx;p.y+=p.vy;p.vy+=p.glitter ? 0.035 : 0.045;p.vx*=.991;p.life--;
+     const alpha=Math.max(0,p.life/p.max);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*1.65,p.y-p.vy*1.65);
+     ctx.strokeStyle='hsla('+p.hue+',100%,'+(p.glitter?82:67)+'%,'+alpha+')';ctx.lineWidth=p.glitter?1:1.7;ctx.shadowBlur=p.glitter?4:7;ctx.shadowColor='hsl('+p.hue+',100%,68%)';ctx.stroke();
+     if(!p.glitter&&Math.random()<.012)extra.push({x:p.x,y:p.y,vx:rand(-1.1,1.1),vy:rand(-1.4,.6),life:Math.floor(rand(8,19)),max:19,hue:rand(40,58),size:1,glitter:true});
+     if(p.life<=0)sparks.splice(i,1);
+   }
+   sparks.push(...extra);
+   ctx.shadowBlur=0;
+   for(let i=flashes.length-1;i>=0;i--){
+     const f=flashes[i];const progress=1-f.life/f.max;ctx.beginPath();ctx.arc(f.x,f.y,progress*23,0,Math.PI*2);
+     ctx.strokeStyle='hsla('+f.hue+',100%,80%,'+(f.life/f.max*.7)+')';ctx.lineWidth=1.5;ctx.stroke();f.life--;if(f.life<=0)flashes.splice(i,1);
+   }
+   ctx.globalCompositeOperation='source-over';
+   raf=requestAnimationFrame(draw);
+ }
+ function start(){
+   if(running||!isActive()||reduceMotion)return;
+   running=true;resize();draw();
+   // The first display is soon; subsequent rocket shows are 15–20 seconds apart.
+   launchTimer=setTimeout(()=>{if(running)launchWave()},3500);
+ }
+ function stop(){
+   running=false;clearTimeout(launchTimer);clearTimeout(secondRocketTimer);cancelAnimationFrame(raf);
+   rockets=[];sparks=[];flashes=[];
+   if(w&&h)ctx.clearRect(0,0,w,h);
+ }
+ const observer=new MutationObserver(()=>{if(isActive())start();else stop()});
+ observer.observe(frame,{attributes:true,attributeFilter:['class','style']});
+ document.addEventListener('visibilitychange',()=>{if(isActive())start();else stop()});
+ window.addEventListener('resize',()=>{if(running)resize()},{passive:true});
+ start();
+})();
+</script>
+</body></html>
