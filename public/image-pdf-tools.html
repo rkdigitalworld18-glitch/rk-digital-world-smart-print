@@ -54,6 +54,15 @@ body.rk-festival-active header{padding-top:36px}
 @media(max-width:760px){.rk-festive-edge{height:22px!important;background-size:27px 22px,100% 22px,100% 100%!important}.rk-festive-side{top:22px!important;bottom:22px!important;width:29px!important}.rk-festive-side:before{inset:0 6px}.rk-festive-side:after{inset:0 3px}.rk-festive-side .rk-diya{font-size:14px!important}.rk-festive-side .rk-side-flower{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.rk-festive-edge span,.rk-festive-side,.rk-festive-side:before,.rk-festive-side:after,.rk-festive-side .rk-diya,.rk-festive-side .rk-side-flower{animation:none!important}}
 
+
+/* Light-touch animations keep the festive border pretty without heavy repaints */
+.rk-fireworks-canvas{mix-blend-mode:normal!important}
+.rk-festive-side{animation:none!important}
+.rk-festive-side:before{animation:none!important}
+.rk-festive-side:after{animation:rk-floral-shimmer 4.8s ease-in-out infinite alternate!important}
+.rk-festive-edge span{animation-duration:4.5s!important}
+.rk-festive-side .rk-side-flower{animation-duration:4.2s!important}
+
 </style></head><body>
 <header><div class="top"><strong>RK DIGITAL WORLD</strong><div style="font-size:12px;color:#dfe0ff;margin-top:4px">Smart Print Portal • Image & PDF Tools</div><a class="back" href="/">← Back to Main Portal</a></div></header>
 
@@ -91,7 +100,7 @@ body.rk-festival-active header{padding-top:36px}
 <section class="tool" data-tool="optimize" style="display:none"><h2>🗜️ PDF Optimize</h2><p>PDF ko dobara save karke optimize karne ki koshish; scanned images ka size zyada kam na bhi ho.</p><input id="optFile" type="file" accept="application/pdf,.pdf"><button class="btn" id="optBtn">Optimize PDF</button><div class="result" id="optOut"></div></section>
 <section class="tool" data-tool="rotate" style="display:none"><h2>↻ PDF Rotate</h2><p>Selected page ko 90° clockwise rotate karein.</p><input id="rotateFile" type="file" accept="application/pdf,.pdf"><input id="rotatePage" type="number" min="1" value="1" aria-label="Page number to rotate"><button class="btn" id="rotateBtn">Rotate Page</button><div class="result" id="rotateOut"></div></section>
 </div><p class="fine">Privacy: selected files are processed in this browser tab and are not uploaded by these tools. PDF libraries load from public CDNs, so internet access is needed for PDF functions. Target KB is approximate and may vary by image content.</p></main>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- PDF libraries now load only when the matching tool is used. -->
 <script>
 (()=>{const $=id=>document.getElementById(id),out=(id,msg)=>$(id).textContent=msg,file=id=>$(id).files[0],name=n=>n.replace(/\.[^.]+$/,'')||'file',download=(b,n)=>{const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)},img=f=>new Promise((ok,no)=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>{URL.revokeObjectURL(u);ok(i)};i.onerror=()=>{URL.revokeObjectURL(u);no(Error('Image open nahi hui'))};i.src=u}),blob=(c,t,q)=>new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(Error('Format conversion failed')),t,q)),canvas=(i,w=i.naturalWidth,h=i.naturalHeight)=>{const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);return c};
 $('compBtn').onclick=async()=>{try{const f=file('compFile'),kb=+$('compKB').value;if(!f||!Number.isFinite(kb)||kb<5)throw Error('Image chunein aur maximum size 5 KB ya zyada rakhein');out('compOut','Processing…');const limit=Math.floor(kb*1024);if(f.size<=limit){download(f,f.name);out('compOut','Original file '+(f.size/1024).toFixed(1)+' KB hai, jo '+kb+' KB se pehle hi chhoti hai. Isliye original file bina quality kharab kiye download ki gayi. Target maximum limit hai; file ko zabardasti 2999 KB banana quality ke liye bekaar hoga.');return}const i=await img(f);let scale=Math.min(1,Math.sqrt(24000000/(i.width*i.height))),best=null;for(let pass=0;pass<18;pass++){const w=Math.max(1,Math.round(i.width*scale)),h=Math.max(1,Math.round(i.height*scale)),c=canvas(i,w,h);let lo=.01,hi=.95,fit=null;for(let n=0;n<14;n++){const q=(lo+hi)/2,b=await blob(c,'image/jpeg',q);if(b.size<=limit){fit=b;lo=q}else hi=q}if(fit){best=fit;break}const minBlob=await blob(c,'image/jpeg',.01);if(minBlob.size<=limit){best=minBlob;break}scale*=.78}if(!best)throw Error('Is image ko '+kb+' KB ke andar nahi la paye. Thoda bada maximum size try karein.');download(best,name(f.name)+'-'+kb+'kb.jpg');out('compOut','Maximum: '+kb+' KB • Actual output: '+(best.size/1024).toFixed(1)+' KB • Limit ke andar hai. Output source image se chhota ho sakta hai; file ko zabardasti target tak bada nahi kiya jata.')}catch(e){out('compOut',e.message)}};
@@ -100,16 +109,33 @@ $('resizeBtn').onclick=async()=>{try{const f=file('resizeFile'),w=+$('width').va
 $('convertBtn').onclick=async()=>{try{const f=file('convertFile');if(!f)throw Error('Pehle image chunein');const t=$('format').value,b=await blob(canvas(await img(f)),t,.92);download(b,name(f.name)+'.'+(t==='image/jpeg'?'jpg':t.split('/')[1]));out('convertOut','Converted • '+(b.size/1024).toFixed(1)+' KB')}catch(e){out('convertOut',e.message)}};
 $('passBtn').onclick=async()=>{try{const f=file('passFile');if(!f)throw Error('Photo chunein');const i=await img(f),c=document.createElement('canvas');c.width=413;c.height=531;const x=c.getContext('2d');x.fillStyle=$('bg').value;x.fillRect(0,0,c.width,c.height);const scale=Math.min(c.width/i.width,c.height/i.height),w=i.width*scale,h=i.height*scale;x.drawImage(i,(c.width-w)/2,(c.height-h)/2,w,h);download(await blob(c,'image/jpeg',.92),name(f.name)+'-passport-35x45mm.jpg');out('passOut','35×45 mm layout download ho gaya. Background fill hai, removal nahi.')}catch(e){out('passOut',e.message)}};
 let pdfUrl=null;$('previewBtn').onclick=()=>{const f=file('previewFile');if(!f){out('previewOut','PDF chunein');return}if(pdfUrl)URL.revokeObjectURL(pdfUrl);pdfUrl=URL.createObjectURL(f);$('pdfFrame').src=pdfUrl;$('pdfFrame').style.display='block';out('previewOut',f.name+' • '+(f.size/1048576).toFixed(2)+' MB')};$('downloadBtn').onclick=()=>{const f=file('previewFile');if(f)download(f,f.name);else out('previewOut','PDF chunein')};
-$('toPdfBtn').onclick=async()=>{try{const fs=[...$('toPdfFiles').files];if(!fs.length||!window.jspdf)throw Error('Image chunein aur internet connection check karein');const {jsPDF}=window.jspdf;let d=null;for(const f of fs){const i=await img(f),c=canvas(i),o=i.width>i.height?'landscape':'portrait';if(!d)d=new jsPDF({orientation:o,unit:'px',format:[i.width,i.height]});else d.addPage([i.width,i.height],o);d.addImage(c.toDataURL('image/jpeg',.92),'JPEG',0,0,i.width,i.height)}d.save('rk-images.pdf');out('toPdfOut',fs.length+' image(s) PDF ban gayi')}catch(e){out('toPdfOut',e.message)}};
-$('toJpgBtn').onclick=async()=>{try{const f=file('toJpgFile');if(!f||!window.pdfjsLib)throw Error('PDF chunein; PDF library ke liye internet chahiye');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,p=await d.getPage(1),v=p.getViewport({scale:2}),c=document.createElement('canvas');c.width=v.width;c.height=v.height;await p.render({canvasContext:c.getContext('2d'),viewport:v}).promise;download(await blob(c,'image/jpeg',.92),name(f.name)+'-page1.jpg');out('toJpgOut','First page JPG ban gaya')}catch(e){out('toJpgOut',e.message)}};
-$('mergeBtn').onclick=async()=>{try{const fs=[...$('mergeFiles').files];if(fs.length<2||!window.PDFLib)throw Error('Kam se kam 2 PDF chunein; internet bhi check karein');const d=await PDFLib.PDFDocument.create();for(const f of fs){const s=await PDFLib.PDFDocument.load(await f.arrayBuffer());(await d.copyPages(s,s.getPageIndices())).forEach(p=>d.addPage(p))}download(new Blob([await d.save()],{type:'application/pdf'}),'merged.pdf');out('mergeOut','PDFs merge ho gayi')}catch(e){out('mergeOut',e.message)}};
-$('splitBtn').onclick=async()=>{try{const f=file('splitFile');if(!f||!window.PDFLib)throw Error('PDF chunein; PDF library ke liye internet check karein');const s=await PDFLib.PDFDocument.load(await f.arrayBuffer()),start=+$('splitPage').value,end=+$('splitEndPage').value,total=s.getPageCount();if(start<1||end<start||end>total)throw Error('Valid range dein: 1 se '+total+' pages');const d=await PDFLib.PDFDocument.create(),indices=Array.from({length:end-start+1},(_,i)=>start-1+i),pages=await d.copyPages(s,indices);pages.forEach(p=>d.addPage(p));download(new Blob([await d.save()],{type:'application/pdf'}),name(f.name)+'-pages-'+start+'-'+end+'.pdf');out('splitOut',pages.length+' page(s) extract hue')}catch(e){out('splitOut',e.message)}};
-$('optBtn').onclick=async()=>{try{const f=file('optFile');if(!f||!window.PDFLib)throw Error('PDF chunein; internet bhi check karein');const d=await PDFLib.PDFDocument.load(await f.arrayBuffer()),b=new Blob([await d.save({useObjectStreams:true})],{type:'application/pdf'});download(b,name(f.name)+'-optimized.pdf');out('optOut','Original '+(f.size/1024).toFixed(1)+' KB • output '+(b.size/1024).toFixed(1)+' KB. Image scans ka size kam hona guaranteed nahi.')}catch(e){out('optOut',e.message)}};
-$('rotateBtn').onclick=async()=>{try{const f=file('rotateFile');if(!f||!window.PDFLib)throw Error('PDF chunein; internet bhi check karein');const d=await PDFLib.PDFDocument.load(await f.arrayBuffer()),n=+$('rotatePage').value;if(n<1||n>d.getPageCount())throw Error('Page 1 se '+d.getPageCount()+' ke beech rakhein');const p=d.getPage(n-1);p.setRotation(PDFLib.degrees((p.getRotation().angle+90)%360));download(new Blob([await d.save()],{type:'application/pdf'}),name(f.name)+'-rotated.pdf');out('rotateOut','Page rotate ho gaya')}catch(e){out('rotateOut',e.message)}};
+$('toPdfBtn').onclick=async()=>{try{const fs=[...$('toPdfFiles').files];if(!fs.length)throw Error('Pehle kam se kam ek image chunein');await ensureLibrary('jspdf');if(!window.jspdf)throw Error('jsPDF library load nahi hui; internet check karein');const {jsPDF}=window.jspdf;let d=null;for(const f of fs){const i=await img(f),c=canvas(i),o=i.width>i.height?'landscape':'portrait';if(!d)d=new jsPDF({orientation:o,unit:'px',format:[i.width,i.height]});else d.addPage([i.width,i.height],o);d.addImage(c.toDataURL('image/jpeg',.92),'JPEG',0,0,i.width,i.height)}d.save('rk-images.pdf');out('toPdfOut',fs.length+' image(s) PDF ban gayi')}catch(e){out('toPdfOut',e.message)}};
+$('toJpgBtn').onclick=async()=>{try{const f=file('toJpgFile');if(!f)throw Error('Pehle PDF chunein');await ensureLibrary('pdfjs');if(!window.pdfjsLib)throw Error('PDF library load nahi hui; internet check karein');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,p=await d.getPage(1),v=p.getViewport({scale:2}),c=document.createElement('canvas');c.width=v.width;c.height=v.height;await p.render({canvasContext:c.getContext('2d'),viewport:v}).promise;download(await blob(c,'image/jpeg',.92),name(f.name)+'-page1.jpg');out('toJpgOut','First page JPG ban gaya')}catch(e){out('toJpgOut',e.message)}};
+$('mergeBtn').onclick=async()=>{try{const fs=[...$('mergeFiles').files];if(fs.length<2)throw Error('Kam se kam 2 PDF chunein');await ensureLibrary('pdflib');if(!window.PDFLib)throw Error('PDF library load nahi hui; internet check karein');const d=await PDFLib.PDFDocument.create();for(const f of fs){const s=await PDFLib.PDFDocument.load(await f.arrayBuffer());(await d.copyPages(s,s.getPageIndices())).forEach(p=>d.addPage(p))}download(new Blob([await d.save()],{type:'application/pdf'}),'merged.pdf');out('mergeOut','PDFs merge ho gayi')}catch(e){out('mergeOut',e.message)}};
+$('splitBtn').onclick=async()=>{try{const f=file('splitFile');if(!f)throw Error('Pehle PDF chunein');await ensureLibrary('pdflib');if(!window.PDFLib)throw Error('PDF library load nahi hui; internet check karein');const s=await PDFLib.PDFDocument.load(await f.arrayBuffer()),start=+$('splitPage').value,end=+$('splitEndPage').value,total=s.getPageCount();if(start<1||end<start||end>total)throw Error('Valid range dein: 1 se '+total+' pages');const d=await PDFLib.PDFDocument.create(),indices=Array.from({length:end-start+1},(_,i)=>start-1+i),pages=await d.copyPages(s,indices);pages.forEach(p=>d.addPage(p));download(new Blob([await d.save()],{type:'application/pdf'}),name(f.name)+'-pages-'+start+'-'+end+'.pdf');out('splitOut',pages.length+' page(s) extract hue')}catch(e){out('splitOut',e.message)}};
+$('optBtn').onclick=async()=>{try{const f=file('optFile');if(!f)throw Error('Pehle PDF chunein');await ensureLibrary('pdflib');if(!window.PDFLib)throw Error('PDF library load nahi hui; internet check karein');const d=await PDFLib.PDFDocument.load(await f.arrayBuffer()),b=new Blob([await d.save({useObjectStreams:true})],{type:'application/pdf'});download(b,name(f.name)+'-optimized.pdf');out('optOut','Original '+(f.size/1024).toFixed(1)+' KB • output '+(b.size/1024).toFixed(1)+' KB. Image scans ka size kam hona guaranteed nahi.')}catch(e){out('optOut',e.message)}};
+$('rotateBtn').onclick=async()=>{try{const f=file('rotateFile');if(!f)throw Error('Pehle PDF chunein');await ensureLibrary('pdflib');if(!window.PDFLib)throw Error('PDF library load nahi hui; internet check karein');const d=await PDFLib.PDFDocument.load(await f.arrayBuffer()),n=+$('rotatePage').value;if(n<1||n>d.getPageCount())throw Error('Page 1 se '+d.getPageCount()+' ke beech rakhein');const p=d.getPage(n-1);p.setRotation(PDFLib.degrees((p.getRotation().angle+90)%360));download(new Blob([await d.save()],{type:'application/pdf'}),name(f.name)+'-rotated.pdf');out('rotateOut','Page rotate ho gaya')}catch(e){out('rotateOut',e.message)}};
 
 // Free browser-side passport photo: MediaPipe selfie segmentation, no server upload.
 let aiPassSeg=null, aiPassBlob=null;
 function loadScript(src){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=()=>reject(Error('AI model load nahi hua. Internet connection check karke dobara try karein.'));document.head.appendChild(s)})}
+const lazyLibraryPromises={};
+async function ensureLibrary(name){
+ const config={
+  jspdf:{url:'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js',ready:()=>!!window.jspdf},
+  pdflib:{url:'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',ready:()=>!!window.PDFLib},
+  pdfjs:{url:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',ready:()=>!!window.pdfjsLib}
+ }[name];
+ if(!config)throw Error('Unknown library');
+ if(config.ready())return;
+ if(!lazyLibraryPromises[name])lazyLibraryPromises[name]=new Promise((resolve,reject)=>{
+  const tag=document.createElement('script');tag.src=config.url;tag.async=true;
+  tag.onload=()=>config.ready()?resolve():reject(Error('Library load hui lekin initialize nahi hui.'));
+  tag.onerror=()=>reject(Error('Library download nahi hui. Internet connection check karke dobara try karein.'));
+  document.head.appendChild(tag);
+ });
+ await lazyLibraryPromises[name];
+}
 $('aiPassGenerate').onclick=async()=>{
  try{
   const f=file('aiPassFile');if(!f)throw Error('Pehle customer ki photo chunein.');
@@ -142,93 +168,28 @@ addEventListener('beforeunload',()=>{if(pdfUrl)URL.revokeObjectURL(pdfUrl)});
  const ctx=canvas.getContext('2d',{alpha:true});
  if(!ctx)return;
  const reduceMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- let w=0,h=0,dpr=1,raf=0,launchTimer=0,secondRocketTimer=0,running=false;
+ let w=0,h=0,dpr=1,raf=0,launchTimer=0,secondRocketTimer=0,enabled=false;
  let rockets=[],sparks=[],flashes=[];
  const rand=(a,b)=>a+Math.random()*(b-a);
  const palette=[42,48,195,205,270,325,355];
- function resize(){
-   dpr=Math.min(window.devicePixelRatio||1,1.7);w=window.innerWidth;h=window.innerHeight;
-   canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
-   canvas.style.width=w+'px';canvas.style.height=h+'px';
-   ctx.setTransform(dpr,0,0,dpr,0,0);
- }
+ function resize(){dpr=Math.min(window.devicePixelRatio||1,1.25);w=window.innerWidth;h=window.innerHeight;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
  function isActive(){return !frame.classList.contains('hidden')&&getComputedStyle(frame).display!=='none'&&!document.hidden}
- function launchRocket(){
-   if(!running)return;
-   const targetX=rand(w*.10,w*.90),startX=Math.max(w*.04,Math.min(w*.96,targetX+rand(-w*.16,w*.16)));
-   rockets.push({x:startX,y:h+8,prevX:startX,prevY:h+8,targetX,targetY:rand(h*.16,h*.63),vx:(targetX-startX)/48,vy:-rand(Math.max(7,h/105),Math.max(9,h/80)),hue:palette[Math.floor(Math.random()*palette.length)],tail:[]});
- }
- function explode(r){
-   flashes.push({x:r.x,y:r.y,life:9,max:9,hue:r.hue});
-   const total=Math.floor(rand(82,118));
-   for(let i=0;i<total;i++){
-     const a=rand(0,Math.PI*2),speed=Math.pow(Math.random(),.45)*rand(1.5,5.8);
-     sparks.push({x:r.x,y:r.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,life:Math.floor(rand(42,88)),max:88,hue:Math.random()<.36?rand(38,54):r.hue,size:rand(1,2.6),glitter:false});
-   }
-   // Fine golden sparks give the burst a phul-jhari / crackling finish.
-   for(let i=0;i<32;i++){
-     const a=rand(0,Math.PI*2),speed=rand(1.5,5.2);
-     sparks.push({x:r.x,y:r.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,life:Math.floor(rand(20,49)),max:49,hue:rand(38,58),size:rand(.7,1.5),glitter:true});
-   }
- }
- function launchWave(){
-   if(!running)return;
-   launchRocket();
-   secondRocketTimer=setTimeout(()=>{if(running)launchRocket()},650);
-   scheduleNext();
- }
- function scheduleNext(){
-   clearTimeout(launchTimer);
-   launchTimer=setTimeout(()=>{if(running)launchWave()},15000+Math.random()*5000);
- }
+ function requestDraw(){if(enabled&&!raf)raf=requestAnimationFrame(draw)}
+ function launchRocket(){if(!enabled)return;const targetX=rand(w*.12,w*.88),startX=Math.max(w*.04,Math.min(w*.96,targetX+rand(-w*.14,w*.14)));rockets.push({x:startX,y:h+8,targetY:rand(h*.18,h*.62),vx:(targetX-startX)/48,vy:-rand(Math.max(7,h/110),Math.max(9,h/84)),hue:palette[Math.floor(Math.random()*palette.length)],tail:[]})}
+ function explode(r){flashes.push({x:r.x,y:r.y,life:7,max:7,hue:r.hue});const total=Math.floor(rand(54,76));for(let i=0;i<total;i++){const a=rand(0,Math.PI*2),speed=Math.pow(Math.random(),.45)*rand(1.5,5.4);sparks.push({x:r.x,y:r.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,life:Math.floor(rand(34,66)),max:66,hue:Math.random()<.36?rand(38,54):r.hue,glitter:false})}for(let i=0;i<18;i++){const a=rand(0,Math.PI*2),speed=rand(1.5,4.8);sparks.push({x:r.x,y:r.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,life:Math.floor(rand(18,40)),max:40,hue:rand(38,58),glitter:true})}}
+ function launchWave(){if(!enabled)return;launchRocket();requestDraw();secondRocketTimer=setTimeout(()=>{if(enabled){launchRocket();requestDraw()}},650);launchTimer=setTimeout(()=>{if(enabled)launchWave()},15000+Math.random()*5000)}
  function draw(){
-   if(!running)return;
-   ctx.clearRect(0,0,w,h);
-   ctx.globalCompositeOperation='lighter';
-   for(let i=rockets.length-1;i>=0;i--){
-     const r=rockets[i];r.prevX=r.x;r.prevY=r.y;r.x+=r.vx;r.y+=r.vy;r.vy+=.055;
-     r.tail.push({x:r.x,y:r.y});if(r.tail.length>8)r.tail.shift();
-     for(let j=1;j<r.tail.length;j++){
-       const a=j/r.tail.length;ctx.beginPath();ctx.moveTo(r.tail[j-1].x,r.tail[j-1].y);ctx.lineTo(r.tail[j].x,r.tail[j].y);
-       ctx.strokeStyle='hsla('+r.hue+',100%,70%,'+(a*.8)+')';ctx.lineWidth=1.2+a*1.2;ctx.shadowBlur=9;ctx.shadowColor='hsl('+r.hue+',100%,65%)';ctx.stroke();
-     }
-     ctx.beginPath();ctx.arc(r.x,r.y,2.1,0,Math.PI*2);ctx.fillStyle='#fff5cf';ctx.shadowBlur=15;ctx.shadowColor='hsl('+r.hue+',100%,66%)';ctx.fill();
-     if(r.y<=r.targetY||r.vy>=-1){explode(r);rockets.splice(i,1)}
-   }
-   ctx.shadowBlur=0;
-   const extra=[];
-   for(let i=sparks.length-1;i>=0;i--){
-     const p=sparks[i];p.x+=p.vx;p.y+=p.vy;p.vy+=p.glitter ? 0.035 : 0.045;p.vx*=.991;p.life--;
-     const alpha=Math.max(0,p.life/p.max);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*1.65,p.y-p.vy*1.65);
-     ctx.strokeStyle='hsla('+p.hue+',100%,'+(p.glitter?82:67)+'%,'+alpha+')';ctx.lineWidth=p.glitter?1:1.7;ctx.shadowBlur=p.glitter?4:7;ctx.shadowColor='hsl('+p.hue+',100%,68%)';ctx.stroke();
-     if(!p.glitter&&Math.random()<.012)extra.push({x:p.x,y:p.y,vx:rand(-1.1,1.1),vy:rand(-1.4,.6),life:Math.floor(rand(8,19)),max:19,hue:rand(40,58),size:1,glitter:true});
-     if(p.life<=0)sparks.splice(i,1);
-   }
-   sparks.push(...extra);
-   ctx.shadowBlur=0;
-   for(let i=flashes.length-1;i>=0;i--){
-     const f=flashes[i];const progress=1-f.life/f.max;ctx.beginPath();ctx.arc(f.x,f.y,progress*23,0,Math.PI*2);
-     ctx.strokeStyle='hsla('+f.hue+',100%,80%,'+(f.life/f.max*.7)+')';ctx.lineWidth=1.5;ctx.stroke();f.life--;if(f.life<=0)flashes.splice(i,1);
-   }
-   ctx.globalCompositeOperation='source-over';
-   raf=requestAnimationFrame(draw);
+  raf=0;if(!enabled||!isActive()){stop();return}ctx.clearRect(0,0,w,h);ctx.globalCompositeOperation='lighter';
+  for(let i=rockets.length-1;i>=0;i--){const r=rockets[i];r.x+=r.vx;r.y+=r.vy;r.vy+=.055;r.tail.push({x:r.x,y:r.y});if(r.tail.length>6)r.tail.shift();ctx.lineWidth=1.6;ctx.strokeStyle='hsla('+r.hue+',100%,72%,.72)';ctx.beginPath();for(let j=0;j<r.tail.length;j++){const p=r.tail[j];if(j===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}ctx.stroke();ctx.beginPath();ctx.arc(r.x,r.y,1.8,0,Math.PI*2);ctx.fillStyle='#fff5cf';ctx.fill();if(r.y<=r.targetY||r.vy>=-1){explode(r);rockets.splice(i,1)}}
+  ctx.lineWidth=1.35;for(let i=sparks.length-1;i>=0;i--){const p=sparks[i];p.x+=p.vx;p.y+=p.vy;p.vy+=p.glitter?0.035:0.045;p.vx*=.991;p.life--;const alpha=Math.max(0,p.life/p.max);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*1.5,p.y-p.vy*1.5);ctx.strokeStyle='hsla('+p.hue+',100%,'+(p.glitter?84:68)+'%,'+alpha+')';ctx.stroke();if(p.life<=0)sparks.splice(i,1)}
+  for(let i=flashes.length-1;i>=0;i--){const f=flashes[i],progress=1-f.life/f.max;ctx.beginPath();ctx.arc(f.x,f.y,progress*18,0,Math.PI*2);ctx.strokeStyle='hsla('+f.hue+',100%,82%,'+(f.life/f.max*.65)+')';ctx.lineWidth=1.2;ctx.stroke();f.life--;if(f.life<=0)flashes.splice(i,1)}
+  ctx.globalCompositeOperation='source-over';
+  // Stop repainting completely while waiting for the next rocket wave.
+  if(rockets.length||sparks.length||flashes.length)requestDraw();else ctx.clearRect(0,0,w,h);
  }
- function start(){
-   if(running||!isActive()||reduceMotion)return;
-   running=true;resize();draw();
-   // The first display is soon; subsequent rocket shows are 15–20 seconds apart.
-   launchTimer=setTimeout(()=>{if(running)launchWave()},3500);
- }
- function stop(){
-   running=false;clearTimeout(launchTimer);clearTimeout(secondRocketTimer);cancelAnimationFrame(raf);
-   rockets=[];sparks=[];flashes=[];
-   if(w&&h)ctx.clearRect(0,0,w,h);
- }
- const observer=new MutationObserver(()=>{if(isActive())start();else stop()});
- observer.observe(frame,{attributes:true,attributeFilter:['class','style']});
- document.addEventListener('visibilitychange',()=>{if(isActive())start();else stop()});
- window.addEventListener('resize',()=>{if(running)resize()},{passive:true});
- start();
+ function start(){if(enabled||!isActive()||reduceMotion)return;enabled=true;resize();launchTimer=setTimeout(()=>{if(enabled)launchWave()},2400)}
+ function stop(){enabled=false;clearTimeout(launchTimer);clearTimeout(secondRocketTimer);if(raf){cancelAnimationFrame(raf);raf=0}rockets=[];sparks=[];flashes=[];if(w&&h)ctx.clearRect(0,0,w,h)}
+ const observer=new MutationObserver(()=>{if(isActive())start();else stop()});observer.observe(frame,{attributes:true,attributeFilter:['class','style']});document.addEventListener('visibilitychange',()=>{if(isActive())start();else stop()});window.addEventListener('resize',()=>{if(enabled)resize()},{passive:true});start();
 })();
 </script>
 </body></html>
