@@ -1308,7 +1308,7 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
   ctx.strokeStyle='#dbe3f0';ctx.lineWidth=2;ctx.strokeRect(12,12,c.width-24,c.height-24);
   ctx.fillStyle='#64748b';ctx.font='18px Arial';ctx.textAlign='center';ctx.fillText('A4 • Portrait',c.width/2,42);
   if(!image)return;
-  let [wmm,hmm]=dimensions();if(rotation%2)[wmm,hmm]=[hmm,wmm];
+  const [wmm,hmm]=dimensions();
   const scale=840/210,w=wmm*scale,h=hmm*scale,x=(840-w)/2,y=78;
   ctx.save();ctx.translate(x+w/2,y+h/2);ctx.rotate(rotation*Math.PI/2+angle*Math.PI/180);
   const fit=Math.min(w/(rotation%2?image.height:image.width),h/(rotation%2?image.width:image.height)),dw=image.width*fit,dh=image.height*fit;
