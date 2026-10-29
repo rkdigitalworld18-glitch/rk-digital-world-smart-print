@@ -228,6 +228,7 @@ body.rk-festival-active header{padding-top:36px}
 <div id="printPortal" class="tabs">
 <button class="tab tab-customer active" data-view="customer">📄 Document Upload</button>
 <button class="tab tab-idcard" data-view="idcard">🪪 ID Card Upload</button>
+<button class="tab tab-singleprint" data-view="singleprint">📘 Single ID / Passbook Print</button>
 <a class="tab tab-image-tools" href="/image-pdf-tools.html" style="text-decoration:none;display:inline-flex">🖼️ Image &amp; PDF Tools</a>
 <button class="tab" data-view="owner" id="ownerTab" style="display:none">Owner Approval</button>
 <button class="tab tab-products" data-view="products">🛍️ Available Products</button>
@@ -260,6 +261,25 @@ body.rk-festival-active header{padding-top:36px}
 <div class="field full"><label>Instructions (optional)</label><input id="note" maxlength="180" placeholder="Example: ID card, urgent..."></div></div>
 <div class="row"><button id="send" class="btn" disabled>Send for approval →</button><button id="clear" class="btn secondary">Reset</button></div>
 <p id="result" class="fine" aria-live="polite"></p>
+</section>
+
+<section id="singleprint" class="card hidden upload-section singleprint-upload-section">
+<div class="upload-section-heading"><span class="upload-section-icon">📘</span><div><span class="upload-kicker">SINGLE DOCUMENT • A4 PRINT</span><h2>Single ID / Passbook Print</h2><p class="sub">Passbook ya ek document ki ek photo upload karein. A4 page ke upar beech mein chhote, lagbhag asli size par print layout banega.</p></div></div>
+<div class="upload-quick-guide"><span>1️⃣ Photo choose karein</span><span>2️⃣ Size aur preview check karein</span><span>3️⃣ Approval ke liye bhejein</span></div>
+<label id="singlePrintDrop" class="drop customer-drop" for="singlePrintFile"><span class="upload-big-icon">⬆️</span><b id="singlePrintFileLabel">Passbook / Single ID फोटो यहाँ Drag &amp; Drop करें</b><small style="font-size:12px">या क्लिक करके file चुनें • Click to choose</small><small>📷 JPG, PNG, WEBP • Ek side / ek photo</small></label>
+<input id="singlePrintFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden>
+<div id="singlePrintEditor" class="hidden">
+<div class="grid">
+<div class="field"><label for="singlePrintSize">Document size</label><select id="singlePrintSize"><option value="passbook">Passbook — approx. 16 × 8 cm</option><option value="id">Single ID — approx. 8.6 × 5.4 cm</option><option value="small">Small document — approx. 12 × 7 cm</option></select></div>
+<div class="field"><label for="singlePrintColor">Print type</label><select id="singlePrintColor"><option>Black &amp; White</option><option>Color</option></select></div>
+<div class="field"><label for="singlePrintCopies">Copies</label><input id="singlePrintCopies" type="number" min="1" max="20" value="1"></div>
+</div>
+<p class="fine">A4 preview: document upar beech mein rahega, neeche ka zyada hissa khaali rahega. Size approximate hai; camera angle ya photo mein margins hone par physical document ka size alag lag sakta hai.</p>
+<div class="row"><button id="singlePrintRotate" class="btn secondary" type="button">↻ Rotate 90°</button><button id="singlePrintReset" class="btn secondary" type="button">Choose another photo</button></div>
+<div class="field full"><label>Final A4 preview</label><canvas id="singlePrintPreview" width="840" height="1188" style="display:block;width:100%;max-width:520px;height:auto;border:1px solid #dbe3f0;border-radius:12px;background:#fff;margin:8px auto"></canvas></div>
+<div class="row"><button id="singlePrintSend" class="btn" type="button" disabled>✓ Approval ke liye bhejein</button></div>
+<p id="singlePrintResult" class="fine" aria-live="polite"></p>
+</div>
 </section>
 
 <section id="idcard" class="card hidden upload-section idcard-upload-section">
@@ -390,7 +410,7 @@ function updateRkFestivalTheme(view){
   const frame=$('rkFestivalFrame');
   if(frame)frame.classList.toggle('hidden',!show);
 }
-function tab(v){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));['customer','idcard','owner','shop','products'].forEach(id=>$(id).classList.toggle('hidden',id!==v));updateRkFestivalTheme(v)}
+function tab(v){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));['customer','idcard','singleprint','owner','shop','products'].forEach(id=>$(id).classList.toggle('hidden',id!==v));updateRkFestivalTheme(v)}
 updateRkFestivalTheme('customer');
 setTimeout(()=>updateRkFestivalTheme(rkFestivalCurrentView),Math.max(0,rkFestivalEndsAt-Date.now()+100));
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>tab(b.dataset.view));
@@ -1253,5 +1273,82 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
  window.addEventListener('resize',()=>{if(enabled)resize()},{passive:true});
  start();
 })();
+
+/* Single ID / Passbook: create a true A4 PDF with one photo at approximate physical size. */
+(()=>{
+ const fileInput=$('singlePrintFile'), drop=$('singlePrintDrop'), preview=$('singlePrintPreview');
+ if(!fileInput||!drop||!preview)return;
+ let selected=null, image=null, rotation=0, pdfBlob=null, busy=false;
+ const dimensions=()=>({passbook:[160,80],id:[86,54],small:[120,70]}[$('singlePrintSize').value]||[160,80]);
+ function drawPreview(){
+   const c=preview,ctx=c.getContext('2d'); c.width=840;c.height=1188;
+   ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+   ctx.strokeStyle='#dbe3f0';ctx.lineWidth=2;ctx.strokeRect(12,12,c.width-24,c.height-24);
+   ctx.fillStyle='#64748b';ctx.font='18px Arial';ctx.textAlign='center';ctx.fillText('A4 • Portrait',c.width/2,42);
+   if(!image)return;
+   let [wmm,hmm]=dimensions(); if(rotation%2)[wmm,hmm]=[hmm,wmm];
+   const scale=840/210, w=wmm*scale,h=hmm*scale,x=(840-w)/2,y=78;
+   ctx.save();ctx.translate(x+w/2,y+h/2);ctx.rotate(rotation*Math.PI/2);
+   const dw=rotation%2?h:w,dh=rotation%2?w:h;
+   ctx.drawImage(image,-dw/2,-dh/2,dw,dh);ctx.restore();
+   ctx.strokeStyle='#94a3b8';ctx.setLineDash([5,5]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
+   ctx.fillStyle='#475569';ctx.font='15px Arial';ctx.fillText(Math.round(wmm)+' × '+Math.round(hmm)+' mm',c.width/2,y+h+24);
+ }
+ function reset(){
+   selected=null;image=null;rotation=0;pdfBlob=null;fileInput.value='';
+   $('singlePrintEditor').classList.add('hidden');$('singlePrintFileLabel').textContent='Passbook / Single ID फोटो यहाँ Drag & Drop करें';
+   $('singlePrintSend').disabled=true;$('singlePrintResult').textContent='';
+   const ctx=preview.getContext('2d');ctx.clearRect(0,0,preview.width,preview.height);
+ }
+ async function loadFile(f){
+   if(!f)return;
+   if(!/^image\/(jpeg|png|webp)$/.test(f.type)&&!(/\.(jpe?g|png|webp)$/i.test(f.name))){$('singlePrintResult').textContent='Sirf JPG, PNG ya WEBP photo upload karein.';return}
+   if(f.size>20*1024*1024){$('singlePrintResult').textContent='Photo 20 MB se chhoti honi chahiye.';return}
+   try{
+    selected=f;rotation=0;pdfBlob=null;
+    const url=URL.createObjectURL(f),img=new Image();
+    await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error('Photo open nahi hui'));img.src=url});
+    image=img;URL.revokeObjectURL(url);
+    $('singlePrintFileLabel').textContent='✓ '+f.name;
+    $('singlePrintEditor').classList.remove('hidden');$('singlePrintSend').disabled=false;
+    $('singlePrintResult').textContent='Photo ready. Size aur preview check karke approval ke liye bhejein.';
+    drawPreview();
+   }catch(e){$('singlePrintResult').textContent='Photo error: '+e.message}
+ }
+ fileInput.addEventListener('change',()=>loadFile(fileInput.files[0]));
+ ['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('drag-over')}));
+ ['dragleave','dragend'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('drag-over')}));
+ drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag-over');const f=e.dataTransfer?.files?.[0];if(f)loadFile(f)});
+ $('singlePrintSize').addEventListener('change',drawPreview);
+ $('singlePrintRotate').addEventListener('click',()=>{rotation=(rotation+1)%4;drawPreview()});
+ $('singlePrintReset').addEventListener('click',reset);
+ $('singlePrintSend').addEventListener('click',async()=>{
+   if(!selected||!image||busy)return;
+   busy=true;$('singlePrintSend').disabled=true;$('singlePrintResult').textContent='High-quality A4 PDF ban raha hai…';
+   try{
+    const c=document.createElement('canvas');let [wmm,hmm]=dimensions();if(rotation%2)[wmm,hmm]=[hmm,wmm];
+    const pxPerMm=11.81,iw=Math.max(1,Math.round(wmm*pxPerMm)),ih=Math.max(1,Math.round(hmm*pxPerMm));
+    c.width=iw;c.height=ih;const cx=c.getContext('2d');
+    cx.translate(iw/2,ih/2);cx.rotate(rotation*Math.PI/2);
+    const dw=rotation%2?ih:iw,dh=rotation%2?iw:ih;
+    cx.drawImage(image,-dw/2,-dh/2,dw,dh);
+    const png=await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(Error('Photo conversion failed')),'image/png'));
+    if(!window.PDFLib)await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';sc.onload=resolve;sc.onerror=()=>reject(Error('PDF library load nahi hui. Internet check karein.'));document.head.appendChild(sc)});
+    const doc=await PDFLib.PDFDocument.create(),page=doc.addPage([595.28,841.89]),embedded=await doc.embedPng(await png.arrayBuffer());
+    const ptPerMm=72/25.4,wpt=wmm*ptPerMm,hpt=hmm*ptPerMm;
+    const topMargin=22*ptPerMm;
+    page.drawImage(embedded,{x:(595.28-wpt)/2,y:841.89-topMargin-hpt,width:wpt,height:hpt});
+    pdfBlob=new Blob([await doc.save({useObjectStreams:true})],{type:'application/pdf'});
+    const pdfFile=new File([pdfBlob],'Single-ID-Passbook-A4.pdf',{type:'application/pdf'});
+    const fd=new FormData();fd.append('file',pdfFile,pdfFile.name);fd.append('paper','A4');fd.append('orientation','Portrait');fd.append('copies',String(Math.max(1,Math.min(20,Number($('singlePrintCopies').value)||1))));fd.append('color',$('singlePrintColor').value);fd.append('fit','Actual size');fd.append('note','Single ID / Passbook — one photo, approx actual size, centered near top of A4');
+    const response=await fetch('/api/requests',{method:'POST',body:fd}),data=await response.json();
+    if(!response.ok)throw Error(data.error||'Upload failed');
+    $('singlePrintResult').innerHTML='<div class="submit-success" role="status"><span class="success-check" aria-hidden="true">✓</span><strong>Request successfully submitted!</strong><span>Request ID: '+esc(data.id)+' • '+esc(data.message)+'</span></div>';
+    selected=null;image=null;pdfBlob=null;fileInput.value='';$('singlePrintFileLabel').textContent='✓ Upload complete — request submitted';$('singlePrintEditor').classList.add('hidden');
+   }catch(e){$('singlePrintResult').textContent='Error: '+e.message}
+   finally{busy=false;$('singlePrintSend').disabled=!selected}
+ });
+})();
+
 </script>
 </body></html>
