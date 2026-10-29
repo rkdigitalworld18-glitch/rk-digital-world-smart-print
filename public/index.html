@@ -481,7 +481,15 @@ function productPriceMarkup(p){return p.originalPrice?'<div class="product-offer
 function renderProductCatalog(){
   if(!RK_PRODUCT_CATALOG.length)return;
   $("productEmpty").classList.add("hidden");$("productGrid").classList.remove("hidden");
-  $("productGrid").innerHTML=RK_PRODUCT_CATALOG.map(p=>'<article class="product-tile" tabindex="0" role="button" data-product-id="'+esc(p.id)+'" aria-label="View '+esc(p.name)+' details"><img class="product-tile-photo" src="'+esc(p.photoUrl)+'" alt="'+esc(p.name)+'" loading="eager" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/rkdigitalworld18-glitch/rk-digital-world-smart-print/main/public/products/' + this.getAttribute('src').split('/').pop().split('?')[0]"><div class="product-tile-copy"><h3>'+esc(p.name)+'</h3><p>'+esc(p.caption||p.details||"Tap to view product details")+'</p><div class="product-price">'+productPriceMarkup(p)+'</div><span class="product-tile-cta">View details &nbsp;→</span></div></article>').join("");
+  $("productGrid").innerHTML=RK_PRODUCT_CATALOG.map(p=>'<article class="product-tile" tabindex="0" role="button" data-product-id="'+esc(p.id)+'" aria-label="View '+esc(p.name)+' details"><img class="product-tile-photo" src="'+esc(p.photoUrl)+'" alt="'+esc(p.name)+'" loading="eager"><div class="product-tile-copy"><h3>'+esc(p.name)+'</h3><p>'+esc(p.caption||p.details||"Tap to view product details")+'</p><div class="product-price">'+productPriceMarkup(p)+'</div><span class="product-tile-cta">View details &nbsp;→</span></div></article>').join("");
+  $("productGrid").querySelectorAll(".product-tile-photo").forEach(img=>{
+    img.addEventListener("error",()=>{
+      if(img.dataset.fallbackTried==="1")return;
+      img.dataset.fallbackTried="1";
+      const filename=(img.getAttribute("src")||"").split("/").pop().split("?")[0];
+      img.src="https://raw.githubusercontent.com/rkdigitalworld18-glitch/rk-digital-world-smart-print/main/public/products/"+filename;
+    },{once:true});
+  });
 }
 function openProductDetails(id){
   const p=RK_PRODUCT_CATALOG.find(x=>String(x.id)===String(id));if(!p)return;
