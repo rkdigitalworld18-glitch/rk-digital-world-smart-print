@@ -275,8 +275,16 @@ body.rk-festival-active header{padding-top:36px}
 <div class="field"><label for="singlePrintCopies">Copies</label><input id="singlePrintCopies" type="number" min="1" max="20" value="1"></div>
 </div>
 <p class="fine">A4 preview: document upar beech mein rahega, neeche ka zyada hissa khaali rahega. Size approximate hai; camera angle ya photo mein margins hone par physical document ka size alag lag sakta hai.</p>
-<div class="row"><button id="singlePrintRotate" class="btn secondary" type="button">↻ Rotate 90°</button><button id="singlePrintReset" class="btn secondary" type="button">Choose another photo</button></div>
-<div class="field full"><label>Final A4 preview</label><canvas id="singlePrintPreview" width="840" height="1188" style="display:block;width:100%;max-width:520px;height:auto;border:1px solid #dbe3f0;border-radius:12px;background:#fff;margin:8px auto"></canvas></div>
+<div class="single-edit-panel">
+ <h3>✂️ Photo Edit • Crop &amp; Straighten</h3>
+ <p class="fine">Photo par mouse/touch se drag karke crop area select karein. Slider se halka tilt theek karein, ya 90° rotate karein. Final print preview neeche update hoga.</p>
+ <canvas id="singlePrintEditCanvas" width="840" height="560" aria-label="Photo crop editor" style="display:block;width:100%;max-width:620px;height:auto;touch-action:none;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;margin:8px auto;cursor:crosshair"></canvas>
+ <div class="grid">
+  <div class="field"><label for="singlePrintStraighten">Straighten angle: <span id="singlePrintAngleValue">0°</span></label><input id="singlePrintStraighten" type="range" min="-15" max="15" step="0.5" value="0"></div>
+ </div>
+ <div class="row"><button id="singlePrintApplyCrop" class="btn" type="button">✂️ Apply Crop</button><button id="singlePrintRotate" class="btn secondary" type="button">↻ Rotate 90°</button><button id="singlePrintResetCrop" class="btn secondary" type="button">Reset Crop</button><button id="singlePrintReset" class="btn secondary" type="button">Choose another photo</button></div>
+</div>
+<div class="field full"><label>Final A4 print preview</label><canvas id="singlePrintPreview" width="840" height="1188" style="display:block;width:100%;max-width:520px;height:auto;border:1px solid #dbe3f0;border-radius:12px;background:#fff;margin:8px auto"></canvas></div>
 <div class="row"><button id="singlePrintSend" class="btn" type="button" disabled>✓ Approval ke liye bhejein</button></div>
 <p id="singlePrintResult" class="fine" aria-live="polite"></p>
 </div>
@@ -1274,81 +1282,115 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
  start();
 })();
 
-/* Single ID / Passbook: create a true A4 PDF with one photo at approximate physical size. */
+/* Single ID / Passbook editor: manual crop, fine straighten, rotate, A4 preview and submission. */
 (()=>{
- const fileInput=$('singlePrintFile'), drop=$('singlePrintDrop'), preview=$('singlePrintPreview');
- if(!fileInput||!drop||!preview)return;
- let selected=null, image=null, rotation=0, pdfBlob=null, busy=false;
+ const fileInput=$('singlePrintFile'),drop=$('singlePrintDrop'),preview=$('singlePrintPreview'),editCanvas=$('singlePrintEditCanvas');
+ if(!fileInput||!drop||!preview||!editCanvas)return;
+ let selected=null,image=null,rotation=0,angle=0,busy=false,cropRect=null,dragStart=null,dragCurrent=null,originalImage=null;
  const dimensions=()=>({passbook:[160,80],id:[86,54],small:[120,70]}[$('singlePrintSize').value]||[160,80]);
- function drawPreview(){
-   const c=preview,ctx=c.getContext('2d'); c.width=840;c.height=1188;
-   ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
-   ctx.strokeStyle='#dbe3f0';ctx.lineWidth=2;ctx.strokeRect(12,12,c.width-24,c.height-24);
-   ctx.fillStyle='#64748b';ctx.font='18px Arial';ctx.textAlign='center';ctx.fillText('A4 • Portrait',c.width/2,42);
-   if(!image)return;
-   let [wmm,hmm]=dimensions(); if(rotation%2)[wmm,hmm]=[hmm,wmm];
-   const scale=840/210, w=wmm*scale,h=hmm*scale,x=(840-w)/2,y=78;
-   ctx.save();ctx.translate(x+w/2,y+h/2);ctx.rotate(rotation*Math.PI/2);
-   const dw=rotation%2?h:w,dh=rotation%2?w:h;
-   ctx.drawImage(image,-dw/2,-dh/2,dw,dh);ctx.restore();
-   ctx.strokeStyle='#94a3b8';ctx.setLineDash([5,5]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
-   ctx.fillStyle='#475569';ctx.font='15px Arial';ctx.fillText(Math.round(wmm)+' × '+Math.round(hmm)+' mm',c.width/2,y+h+24);
+ function fitRect(src,w,h){const scale=Math.min(w/src.width,h/src.height);return {x:(w-src.width*scale)/2,y:(h-src.height*scale)/2,w:src.width*scale,h:src.height*scale,scale};}
+ function cropBounds(){return cropRect||{x:0,y:0,w:image?image.width:1,h:image?image.height:1};}
+ function drawEditor(){
+  const c=editCanvas,ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,c.width,c.height);
+  if(!image){ctx.fillStyle='#64748b';ctx.font='20px Arial';ctx.textAlign='center';ctx.fillText('Upload a photo to start editing',c.width/2,c.height/2);return}
+  const fit=fitRect(image,c.width-24,c.height-24);fit.x+=12;fit.y+=12;
+  ctx.drawImage(image,fit.x,fit.y,fit.w,fit.h);
+  const b=cropBounds(),sx=fit.w/image.width,sy=fit.h/image.height;
+  const x=fit.x+b.x*sx,y=fit.y+b.y*sy,w=b.w*sx,h=b.h*sy;
+  ctx.fillStyle='rgba(15,23,42,.32)';ctx.fillRect(fit.x,fit.y,fit.w,fit.h);
+  ctx.clearRect(x,y,w,h);ctx.drawImage(image,b.x,b.y,b.w,b.h,x,y,w,h);
+  ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.setLineDash([8,5]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
+  ctx.fillStyle='#1d4ed8';ctx.font='bold 15px Arial';ctx.textAlign='left';ctx.fillText('Drag to select crop area',18,c.height-10);
+  editCanvas.dataset.fit=JSON.stringify(fit);
  }
+ function drawPreview(){
+  const c=preview,ctx=c.getContext('2d');c.width=840;c.height=1188;ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+  ctx.strokeStyle='#dbe3f0';ctx.lineWidth=2;ctx.strokeRect(12,12,c.width-24,c.height-24);
+  ctx.fillStyle='#64748b';ctx.font='18px Arial';ctx.textAlign='center';ctx.fillText('A4 • Portrait',c.width/2,42);
+  if(!image)return;
+  let [wmm,hmm]=dimensions();if(rotation%2)[wmm,hmm]=[hmm,wmm];
+  const scale=840/210,w=wmm*scale,h=hmm*scale,x=(840-w)/2,y=78;
+  ctx.save();ctx.translate(x+w/2,y+h/2);ctx.rotate(rotation*Math.PI/2+angle*Math.PI/180);
+  const fit=Math.min(w/image.width,h/image.height),dw=image.width*fit,dh=image.height*fit;
+  ctx.drawImage(image,-dw/2,-dh/2,dw,dh);ctx.restore();
+  ctx.strokeStyle='#94a3b8';ctx.setLineDash([5,5]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
+  ctx.fillStyle='#475569';ctx.font='15px Arial';ctx.fillText(Math.round(wmm)+' × '+Math.round(hmm)+' mm',c.width/2,y+h+24);
+ }
+ function refresh(){drawEditor();drawPreview()}
  function reset(){
-   selected=null;image=null;rotation=0;pdfBlob=null;fileInput.value='';
-   $('singlePrintEditor').classList.add('hidden');$('singlePrintFileLabel').textContent='Passbook / Single ID फोटो यहाँ Drag & Drop करें';
-   $('singlePrintSend').disabled=true;$('singlePrintResult').textContent='';
-   const ctx=preview.getContext('2d');ctx.clearRect(0,0,preview.width,preview.height);
+  selected=null;image=null;originalImage=null;rotation=0;angle=0;cropRect=null;dragStart=null;dragCurrent=null;fileInput.value='';
+  $('singlePrintEditor').classList.add('hidden');$('singlePrintFileLabel').textContent='Passbook / Single ID फोटो यहाँ Drag & Drop करें';
+  $('singlePrintSend').disabled=true;$('singlePrintResult').textContent='';$('singlePrintStraighten').value='0';$('singlePrintAngleValue').textContent='0°';refresh();
  }
  async function loadFile(f){
-   if(!f)return;
-   if(!/^image\/(jpeg|png|webp)$/.test(f.type)&&!(/\.(jpe?g|png|webp)$/i.test(f.name))){$('singlePrintResult').textContent='Sirf JPG, PNG ya WEBP photo upload karein.';return}
-   if(f.size>20*1024*1024){$('singlePrintResult').textContent='Photo 20 MB se chhoti honi chahiye.';return}
-   try{
-    selected=f;rotation=0;pdfBlob=null;
-    const url=URL.createObjectURL(f),img=new Image();
-    await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error('Photo open nahi hui'));img.src=url});
-    image=img;URL.revokeObjectURL(url);
-    $('singlePrintFileLabel').textContent='✓ '+f.name;
-    $('singlePrintEditor').classList.remove('hidden');$('singlePrintSend').disabled=false;
-    $('singlePrintResult').textContent='Photo ready. Size aur preview check karke approval ke liye bhejein.';
-    drawPreview();
-   }catch(e){$('singlePrintResult').textContent='Photo error: '+e.message}
+  if(!f)return;
+  if(!/^image\/(jpeg|png|webp)$/.test(f.type)&&!(/\.(jpe?g|png|webp)$/i.test(f.name))){$('singlePrintResult').textContent='Sirf JPG, PNG ya WEBP photo upload karein.';return}
+  if(f.size>20*1024*1024){$('singlePrintResult').textContent='Photo 20 MB se chhoti honi chahiye.';return}
+  try{
+   const url=URL.createObjectURL(f),img=new Image();
+   await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error('Photo open nahi hui'));img.src=url});
+   URL.revokeObjectURL(url);selected=f;image=img;originalImage=img;rotation=0;angle=0;cropRect={x:0,y:0,w:img.width,h:img.height};
+   $('singlePrintFileLabel').textContent='✓ '+f.name;$('singlePrintEditor').classList.remove('hidden');$('singlePrintSend').disabled=false;
+   $('singlePrintResult').textContent='Photo ready. Crop area select karein, angle adjust karein aur final preview check karein.';refresh();
+  }catch(e){$('singlePrintResult').textContent='Photo error: '+e.message}
  }
+ function point(e){const r=editCanvas.getBoundingClientRect();return {x:(e.clientX-r.left)*editCanvas.width/r.width,y:(e.clientY-r.top)*editCanvas.height/r.height};}
+ editCanvas.addEventListener('pointerdown',e=>{
+  if(!image)return;const p=point(e),fit=JSON.parse(editCanvas.dataset.fit||'null');if(!fit)return;
+  dragStart={x:Math.max(fit.x,Math.min(fit.x+fit.w,p.x)),y:Math.max(fit.y,Math.min(fit.y+fit.h,p.y)),fit};dragCurrent=dragStart;editCanvas.setPointerCapture(e.pointerId);e.preventDefault();
+ });
+ editCanvas.addEventListener('pointermove',e=>{
+  if(!dragStart||!image)return;const p=point(e),f=dragStart.fit;
+  dragCurrent={x:Math.max(f.x,Math.min(f.x+f.w,p.x)),y:Math.max(f.y,Math.min(f.y+f.h,p.y)),fit:f};
+  const ctx=editCanvas.getContext('2d');drawEditor();ctx.strokeStyle='#f97316';ctx.lineWidth=3;ctx.setLineDash([6,4]);ctx.strokeRect(dragStart.x,dragStart.y,dragCurrent.x-dragStart.x,dragCurrent.y-dragStart.y);ctx.setLineDash([]);
+ });
+ function stopCropDrag(){
+  if(!dragStart||!dragCurrent||!image){dragStart=null;dragCurrent=null;return}
+  const f=dragStart.fit, x=Math.min(dragStart.x,dragCurrent.x),y=Math.min(dragStart.y,dragCurrent.y),w=Math.abs(dragCurrent.x-dragStart.x),h=Math.abs(dragCurrent.y-dragStart.y);
+  if(w>15&&h>15){cropRect={x:Math.max(0,(x-f.x)/f.w*image.width),y:Math.max(0,(y-f.y)/f.h*image.height),w:Math.min(image.width, w/f.w*image.width),h:Math.min(image.height,h/f.h*image.height)};cropRect.w=Math.min(cropRect.w,image.width-cropRect.x);cropRect.h=Math.min(cropRect.h,image.height-cropRect.y);$('singlePrintResult').textContent='Crop area selected. Apply Crop dabayein.'}
+  dragStart=null;dragCurrent=null;drawEditor();
+ }
+ editCanvas.addEventListener('pointerup',stopCropDrag);editCanvas.addEventListener('pointercancel',stopCropDrag);
+ $('singlePrintApplyCrop').addEventListener('click',()=>{
+  if(!image||!cropRect)return;
+  const b=cropBounds();if(b.w<8||b.h<8){$('singlePrintResult').textContent='Crop area bahut chhota hai.';return}
+  const c=document.createElement('canvas');c.width=Math.max(1,Math.round(b.w));c.height=Math.max(1,Math.round(b.h));
+  c.getContext('2d').drawImage(image,b.x,b.y,b.w,b.h,0,0,c.width,c.height);
+  image=c;cropRect={x:0,y:0,w:c.width,h:c.height};$('singlePrintResult').textContent='✓ Crop apply ho gaya. Zarurat ho to angle/rotation adjust karein.';refresh();
+ });
+ $('singlePrintStraighten').addEventListener('input',e=>{angle=Number(e.target.value)||0;$('singlePrintAngleValue').textContent=(angle>0?'+':'')+angle+'°';drawPreview()});
+ $('singlePrintRotate').addEventListener('click',()=>{rotation=(rotation+1)%4;refresh()});
+ $('singlePrintResetCrop').addEventListener('click',()=>{if(!image)return;cropRect={x:0,y:0,w:image.width,h:image.height};angle=0;$('singlePrintStraighten').value='0';$('singlePrintAngleValue').textContent='0°';refresh();$('singlePrintResult').textContent='Crop selection aur straighten angle reset ho gaye.'});
+ $('singlePrintReset').addEventListener('click',reset);
  fileInput.addEventListener('change',()=>loadFile(fileInput.files[0]));
  ['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('drag-over')}));
  ['dragleave','dragend'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('drag-over')}));
  drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag-over');const f=e.dataTransfer?.files?.[0];if(f)loadFile(f)});
  $('singlePrintSize').addEventListener('change',drawPreview);
- $('singlePrintRotate').addEventListener('click',()=>{rotation=(rotation+1)%4;drawPreview()});
- $('singlePrintReset').addEventListener('click',reset);
  $('singlePrintSend').addEventListener('click',async()=>{
-   if(!selected||!image||busy)return;
-   busy=true;$('singlePrintSend').disabled=true;$('singlePrintResult').textContent='High-quality A4 PDF ban raha hai…';
-   try{
-    const c=document.createElement('canvas');let [wmm,hmm]=dimensions();if(rotation%2)[wmm,hmm]=[hmm,wmm];
-    const pxPerMm=11.81,iw=Math.max(1,Math.round(wmm*pxPerMm)),ih=Math.max(1,Math.round(hmm*pxPerMm));
-    c.width=iw;c.height=ih;const cx=c.getContext('2d');
-    cx.translate(iw/2,ih/2);cx.rotate(rotation*Math.PI/2);
-    const dw=rotation%2?ih:iw,dh=rotation%2?iw:ih;
-    cx.drawImage(image,-dw/2,-dh/2,dw,dh);
-    const png=await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(Error('Photo conversion failed')),'image/png'));
-    if(!window.PDFLib)await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';sc.onload=resolve;sc.onerror=()=>reject(Error('PDF library load nahi hui. Internet check karein.'));document.head.appendChild(sc)});
-    const doc=await PDFLib.PDFDocument.create(),page=doc.addPage([595.28,841.89]),embedded=await doc.embedPng(await png.arrayBuffer());
-    const ptPerMm=72/25.4,wpt=wmm*ptPerMm,hpt=hmm*ptPerMm;
-    const topMargin=22*ptPerMm;
-    page.drawImage(embedded,{x:(595.28-wpt)/2,y:841.89-topMargin-hpt,width:wpt,height:hpt});
-    pdfBlob=new Blob([await doc.save({useObjectStreams:true})],{type:'application/pdf'});
-    const pdfFile=new File([pdfBlob],'Single-ID-Passbook-A4.pdf',{type:'application/pdf'});
-    const fd=new FormData();fd.append('file',pdfFile,pdfFile.name);fd.append('paper','A4');fd.append('orientation','Portrait');fd.append('copies',String(Math.max(1,Math.min(20,Number($('singlePrintCopies').value)||1))));fd.append('color',$('singlePrintColor').value);fd.append('fit','Actual size');fd.append('note','Single ID / Passbook — one photo, approx actual size, centered near top of A4');
-    const response=await fetch('/api/requests',{method:'POST',body:fd}),data=await response.json();
-    if(!response.ok)throw Error(data.error||'Upload failed');
-    $('singlePrintResult').innerHTML='<div class="submit-success" role="status"><span class="success-check" aria-hidden="true">✓</span><strong>Request successfully submitted!</strong><span>Request ID: '+esc(data.id)+' • '+esc(data.message)+'</span></div>';
-    selected=null;image=null;pdfBlob=null;fileInput.value='';$('singlePrintFileLabel').textContent='✓ Upload complete — request submitted';$('singlePrintEditor').classList.add('hidden');
-   }catch(e){$('singlePrintResult').textContent='Error: '+e.message}
-   finally{busy=false;$('singlePrintSend').disabled=!selected}
+  if(!selected||!image||busy)return;busy=true;$('singlePrintSend').disabled=true;$('singlePrintResult').textContent='High-quality A4 PDF ban raha hai…';
+  try{
+   let [wmm,hmm]=dimensions();if(rotation%2)[wmm,hmm]=[hmm,wmm];
+   const pxPerMm=11.81,iw=Math.max(1,Math.round(wmm*pxPerMm)),ih=Math.max(1,Math.round(hmm*pxPerMm));
+   const c=document.createElement('canvas');c.width=iw;c.height=ih;const cx=c.getContext('2d');
+   cx.translate(iw/2,ih/2);cx.rotate(rotation*Math.PI/2+angle*Math.PI/180);
+   const fit=Math.min(iw/image.width,ih/image.height),dw=image.width*fit,dh=image.height*fit;cx.drawImage(image,-dw/2,-dh/2,dw,dh);
+   const png=await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(Error('Photo conversion failed')),'image/png'));
+   if(!window.PDFLib)await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';sc.onload=resolve;sc.onerror=()=>reject(Error('PDF library load nahi hui. Internet check karein.'));document.head.appendChild(sc)});
+   const doc=await PDFLib.PDFDocument.create(),page=doc.addPage([595.28,841.89]),embedded=await doc.embedPng(await png.arrayBuffer());
+   const ptPerMm=72/25.4,wpt=wmm*ptPerMm,hpt=hmm*ptPerMm,topMargin=22*ptPerMm;
+   page.drawImage(embedded,{x:(595.28-wpt)/2,y:841.89-topMargin-hpt,width:wpt,height:hpt});
+   const pdfBlob=new Blob([await doc.save({useObjectStreams:true})],{type:'application/pdf'});
+   const pdfFile=new File([pdfBlob],'Single-ID-Passbook-A4.pdf',{type:'application/pdf'});
+   const fd=new FormData();fd.append('file',pdfFile,pdfFile.name);fd.append('paper','A4');fd.append('orientation','Portrait');fd.append('copies',String(Math.max(1,Math.min(20,Number($('singlePrintCopies').value)||1))));fd.append('color',$('singlePrintColor').value);fd.append('fit','Actual size');fd.append('note','Single ID / Passbook — cropped/straightened one photo, approximate actual size, centered near top of A4');
+   const response=await fetch('/api/requests',{method:'POST',body:fd}),data=await response.json();if(!response.ok)throw Error(data.error||'Upload failed');
+   $('singlePrintResult').innerHTML='<div class="submit-success" role="status"><span class="success-check" aria-hidden="true">✓</span><strong>Request successfully submitted!</strong><span>Request ID: '+esc(data.id)+' • '+esc(data.message)+'</span></div>';
+   selected=null;image=null;originalImage=null;fileInput.value='';$('singlePrintFileLabel').textContent='✓ Upload complete — request submitted';$('singlePrintEditor').classList.add('hidden');
+  }catch(e){$('singlePrintResult').textContent='Error: '+e.message}
+  finally{busy=false;$('singlePrintSend').disabled=!selected}
  });
-})();
+ refresh();
+})();;
 
 </script>
 </body></html>
