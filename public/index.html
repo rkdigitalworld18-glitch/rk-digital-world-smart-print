@@ -472,11 +472,11 @@ function refreshShopDetails(){
   else{$("shopWhatsappButton").classList.add("hidden");$("shopContactHint").textContent="Shop owner ka personal naam abhi confirm nahi hai."; }
 }
 function productPrice(p){return p.priceLabel||("₹"+p.price);}
-function productPriceMarkup(p){return p.originalPrice?"<div class=\\"product-offer-prices\\"><span class=\\"product-old-price\\">₹"+esc(p.originalPrice)+"</span><strong>"+esc(productPrice(p))+"</strong><em>DIWALI OFFER</em></div>":esc(productPrice(p));}
+function productPriceMarkup(p){return p.originalPrice?'<div class="product-offer-prices"><span class="product-old-price">₹'+esc(p.originalPrice)+'</span><strong>'+esc(productPrice(p))+'</strong><em>DIWALI OFFER</em></div>':esc(productPrice(p));}
 function renderProductCatalog(){
   if(!RK_PRODUCT_CATALOG.length)return;
   $("productEmpty").classList.add("hidden");$("productGrid").classList.remove("hidden");
-  $("productGrid").innerHTML=RK_PRODUCT_CATALOG.map(p=>"<article class=\\"product-tile\\" tabindex=\\"0\\" role=\\"button\\" data-product-id=\\""+esc(p.id)+"\\" aria-label=\\"View "+esc(p.name)+" details\\"><img class=\\"product-tile-photo\\" src=\\""+esc(p.photoUrl)+"\\" alt=\\""+esc(p.name)+"\\" loading=\\"lazy\\"><div class=\\"product-tile-copy\\"><h3>"+esc(p.name)+"</h3><p>"+esc(p.caption||p.details||"Tap to view product details")+"</p><div class=\\"product-price\\">"+productPriceMarkup(p)+"</div><span class=\\"product-tile-cta\\">View details &nbsp;→</span></div></article>").join("");
+  $("productGrid").innerHTML=RK_PRODUCT_CATALOG.map(p=>'<article class="product-tile" tabindex="0" role="button" data-product-id="'+esc(p.id)+'" aria-label="View '+esc(p.name)+' details"><img class="product-tile-photo" src="'+esc(p.photoUrl)+'" alt="'+esc(p.name)+'" loading="lazy"><div class="product-tile-copy"><h3>'+esc(p.name)+'</h3><p>'+esc(p.caption||p.details||"Tap to view product details")+'</p><div class="product-price">'+productPriceMarkup(p)+'</div><span class="product-tile-cta">View details &nbsp;→</span></div></article>').join("");
 }
 function openProductDetails(id){
   const p=RK_PRODUCT_CATALOG.find(x=>String(x.id)===String(id));if(!p)return;
