@@ -451,7 +451,7 @@ $('logout').onclick=()=>{$('ownerToken').value='';localStorage.removeItem('rkdw_
 // Add the shop name, physical address and WhatsApp number here once the owner shares them.
 const RK_SHOP_INFO = { ownerName: "Rajeev Kumar", address: "शनिचरी बंगाली कॉलोनी, निमाई चौक, West Champaran, Bihar", whatsapp: "7562914692" };
 // Product catalogue keeps shop prices; vivo and UBON SP-85 use internet-sourced product images.
-const RK_PRODUCT_CATALOG = [
+const RK_PRODUCT_CATALOG_RAW = [
   {id:"t110-ultra",name:"T110 Ultra Smart Watch",category:"Smart Watch",caption:"2.09-inch infinite display • Smart watch",details:"T110 Ultra smartwatch with a 2.09-inch infinite display. Price ₹649. Colour and available features can be confirmed at the shop.",price:649,photoUrl:"/products/t110-ultra.webp",availability:"Shop pickup • Availability confirm karein"},
   {id:"airpods-pro-2",name:"AirPods Pro 2 Style TWS Earbuds",category:"Earbuds",caption:"Wireless earbuds with charging case",details:"AirPods Pro 2 style TWS earbuds with charging case. Listing aapki bheji hui package photo aur price par based hai; original Apple product hone ka claim nahi kiya gaya hai.",price:220,photoUrl:"/products/airpods-pro-2.webp",availability:"Shop pickup • Availability confirm karein"},
   {id:"hf-05-handsfree",name:"HF-05 Type-C Handsfree",category:"Handsfree",caption:"Wired handsfree • Type-C connector",details:"HF-05 handsfree with Type-C connector. Price ₹200. Phone compatibility shop par confirm kar lein.",price:200,photoUrl:"/products/hf-05-handsfree.webp",availability:"Shop pickup • Availability confirm karein"},
@@ -462,6 +462,8 @@ const RK_PRODUCT_CATALOG = [
   {id:"oneplus-100w-adapter",name:"OnePlus 100W Adapter",category:"Charger",caption:"100W fast-charging adapter",details:"OnePlus 100W adapter from your shop photo. Phone compatibility shop par confirm karein.",originalPrice:999,price:799,photoUrl:"/products/oneplus-100w.jpg",availability:"Diwali offer • Shop pickup • Availability confirm karein"},
   {id:"boat-220h",name:"boAt 220H Bluetooth Neckband",category:"Neckband",caption:"Bluetooth neckband • Wireless audio",details:"boAt 220H Bluetooth neckband as shown on the product package. Price ₹229.",price:229,photoUrl:"/products/boat-220h.webp",availability:"Shop pickup • Availability confirm karein"}
 ];
+// If a product ID is listed again, keep the latest entry instead of showing duplicates.
+const RK_PRODUCT_CATALOG = Array.from(new Map(RK_PRODUCT_CATALOG_RAW.map(p=>[p.id,p])).values());
 function shopWhatsAppNumber(){const digits=String(RK_SHOP_INFO.whatsapp||"").replace(/\D/g,"");return digits.length===10?"91"+digits:digits;}
 function refreshShopDetails(){
   $("shopOwnerText").textContent=RK_SHOP_INFO.ownerName.trim()||"Owner name update hona baaki hai.";
