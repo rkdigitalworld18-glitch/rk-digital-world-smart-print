@@ -264,13 +264,13 @@ body.rk-festival-active header{padding-top:36px}
 </section>
 
 <section id="singleprint" class="card hidden upload-section singleprint-upload-section">
-<div class="upload-section-heading"><span class="upload-section-icon">📘</span><div><span class="upload-kicker">SINGLE DOCUMENT • A4 PRINT</span><h2>Single ID / Passbook Print</h2><p class="sub">Passbook ya ek document ki ek photo upload karein. A4 page ke upar beech mein chhote, lagbhag asli size par print layout banega.</p></div></div>
+<div class="upload-section-heading"><span class="upload-section-icon">📘</span><div><span class="upload-kicker">SINGLE DOCUMENT • A4 PRINT</span><h2>Single ID / Passbook Print</h2><p class="sub">Passbook ya ek document ki ek photo upload karein. Passbook 4 inch length mein A4 page ke upar beech mein print hoga.</p></div></div>
 <div class="upload-quick-guide"><span>1️⃣ Photo choose karein</span><span>2️⃣ Size aur preview check karein</span><span>3️⃣ Approval ke liye bhejein</span></div>
 <label id="singlePrintDrop" class="drop customer-drop" for="singlePrintFile"><span class="upload-big-icon">⬆️</span><b id="singlePrintFileLabel">Passbook / Single ID फोटो यहाँ Drag &amp; Drop करें</b><small style="font-size:12px">या क्लिक करके file चुनें • Click to choose</small><small>📷 JPG, PNG, WEBP • Ek side / ek photo</small></label>
 <input id="singlePrintFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden>
 <div id="singlePrintEditor" class="hidden">
 <div class="grid">
-<div class="field"><label for="singlePrintSize">Document size</label><select id="singlePrintSize"><option value="passbook">Passbook — approx. 16 × 8 cm</option><option value="id">Single ID — approx. 8.6 × 5.4 cm</option><option value="small">Small document — approx. 12 × 7 cm</option></select></div>
+<div class="field"><label for="singlePrintSize">Document size</label><select id="singlePrintSize"><option value="passbook">Passbook — 4 × 2 inch (10.16 × 5.08 cm)</option><option value="id">Single ID — approx. 8.6 × 5.4 cm</option><option value="small">Small document — approx. 12 × 7 cm</option></select></div>
 <div class="field"><label for="singlePrintColor">Print type</label><select id="singlePrintColor"><option>Black &amp; White</option><option>Color</option></select></div>
 <div class="field"><label for="singlePrintCopies">Copies</label><input id="singlePrintCopies" type="number" min="1" max="20" value="1"></div>
 </div>
@@ -1287,7 +1287,7 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
  const fileInput=$('singlePrintFile'),drop=$('singlePrintDrop'),preview=$('singlePrintPreview'),editCanvas=$('singlePrintEditCanvas');
  if(!fileInput||!drop||!preview||!editCanvas)return;
  let selected=null,image=null,rotation=0,angle=0,busy=false,cropRect=null,dragStart=null,dragCurrent=null,originalImage=null;
- const dimensions=()=>({passbook:[160,80],id:[86,54],small:[120,70]}[$('singlePrintSize').value]||[160,80]);
+ const dimensions=()=>({passbook:[101.6,50.8],id:[86,54],small:[120,70]}[$('singlePrintSize').value]||[101.6,50.8]);
  function fitRect(src,w,h){const scale=Math.min(w/src.width,h/src.height);return {x:(w-src.width*scale)/2,y:(h-src.height*scale)/2,w:src.width*scale,h:src.height*scale,scale};}
  function cropBounds(){return cropRect||{x:0,y:0,w:image?image.width:1,h:image?image.height:1};}
  function drawEditor(){
@@ -1382,7 +1382,7 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
    page.drawImage(embedded,{x:(595.28-wpt)/2,y:841.89-topMargin-hpt,width:wpt,height:hpt});
    const pdfBlob=new Blob([await doc.save({useObjectStreams:true})],{type:'application/pdf'});
    const pdfFile=new File([pdfBlob],'Single-ID-Passbook-A4.pdf',{type:'application/pdf'});
-   const fd=new FormData();fd.append('file',pdfFile,pdfFile.name);fd.append('paper','A4');fd.append('orientation','Portrait');fd.append('copies',String(Math.max(1,Math.min(20,Number($('singlePrintCopies').value)||1))));fd.append('color',$('singlePrintColor').value);fd.append('fit','Actual size');fd.append('note','Single ID / Passbook — cropped/straightened one photo, approximate actual size, centered near top of A4');
+   const fd=new FormData();fd.append('file',pdfFile,pdfFile.name);fd.append('paper','A4');fd.append('orientation','Portrait');fd.append('copies',String(Math.max(1,Math.min(20,Number($('singlePrintCopies').value)||1))));fd.append('color',$('singlePrintColor').value);fd.append('fit','Actual size');fd.append('note','Single ID / Passbook — passbook image 4 x 2 inch, cropped/straightened, centered near top of A4');
    const response=await fetch('/api/requests',{method:'POST',body:fd}),data=await response.json();if(!response.ok)throw Error(data.error||'Upload failed');
    $('singlePrintResult').innerHTML='<div class="submit-success" role="status"><span class="success-check" aria-hidden="true">✓</span><strong>Request successfully submitted!</strong><span>Request ID: '+esc(data.id)+' • '+esc(data.message)+'</span></div>';
    selected=null;image=null;originalImage=null;fileInput.value='';$('singlePrintFileLabel').textContent='✓ Upload complete — request submitted';$('singlePrintEditor').classList.add('hidden');$('singlePrintResult').scrollIntoView({behavior:'smooth',block:'center'});
