@@ -1368,9 +1368,9 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
  drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag-over');const f=e.dataTransfer?.files?.[0];if(f)loadFile(f)});
  $('singlePrintSize').addEventListener('change',drawPreview);
  $('singlePrintSend').addEventListener('click',async()=>{
-  if(!selected||!image||busy)return;busy=true;$('singlePrintSend').disabled=true;$('singlePrintResult').textContent='High-quality A4 PDF ban raha hai…';
+  if(!selected||!image||busy)return;busy=true;$('singlePrintSend').disabled=true;$('singlePrintSend').textContent='⏳ Submit ho raha hai…';$('singlePrintResult').innerHTML='<div class="notice" role="status">⏳ Aapki request submit ho rahi hai. Kripya page band ya refresh na karein.</div>';
   try{
-   let [wmm,hmm]=dimensions();if(rotation%2)[wmm,hmm]=[hmm,wmm];
+   const [wmm,hmm]=dimensions();
    const pxPerMm=11.81,iw=Math.max(1,Math.round(wmm*pxPerMm)),ih=Math.max(1,Math.round(hmm*pxPerMm));
    const c=document.createElement('canvas');c.width=iw;c.height=ih;const cx=c.getContext('2d');
    cx.translate(iw/2,ih/2);cx.rotate(rotation*Math.PI/2+angle*Math.PI/180);
@@ -1385,9 +1385,9 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
    const fd=new FormData();fd.append('file',pdfFile,pdfFile.name);fd.append('paper','A4');fd.append('orientation','Portrait');fd.append('copies',String(Math.max(1,Math.min(20,Number($('singlePrintCopies').value)||1))));fd.append('color',$('singlePrintColor').value);fd.append('fit','Actual size');fd.append('note','Single ID / Passbook — cropped/straightened one photo, approximate actual size, centered near top of A4');
    const response=await fetch('/api/requests',{method:'POST',body:fd}),data=await response.json();if(!response.ok)throw Error(data.error||'Upload failed');
    $('singlePrintResult').innerHTML='<div class="submit-success" role="status"><span class="success-check" aria-hidden="true">✓</span><strong>Request successfully submitted!</strong><span>Request ID: '+esc(data.id)+' • '+esc(data.message)+'</span></div>';
-   selected=null;image=null;originalImage=null;fileInput.value='';$('singlePrintFileLabel').textContent='✓ Upload complete — request submitted';$('singlePrintEditor').classList.add('hidden');
+   selected=null;image=null;originalImage=null;fileInput.value='';$('singlePrintFileLabel').textContent='✓ Upload complete — request submitted';$('singlePrintEditor').classList.add('hidden');$('singlePrintResult').scrollIntoView({behavior:'smooth',block:'center'});
   }catch(e){$('singlePrintResult').textContent='Error: '+e.message}
-  finally{busy=false;$('singlePrintSend').disabled=!selected}
+  finally{busy=false;$('singlePrintSend').disabled=!selected;$('singlePrintSend').textContent='✓ Approval ke liye bhejein'}
  });
  refresh();
 })();
