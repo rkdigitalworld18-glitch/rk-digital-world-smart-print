@@ -1311,7 +1311,7 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
   let [wmm,hmm]=dimensions();if(rotation%2)[wmm,hmm]=[hmm,wmm];
   const scale=840/210,w=wmm*scale,h=hmm*scale,x=(840-w)/2,y=78;
   ctx.save();ctx.translate(x+w/2,y+h/2);ctx.rotate(rotation*Math.PI/2+angle*Math.PI/180);
-  const fit=Math.min(w/image.width,h/image.height),dw=image.width*fit,dh=image.height*fit;
+  const fit=Math.min(w/(rotation%2?image.height:image.width),h/(rotation%2?image.width:image.height)),dw=image.width*fit,dh=image.height*fit;
   ctx.drawImage(image,-dw/2,-dh/2,dw,dh);ctx.restore();
   ctx.strokeStyle='#94a3b8';ctx.setLineDash([5,5]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
   ctx.fillStyle='#475569';ctx.font='15px Arial';ctx.fillText(Math.round(wmm)+' × '+Math.round(hmm)+' mm',c.width/2,y+h+24);
@@ -1374,7 +1374,7 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
    const pxPerMm=11.81,iw=Math.max(1,Math.round(wmm*pxPerMm)),ih=Math.max(1,Math.round(hmm*pxPerMm));
    const c=document.createElement('canvas');c.width=iw;c.height=ih;const cx=c.getContext('2d');
    cx.translate(iw/2,ih/2);cx.rotate(rotation*Math.PI/2+angle*Math.PI/180);
-   const fit=Math.min(iw/image.width,ih/image.height),dw=image.width*fit,dh=image.height*fit;cx.drawImage(image,-dw/2,-dh/2,dw,dh);
+   const fit=Math.min(iw/(rotation%2?image.height:image.width),ih/(rotation%2?image.width:image.height)),dw=image.width*fit,dh=image.height*fit;cx.drawImage(image,-dw/2,-dh/2,dw,dh);
    const png=await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(Error('Photo conversion failed')),'image/png'));
    if(!window.PDFLib)await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';sc.onload=resolve;sc.onerror=()=>reject(Error('PDF library load nahi hui. Internet check karein.'));document.head.appendChild(sc)});
    const doc=await PDFLib.PDFDocument.create(),page=doc.addPage([595.28,841.89]),embedded=await doc.embedPng(await png.arrayBuffer());
@@ -1390,7 +1390,7 @@ if(new URLSearchParams(location.search).get('owner')==='1'){document.querySelect
   finally{busy=false;$('singlePrintSend').disabled=!selected}
  });
  refresh();
-})();;
+})();
 
 </script>
 </body></html>
