@@ -212,6 +212,10 @@ body.rk-festival-active header{padding-top:36px}
 .rk-festive-edge span{animation-duration:4.5s!important}
 .rk-festive-side .rk-side-flower{animation-duration:4.2s!important}
 
+
+/* Remove Diwali border overlay from work pages */
+.rk-festival-frame{display:none!important}
+body.rk-festival-active header{padding-top:24px!important}
 </style></head><body>
 <header><div class="wrap"><div class="brand-lockup"><svg class="brand-mark" viewBox="0 0 64 64" role="img" aria-label="RK Digital World logo"><defs><linearGradient id="rkLogoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#5145d8"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="18" fill="url(#rkLogoGrad)" stroke="#ffffff" stroke-opacity=".8" stroke-width="2"/><path d="M11 14h42v36H11z" fill="#111a42" fill-opacity=".24" rx="8"/><text x="32" y="41" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="25" font-weight="900" fill="#ffffff">RK</text><circle cx="50" cy="13" r="4" fill="#a7f3d0" stroke="#fff" stroke-width="1.5"/></svg><div class="brand-copy"><div class="brand">RK DIGITAL WORLD</div><div class="tag">DIGITAL SEVA • MOBILE REPAIR • SMART PRINT</div></div></div></div></header>
 
@@ -451,7 +455,140 @@ $('logout').onclick=()=>{$('ownerToken').value='';localStorage.removeItem('rkdw_
 // Add the shop name, physical address and WhatsApp number here once the owner shares them.
 const RK_SHOP_INFO = { ownerName: "Rajeev Kumar", address: "शनिचरी बंगाली कॉलोनी, निमाई चौक, West Champaran, Bihar", whatsapp: "7562914692" };
 // Product catalogue keeps shop prices; vivo and UBON SP-85 use internet-sourced product images.
-const RK_PRODUCT_CATALOG_RAW = [];
+const RK_PRODUCT_CATALOG_RAW = [
+  {
+    "id": "oneplus-100w-adapter",
+    "name": "OnePlus 100W Adapter",
+    "category": "Charger",
+    "caption": "100W Fast Charging Adapter",
+    "details": "OnePlus 100W adapter. Compatibility shop par confirm karein.",
+    "originalPrice": 999,
+    "price": 799,
+    "photoUrl": "/products/oneplus-100w.jpg",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "oneplus-supervooc-125w",
+    "name": "OnePlus SUPERVOOC 125W Charger",
+    "category": "Charger",
+    "caption": "125W SUPERVOOC Fast Charger",
+    "details": "OnePlus SUPERVOOC 125W charger. Compatibility shop par confirm karein.",
+    "originalPrice": 499,
+    "price": 399,
+    "photoUrl": "/products/oneplus-supervooc-125w.jpg",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "oppo-supervooc-125w",
+    "name": "OPPO SUPERVOOC Charger",
+    "category": "Charger",
+    "caption": "SUPERVOOC Fast Charger",
+    "details": "OPPO SUPERVOOC charger. Compatibility shop par confirm karein.",
+    "originalPrice": 899,
+    "price": 599,
+    "photoUrl": "/products/oppo-supervooc-125w.webp",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "ubon-budspro-bt215",
+    "name": "UBON BudsPro BT-215 Earbuds",
+    "category": "Earbuds",
+    "caption": "BudsPro TWS Earbuds • Up to 36 Hours",
+    "details": "UBON BudsPro BT-215 TWS earbuds.",
+    "originalPrice": 1099,
+    "price": 849,
+    "photoUrl": "/products/ubon-budspro-bt215.jpg",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "ubon-budspro-bt220",
+    "name": "UBON BudsPro 2.0 BT-220 Earbuds",
+    "category": "Earbuds",
+    "caption": "BudsPro 2.0 • Up to 36 Hours Playback",
+    "details": "UBON BudsPro 2.0 BT-220 TWS earbuds.",
+    "originalPrice": 1299,
+    "price": 899,
+    "photoUrl": "/products/ubon-budspro-bt220.jpg",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "taxioo-true-connect-b101",
+    "name": "TAXIOO True Connect B-101",
+    "category": "Earbuds",
+    "caption": "True Connect Wireless Earbuds",
+    "details": "TAXIOO True Connect B-101 earbuds.",
+    "originalPrice": 899,
+    "price": 649,
+    "photoUrl": "/products/taxioo-true-connect-b101.jpg",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "taxioo-hf05",
+    "name": "TAXIOO HF-05 Type-C Handsfree",
+    "category": "Handsfree",
+    "caption": "Type-C Wired Handsfree",
+    "details": "TAXIOO HF-05 Type-C handsfree.",
+    "originalPrice": 199,
+    "price": 149,
+    "photoUrl": "/products/taxioo-hf05.jpg",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "ultra-209-smartwatch",
+    "name": "ULTRA 2.09 Smart Watch",
+    "category": "Smart Watch",
+    "caption": "2.09-inch Ultra Display",
+    "details": "ULTRA smartwatch with 2.09-inch display.",
+    "originalPrice": 1199,
+    "price": 649,
+    "photoUrl": "/products/ultra-209-smartwatch.jpg",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "ubon-sp85",
+    "name": "UBON SP-85 Party Speaker",
+    "category": "Bluetooth Speaker",
+    "caption": "30W Party Speaker",
+    "details": "UBON SP-85 portable party speaker.",
+    "originalPrice": 1999,
+    "price": 1549,
+    "photoUrl": "/products/ubon-sp85.webp",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "t110-ultra",
+    "name": "T110 Ultra Smart Watch",
+    "category": "Smart Watch",
+    "caption": "Smart Watch",
+    "details": "T110 Ultra smartwatch.",
+    "originalPrice": 1199,
+    "price": 649,
+    "photoUrl": "/products/t110-ultra.webp",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "ubon-ch670-65w",
+    "name": "UBON CH-670 65W Charger",
+    "category": "Charger",
+    "caption": "65W Champion Series Charger",
+    "details": "UBON 65W Champion charger.",
+    "originalPrice": 799,
+    "price": 599,
+    "photoUrl": "/products/ubon-ch670-65w.webp",
+    "availability": "Diwali Special Offer • Shop pickup"
+  },
+  {
+    "id": "vivo-44w",
+    "name": "Vivo 44W Flash Charge",
+    "category": "Charger",
+    "caption": "44W FlashCharge Adapter",
+    "details": "Vivo 44W FlashCharge adapter.",
+    "originalPrice": 899,
+    "price": 599,
+    "photoUrl": "/products/vivo-44w.webp",
+    "availability": "Diwali Special Offer • Shop pickup"
+  }
+];
 // If a product ID is listed again, keep the latest entry instead of showing duplicates.
 const RK_PRODUCT_CATALOG = Array.from(new Map(RK_PRODUCT_CATALOG_RAW.map(p=>[p.id,p])).values());
 function shopWhatsAppNumber(){const digits=String(RK_SHOP_INFO.whatsapp||"").replace(/\D/g,"");return digits.length===10?"91"+digits:digits;}
