@@ -417,7 +417,7 @@ function updateRkFestivalTheme(view){
   rkFestivalCurrentView=view;
   const now=Date.now();
   const inSeason=now>=rkFestivalStartsAt&&now<rkFestivalEndsAt;
-  const show=inSeason&&['customer','idcard','owner'].includes(view);
+  const show=false; // Seasonal Diwali border disabled on work pages
   document.body.classList.toggle('rk-festival-active',show);
   const frame=$('rkFestivalFrame');
   if(frame)frame.classList.toggle('hidden',!show);
