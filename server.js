@@ -104,6 +104,11 @@ app.get("/api/studio/capabilities", (_req, res) => {
 const studioRate = new Map();
 setInterval(() => { const cutoff = Date.now() - 60 * 1000; for (const [ip, state] of studioRate) if (state.start < cutoff) studioRate.delete(ip); }, 60 * 1000).unref();
 app.post("/api/studio/remove-background", (req, res, next) => {
+  const origin = req.get("origin");
+  if (origin) {
+    try { if (new URL(origin).host !== req.get("host")) return res.status(403).json({ error: "Cross-origin requests are not allowed." }); }
+    catch { return res.status(403).json({ error: "Invalid request origin." }); }
+  }
   const now = Date.now();
   const ip = String(req.ip || req.socket.remoteAddress || "unknown");
   const state = studioRate.get(ip) || { start: now, count: 0 };
