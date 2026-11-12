@@ -83,7 +83,7 @@ const upload = multer({
     destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
     filename: (_req, file, cb) => cb(null, crypto.randomUUID() + path.extname(file.originalname).toLowerCase())
   }),
-  limits: { fileSize: 20 * 1024 * 1024, files: 3 },
+  limits: { fileSize: 20 * 1024 * 1024, files: 3, fields: 20, fieldNameSize: 100, fieldSize: 200 * 1024, fieldNestingDepth: 2, fieldArrayIndexLimit: 10 },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     const allowed = [".pdf", ".jpg", ".jpeg", ".png", ".webp"];
