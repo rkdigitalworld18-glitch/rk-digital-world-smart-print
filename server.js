@@ -21,6 +21,7 @@ fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, "[]", "utf8");
 
 app.disable("x-powered-by");
+app.set("trust proxy", 1);
 app.use(compression({ threshold: 1024 }));
 app.use(express.json({ limit: "100kb" }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -101,9 +102,10 @@ app.get("/api/studio/capabilities", (_req, res) => {
 // Optional paid remove.bg adapter. The API key stays on the server and uploaded files
 // are deleted in a finally block immediately after processing.
 const studioRate = new Map();
+setInterval(() => { const cutoff = Date.now() - 60 * 1000; for (const [ip, state] of studioRate) if (state.start < cutoff) studioRate.delete(ip); }, 60 * 1000).unref();
 app.post("/api/studio/remove-background", (req, res, next) => {
   const now = Date.now();
-  const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(",")[0].trim();
+  const ip = String(req.ip || req.socket.remoteAddress || "unknown");
   const state = studioRate.get(ip) || { start: now, count: 0 };
   if (now - state.start > 60 * 1000) { state.start = now; state.count = 0; }
   state.count += 1;
