@@ -26,9 +26,9 @@ The server uses Node.js 18+ (global `fetch`, `FormData`, and `Blob` are required
 - JPEG and PNG resize outputs include JFIF density / PNG pHYs DPI metadata. WEBP outputs retain pixel dimensions but do not receive a DPI tag from this pipeline.
 - Passport dimensions are crop/resize presets. White/blue/red background replacement depends on the optional paid background-removal provider.
 - Face enhancement, AI upscaling, skin retouching, object/logo/text removal, old-photo restoration and advanced inpainting are not enabled.
-- GIF creation from still photos is implemented; GIF optimization, video-to-GIF and photos-to-video still need a video/GIF decoder pipeline.
+- GIF creation from still photos, GIF optimization, video-to-GIF and photos-to-MP4 are implemented using browser-side encoders/FFmpeg WebAssembly. FFmpeg core downloads on first use (about 31 MB) and may be memory-heavy on phones.
 - HEIC conversion uses a browser decoder loaded on demand. AVIF depends on native browser decoding support.
-- The browser loads JSZip, pdf-lib, Tesseract.js, docx, ExifReader, piexifjs, heic2any and gifenc from CDNs only when needed. Production hardening should self-host pinned library assets and review each license.
+- The browser loads JSZip, pdf-lib, Tesseract.js, docx, ExifReader, piexifjs, heic2any, gifenc and FFmpeg WebAssembly from CDNs only when needed. Production hardening should self-host pinned library assets and review each license.
 
 ## Release rule
 
