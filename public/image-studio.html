@@ -39,16 +39,16 @@
 </main>
 <script>
 const tools = [
-{cat:"Compressor",icon:"🗜️",name:"Compress Image to Exact KB",slug:"compress-kb",desc:"JPEG को target KB के अंदर compress करें।",mode:"compress",ready:true},
-{cat:"Compressor",icon:"📦",name:"5KB – 1MB Preset Compressor",slug:"preset-compress",desc:"Government form के लिए common KB sizes।",mode:"preset",ready:true},
-{cat:"Compressor",icon:"🖼️",name:"JPG Compressor",slug:"jpg-compressor",desc:"JPG quality और file size कम करें।",mode:"compress",ready:true},
-{cat:"Compressor",icon:"📚",name:"Bulk Image Compression",slug:"bulk-compress",desc:"एक साथ कई images compress करके ZIP डाउनलोड करें।",mode:"bulk-compress",ready:true},
-{cat:"Compressor",icon:"➕",name:"Increase Image Size",slug:"increase-size",desc:"Target KB तक image bytes बढ़ाने की कोशिश करें; pixel upscale होगा।",mode:"increase",ready:true},
-{cat:"Resizer",icon:"📐",name:"Resize by Pixels",slug:"resize-pixels",desc:"Custom width और height pixels में।",mode:"resize",ready:true},
-{cat:"Resizer",icon:"📏",name:"Resize by CM / MM / Inches",slug:"resize-physical",desc:"DPI के आधार पर physical dimensions।",mode:"physical",ready:true},
-{cat:"Resizer",icon:"🎯",name:"Resize by DPI",slug:"resize-dpi",desc:"72, 150, 200, 300 या 600 DPI dimensions।",mode:"physical",ready:true},
-{cat:"Resizer",icon:"🔍",name:"Image Upscaler",slug:"upscale",desc:"Pixel dimensions बढ़ाएँ; खोई detail वापस नहीं आती।",mode:"resize",ready:true},
-{cat:"Resizer",icon:"🗂️",name:"Bulk Image Resizer",slug:"bulk-resize",desc:"कई images resize करके ZIP डाउनलोड करें।",mode:"bulk-resize",ready:true},
+{cat:"Image Compressor",icon:"🗜️",name:"Compress Image to Exact KB",slug:"compress-kb",desc:"JPEG को target KB के अंदर compress करें।",mode:"compress",ready:true},
+{cat:"Image Compressor",icon:"📦",name:"5KB – 1MB Preset Compressor",slug:"preset-compress",desc:"Government form के लिए common KB sizes।",mode:"preset",ready:true},
+{cat:"Image Compressor",icon:"🖼️",name:"JPG Compressor",slug:"jpg-compressor",desc:"JPG quality और file size कम करें।",mode:"compress",ready:true},
+{cat:"Bulk Tools",icon:"📚",name:"Bulk Image Compression",slug:"bulk-compress",desc:"एक साथ कई images compress करके ZIP डाउनलोड करें।",mode:"bulk-compress",ready:true},
+{cat:"Image Compressor",icon:"➕",name:"Increase Image Size",slug:"increase-size",desc:"Target KB तक image bytes बढ़ाने की कोशिश करें; pixel upscale होगा।",mode:"increase",ready:true},
+{cat:"Image Resizer",icon:"📐",name:"Resize by Pixels",slug:"resize-pixels",desc:"Custom width और height pixels में।",mode:"resize",ready:true},
+{cat:"Image Resizer",icon:"📏",name:"Resize by CM / MM / Inches",slug:"resize-physical",desc:"DPI के आधार पर physical dimensions।",mode:"physical",ready:true},
+{cat:"Image Resizer",icon:"🎯",name:"Resize by DPI",slug:"resize-dpi",desc:"72, 150, 200, 300 या 600 DPI dimensions।",mode:"physical",ready:true},
+{cat:"Image Resizer",icon:"🔍",name:"Image Upscaler",slug:"upscale",desc:"Pixel dimensions बढ़ाएँ; खोई detail वापस नहीं आती।",mode:"resize",ready:true},
+{cat:"Bulk Tools",icon:"🗂️",name:"Bulk Image Resizer",slug:"bulk-resize",desc:"कई images resize करके ZIP डाउनलोड करें।",mode:"bulk-resize",ready:true},
 {cat:"Passport Photo",icon:"🪪",name:"Passport Photo Maker",slug:"passport-photo",desc:"35 × 45 mm photo preset, crop और white background।",mode:"passport",ready:true},
 {cat:"Passport Photo",icon:"⬜",name:"White Background Passport",slug:"passport-white",desc:"White background और passport dimensions।",mode:"passport",ready:true},
 {cat:"Passport Photo",icon:"🟦",name:"Blue Background Passport",slug:"passport-blue",desc:"Blue canvas background और passport dimensions।",mode:"passport",ready:true},
@@ -63,10 +63,10 @@ const tools = [
 {cat:"Editing",icon:"🌫️",name:"Blur Image",slug:"blur",desc:"Canvas blur filter apply करें।",mode:"blur",ready:true},
 {cat:"Editing",icon:"⚫",name:"Circle Crop",slug:"circle-crop",desc:"Circular PNG profile image बनाएं।",mode:"circle",ready:true},
 {cat:"Editing",icon:"🧩",name:"Join Images",slug:"join-images",desc:"दो या अधिक images को vertical strip में जोड़ें।",mode:"join",ready:true},
-{cat:"Converter",icon:"🔁",name:"JPG / PNG / WEBP Converter",slug:"image-converter",desc:"Browser-supported formats में convert करें।",mode:"convert",ready:true},
-{cat:"Converter",icon:"📄",name:"Image to PDF",slug:"image-to-pdf",desc:"Image को PDF में बदलें और डाउनलोड करें।",mode:"pdf",ready:true},
-{cat:"Converter",icon:"🔎",name:"Image to Text (OCR)",slug:"image-ocr",desc:"Tesseract OCR से Hindi/English text पहचानें।",mode:"ocr",ready:true},
-{cat:"Signature",icon:"🖊️",name:"Signature Maker",slug:"signature-maker",desc:"Touch या mouse से transparent signature बनाएँ।",mode:"signature-draw",ready:true},
+{cat:"Image Converter",icon:"🔁",name:"JPG / PNG / WEBP Converter",slug:"image-converter",desc:"Browser-supported formats में convert करें।",mode:"convert",ready:true},
+{cat:"PDF Tools",icon:"📄",name:"Image to PDF",slug:"image-to-pdf",desc:"Image को PDF में बदलें और डाउनलोड करें।",mode:"pdf",ready:true},
+{cat:"Image Converter",icon:"🔎",name:"Image to Text (OCR)",slug:"image-ocr",desc:"Tesseract OCR से Hindi/English text पहचानें।",mode:"ocr",ready:true},
+{cat:"Signature Tools",icon:"🖊️",name:"Signature Maker",slug:"signature-maker",desc:"Touch या mouse से transparent signature बनाएँ।",mode:"signature-draw",ready:true},
 {cat:"Other",icon:"🎨",name:"Image Color Picker",slug:"color-picker",desc:"Image से pixel color और HEX code चुनें।",mode:"color",ready:true},
 {cat:"Other",icon:"🧾",name:"Metadata Remover",slug:"metadata",desc:"Canvas export से नया image बनाकर embedded metadata हटाएँ।",mode:"metadata",ready:true},
 {cat:"AI Photo Editor",icon:"✨",name:"AI Photo Enhancer",slug:"ai-enhancer",desc:"AI model integration के बाद उपलब्ध होगा।",mode:"locked",ready:false,why:"Paid AI provider required"},
@@ -101,18 +101,18 @@ const tools = [
 ,{cat:"AI Photo Editor",icon:"👁️",name:"Unblur Face",slug:"unblur-face",desc:"Face-specific deblurring.",mode:"locked",ready:false,why:"AI face restoration model required"}
 ,{cat:"AI Photo Editor",icon:"🕰️",name:"Old Photo Restoration",slug:"old-photo-restoration",desc:"Repair scratches and restore faded photos.",mode:"locked",ready:false,why:"AI restoration model required"}
 ,{cat:"AI Photo Editor",icon:"🎨",name:"AI Background Replacement",slug:"ai-background-replace",desc:"Replace photo background with subject masking.",mode:"locked",ready:false,why:"Segmentation and AI compositing required"}
-,{cat:"Converter",icon:"🖼️",name:"JPG to JPEG",slug:"jpg-to-jpeg",desc:"Export JPG/JPEG image.",mode:"convert",ready:true}
-,{cat:"Converter",icon:"🖼️",name:"JPEG to PNG",slug:"jpeg-to-png",desc:"Convert JPEG into PNG.",mode:"convert",ready:true}
-,{cat:"Converter",icon:"🖼️",name:"PNG to JPG",slug:"png-to-jpg",desc:"Convert PNG to JPEG with white background.",mode:"convert",ready:true}
-,{cat:"Converter",icon:"🌐",name:"WEBP to JPG",slug:"webp-to-jpg",desc:"Convert WEBP to JPEG.",mode:"convert",ready:true}
-,{cat:"Converter",icon:"📱",name:"HEIC to JPG",slug:"heic-to-jpg",desc:"Convert iPhone HEIC photos.",mode:"locked",ready:false,why:"HEIC decoder library required"}
-,{cat:"Converter",icon:"🌄",name:"AVIF to JPG",slug:"avif-to-jpg",desc:"Convert AVIF images.",mode:"locked",ready:false,why:"AVIF decode support varies by browser"}
-,{cat:"Converter",icon:"🗂️",name:"JFIF to JPG",slug:"jfif-to-jpg",desc:"Convert JFIF to JPEG.",mode:"convert",ready:true}
-,{cat:"Converter",icon:"📝",name:"Image to Word (OCR DOCX)",slug:"image-to-word",desc:"Image से OCR text निकालकर editable DOCX बनाएँ।",mode:"word",ready:true}
-,{cat:"Converter",icon:"📑",name:"JPG to PDF Size Limits",slug:"jpg-to-pdf-limits",desc:"JPEG image को चुनी हुई maximum KB limit के अंदर PDF में बदलें।",mode:"pdf-limit",ready:true}
-,{cat:"Signature",icon:"🇮🇳",name:"Hindi Signature Maker",slug:"hindi-signature",desc:"Hindi text signature composition.",mode:"locked",ready:false,why:"Dedicated Devanagari font and drawing workspace pending"}
-,{cat:"Signature",icon:"✍️",name:"Text to Handwriting",slug:"text-handwriting",desc:"Render typed text in handwriting styles.",mode:"locked",ready:false,why:"Handwriting font licensing and export workspace pending"}
-,{cat:"Other",icon:"🧩",name:"Photo Collage Maker",slug:"photo-collage",desc:"कई photos का grid collage बनाएँ।",mode:"collage",ready:true}
+,{cat:"Image Converter",icon:"🖼️",name:"JPG to JPEG",slug:"jpg-to-jpeg",desc:"Export JPG/JPEG image.",mode:"convert",ready:true}
+,{cat:"Image Converter",icon:"🖼️",name:"JPEG to PNG",slug:"jpeg-to-png",desc:"Convert JPEG into PNG.",mode:"convert",ready:true}
+,{cat:"Image Converter",icon:"🖼️",name:"PNG to JPG",slug:"png-to-jpg",desc:"Convert PNG to JPEG with white background.",mode:"convert",ready:true}
+,{cat:"Image Converter",icon:"🌐",name:"WEBP to JPG",slug:"webp-to-jpg",desc:"Convert WEBP to JPEG.",mode:"convert",ready:true}
+,{cat:"Image Converter",icon:"📱",name:"HEIC to JPG",slug:"heic-to-jpg",desc:"Convert iPhone HEIC photos.",mode:"locked",ready:false,why:"HEIC decoder library required"}
+,{cat:"Image Converter",icon:"🌄",name:"AVIF to JPG",slug:"avif-to-jpg",desc:"Convert AVIF images.",mode:"locked",ready:false,why:"AVIF decode support varies by browser"}
+,{cat:"Image Converter",icon:"🗂️",name:"JFIF to JPG",slug:"jfif-to-jpg",desc:"Convert JFIF to JPEG.",mode:"convert",ready:true}
+,{cat:"Image Converter",icon:"📝",name:"Image to Word (OCR DOCX)",slug:"image-to-word",desc:"Image से OCR text निकालकर editable DOCX बनाएँ।",mode:"word",ready:true}
+,{cat:"PDF Tools",icon:"📑",name:"JPG to PDF Size Limits",slug:"jpg-to-pdf-limits",desc:"JPEG image को चुनी हुई maximum KB limit के अंदर PDF में बदलें।",mode:"pdf-limit",ready:true}
+,{cat:"Signature Tools",icon:"🇮🇳",name:"Hindi Signature Maker",slug:"hindi-signature",desc:"Hindi text signature composition.",mode:"locked",ready:false,why:"Dedicated Devanagari font and drawing workspace pending"}
+,{cat:"Signature Tools",icon:"✍️",name:"Text to Handwriting",slug:"text-handwriting",desc:"Render typed text in handwriting styles.",mode:"locked",ready:false,why:"Handwriting font licensing and export workspace pending"}
+,{cat:"Collage Maker",icon:"🧩",name:"Photo Collage Maker",slug:"photo-collage",desc:"कई photos का grid collage बनाएँ।",mode:"collage",ready:true}
 ,{cat:"Other",icon:"🧾",name:"Metadata Editor",slug:"metadata-editor",desc:"Edit EXIF and image metadata fields.",mode:"locked",ready:false,why:"Metadata writer backend/library required"}
 ,{cat:"Other",icon:"🎞️",name:"GIF Maker",slug:"gif-maker",desc:"Create animated GIF from images.",mode:"locked",ready:false,why:"GIF encoder integration required"}
 ,{cat:"Other",icon:"🗜️",name:"GIF Compressor",slug:"gif-compressor",desc:"Optimize animated GIF size.",mode:"locked",ready:false,why:"GIF encoder/optimizer required"}
@@ -122,7 +122,7 @@ const tools = [
 
 ];
 const $=s=>document.querySelector(s);let activeCat="All",currentTool=null,sourceFiles=[],sourceImage=null,outputBlob=null,outputUrl=null;
-const cats=["All","Compressor","Resizer","Passport Photo","Editing","Converter","Signature","AI Photo Editor","Other"];
+const cats=["All","Image Compressor","Image Resizer","Passport Photo","Editing","Background Editor","AI Photo Editor","Image Converter","PDF Tools","Signature Tools","Collage Maker","Bulk Tools","Other"];
 function renderFilters(){ $("#filters").innerHTML=cats.map(c=>'<button class="chip '+(c===activeCat?'active':'')+'" data-cat="'+c+'">'+(c==="All"?"सभी":c)+'</button>').join("");}
 function renderTools(){const q=$("#search").value.trim().toLowerCase();const list=tools.filter(t=>(activeCat==="All"||t.cat===activeCat)&&(!q||(t.name+" "+t.desc+" "+t.cat+" "+t.slug).toLowerCase().includes(q)));$("#count").textContent=list.length+" tools · "+tools.filter(t=>t.ready).length+" browser tools enabled";$("#toolGrid").innerHTML=list.length?list.map(t=>'<article class="tool"><div class="ico">'+t.icon+'</div><button data-tool="'+t.slug+'"><strong>'+t.name+'</strong></button><p>'+t.desc+'</p><div class="status '+(t.ready?'':'later')+'">'+(t.ready?'● READY':'● '+(t.why||"INTEGRATION PENDING"))+'</div></article>').join(""):'<div class="empty">इस खोज में कोई tool नहीं मिला।</div>'; }
 function openTool(slug){const t=tools.find(x=>x.slug===slug);if(!t)return;currentTool=t;$("#dashboard").classList.add("hide");$("#workspace").classList.add("show");$("#toolTitle").textContent=t.name;$("#toolDesc").textContent=t.desc;$("#sourcePreview").hidden=true;$("#outputPreview").hidden=true;$("#sourceMeta").innerHTML="";$("#outputMeta").innerHTML="";$("#outputActions").innerHTML="";$("#result").className="result";$("#result").textContent="";$("#file").value="";sourceFiles=[];sourceImage=null;outputBlob=null;$("#drop").style.display=t.ready&&t.mode!=="signature-draw"?"block":"none";$("#processBtn").style.display=t.ready&&t.mode!=="signature-draw"?"inline-block":"none";$("#resetBtn").style.display=t.ready?"inline-block":"none";if(t.ready){renderControls(t);$("#processBtn").disabled=true;}else{$("#controls").innerHTML="<div class=\"field full\"><b>यह tool अभी सक्रिय नहीं है</b><p class=\"notice\">कारण: "+t.why+". इस सुविधा को चालू करने से पहले आवश्यक processing engine/API और परीक्षण जोड़े जाएँगे। अभी कोई fake output या download नहीं दिखाया जाएगा।</p></div>";$("#result").className="result show";$("#result").textContent="Integration pending · यह अलग tool page है, लेकिन processing अभी उपलब्ध नहीं है।";}history.replaceState(null,"","?tool="+encodeURIComponent(slug));window.scrollTo(0,0);}
