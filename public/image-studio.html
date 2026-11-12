@@ -75,6 +75,51 @@ const tools = [
 {cat:"AI Photo Editor",icon:"🙂",name:"Face Retouch / Restoration",slug:"face-retouch",desc:"Natural identity-preserving face enhancement।",mode:"locked",ready:false,why:"Paid AI provider required"},
 {cat:"Other",icon:"🎞️",name:"GIF / Video / Slideshow Tools",slug:"gif-video",desc:"GIF and video encoding workspace।",mode:"locked",ready:false,why:"FFmpeg WASM integration required"},
 {cat:"Other",icon:"🗃️",name:"HEIC / AVIF Converter",slug:"heic-avif",desc:"Additional decoder required for unsupported browser formats।",mode:"locked",ready:false,why:"HEIC/AVIF decoder integration required"}
+,{cat:"Passport Photo",icon:"🪪",name:"PAN Card Photo Resizer",slug:"pan-photo",desc:"PAN portal photo requirements — specification verification pending.",mode:"locked",ready:false,why:"PAN portal dimensions and size specification validation pending"}
+,{cat:"Passport Photo",icon:"🎓",name:"SSC Photo Resizer",slug:"ssc-photo",desc:"SSC photo and signature presets.",mode:"locked",ready:false,why:"Current SSC notification-specific dimensions and KB limits need validation"}
+,{cat:"Passport Photo",icon:"🏛️",name:"UPSC Photo Resizer",slug:"upsc-photo",desc:"UPSC photo and signature presets.",mode:"locked",ready:false,why:"Current UPSC notification-specific dimensions and KB limits need validation"}
+,{cat:"Passport Photo",icon:"🖼️",name:"600 × 600 Pixels Photo",slug:"photo-600",desc:"Square 600 × 600 px photo.",mode:"resize",ready:true}
+,{cat:"Passport Photo",icon:"📷",name:"3.5 × 4.5 CM Photo",slug:"photo-3545",desc:"Standard 35 × 45 mm photo.",mode:"passport",ready:true}
+,{cat:"Passport Photo",icon:"📷",name:"35 × 45 MM Photo",slug:"photo-35x45",desc:"Standard 35 × 45 mm photo.",mode:"passport",ready:true}
+,{cat:"Passport Photo",icon:"🧾",name:"Photo & Signature Merger",slug:"photo-signature-merge",desc:"Combine portrait and signature into one application image.",mode:"locked",ready:false,why:"Dedicated two-file layout workspace pending"}
+,{cat:"Passport Photo",icon:"🔠",name:"Add Name & Date on Photo",slug:"name-date-photo",desc:"Stamp applicant name and date on image.",mode:"text",ready:true}
+,{cat:"Editing",icon:"🖐️",name:"Freehand Crop",slug:"freehand-crop",desc:"Draw a custom crop selection.",mode:"locked",ready:false,why:"Interactive crop-selection UI pending"}
+,{cat:"Editing",icon:"🟦",name:"Square Crop",slug:"square-crop",desc:"Center square crop.",mode:"crop",ready:true}
+,{cat:"Editing",icon:"🧽",name:"Remove Background",slug:"remove-background",desc:"Automatic subject cut-out.",mode:"locked",ready:false,why:"Background-removal AI model required"}
+,{cat:"Editing",icon:"🪄",name:"Blur Background",slug:"blur-background",desc:"Subject-aware background blur.",mode:"locked",ready:false,why:"Subject segmentation model required"}
+,{cat:"Editing",icon:"🧹",name:"Remove Objects",slug:"remove-objects",desc:"Remove unwanted objects from a photo.",mode:"locked",ready:false,why:"AI inpainting model required"}
+,{cat:"Editing",icon:"🔖",name:"Remove Logo",slug:"remove-logo",desc:"Erase logo from image.",mode:"locked",ready:false,why:"AI inpainting model required"}
+,{cat:"Editing",icon:"🔡",name:"Remove Text",slug:"remove-text",desc:"Erase text while reconstructing background.",mode:"locked",ready:false,why:"OCR plus AI inpainting required"}
+,{cat:"Editing",icon:"🟠",name:"Round Corners",slug:"round-corners",desc:"Round image corners with transparent output.",mode:"border",ready:true}
+,{cat:"Editing",icon:"↔️",name:"Change Aspect Ratio",slug:"aspect-ratio",desc:"Fit image into common aspect ratios.",mode:"crop",ready:true}
+,{cat:"Editing",icon:"🪓",name:"Image Splitter",slug:"image-splitter",desc:"Split an image into equal tiles.",mode:"locked",ready:false,why:"Multi-output export workspace pending"}
+,{cat:"AI Photo Editor",icon:"🔎",name:"AI Image Upscaler",slug:"ai-upscaler",desc:"AI detail reconstruction and super resolution.",mode:"locked",ready:false,why:"Paid AI upscaling model required"}
+,{cat:"AI Photo Editor",icon:"🙂",name:"Face Enhancement",slug:"face-enhancement",desc:"Natural face detail restoration.",mode:"locked",ready:false,why:"Face restoration model required"}
+,{cat:"AI Photo Editor",icon:"✨",name:"Skin Retouching",slug:"skin-retouch",desc:"Subtle portrait retouching.",mode:"locked",ready:false,why:"Portrait retouch model required"}
+,{cat:"AI Photo Editor",icon:"🪄",name:"Remove Wrinkles",slug:"remove-wrinkles",desc:"Portrait wrinkle correction.",mode:"locked",ready:false,why:"AI portrait editing model required"}
+,{cat:"AI Photo Editor",icon:"🫧",name:"Remove Blemishes",slug:"remove-blemishes",desc:"Natural blemish cleanup.",mode:"locked",ready:false,why:"AI portrait editing model required"}
+,{cat:"AI Photo Editor",icon:"👁️",name:"Unblur Face",slug:"unblur-face",desc:"Face-specific deblurring.",mode:"locked",ready:false,why:"AI face restoration model required"}
+,{cat:"AI Photo Editor",icon:"🕰️",name:"Old Photo Restoration",slug:"old-photo-restoration",desc:"Repair scratches and restore faded photos.",mode:"locked",ready:false,why:"AI restoration model required"}
+,{cat:"AI Photo Editor",icon:"🎨",name:"AI Background Replacement",slug:"ai-background-replace",desc:"Replace photo background with subject masking.",mode:"locked",ready:false,why:"Segmentation and AI compositing required"}
+,{cat:"Converter",icon:"🖼️",name:"JPG to JPEG",slug:"jpg-to-jpeg",desc:"Export JPG/JPEG image.",mode:"convert",ready:true}
+,{cat:"Converter",icon:"🖼️",name:"JPEG to PNG",slug:"jpeg-to-png",desc:"Convert JPEG into PNG.",mode:"convert",ready:true}
+,{cat:"Converter",icon:"🖼️",name:"PNG to JPG",slug:"png-to-jpg",desc:"Convert PNG to JPEG with white background.",mode:"convert",ready:true}
+,{cat:"Converter",icon:"🌐",name:"WEBP to JPG",slug:"webp-to-jpg",desc:"Convert WEBP to JPEG.",mode:"convert",ready:true}
+,{cat:"Converter",icon:"📱",name:"HEIC to JPG",slug:"heic-to-jpg",desc:"Convert iPhone HEIC photos.",mode:"locked",ready:false,why:"HEIC decoder library required"}
+,{cat:"Converter",icon:"🌄",name:"AVIF to JPG",slug:"avif-to-jpg",desc:"Convert AVIF images.",mode:"locked",ready:false,why:"AVIF decode support varies by browser"}
+,{cat:"Converter",icon:"🗂️",name:"JFIF to JPG",slug:"jfif-to-jpg",desc:"Convert JFIF to JPEG.",mode:"convert",ready:true}
+,{cat:"Converter",icon:"📝",name:"Image to Word",slug:"image-to-word",desc:"Extract text and create a Word document.",mode:"locked",ready:false,why:"OCR and DOCX generation modules required"}
+,{cat:"Converter",icon:"📑",name:"JPG to PDF Size Limits",slug:"jpg-to-pdf-limits",desc:"Create PDF under common KB limits.",mode:"locked",ready:false,why:"PDF generation and output-size optimizer required"}
+,{cat:"Signature",icon:"🇮🇳",name:"Hindi Signature Maker",slug:"hindi-signature",desc:"Hindi text signature composition.",mode:"locked",ready:false,why:"Dedicated Devanagari font and drawing workspace pending"}
+,{cat:"Signature",icon:"✍️",name:"Text to Handwriting",slug:"text-handwriting",desc:"Render typed text in handwriting styles.",mode:"locked",ready:false,why:"Handwriting font licensing and export workspace pending"}
+,{cat:"Other",icon:"🧩",name:"Photo Collage Maker",slug:"photo-collage",desc:"Arrange multiple photos in a grid.",mode:"locked",ready:false,why:"Multi-image layout workspace pending"}
+,{cat:"Other",icon:"🧾",name:"Metadata Editor",slug:"metadata-editor",desc:"Edit EXIF and image metadata fields.",mode:"locked",ready:false,why:"Metadata writer backend/library required"}
+,{cat:"Other",icon:"🎞️",name:"GIF Maker",slug:"gif-maker",desc:"Create animated GIF from images.",mode:"locked",ready:false,why:"GIF encoder integration required"}
+,{cat:"Other",icon:"🗜️",name:"GIF Compressor",slug:"gif-compressor",desc:"Optimize animated GIF size.",mode:"locked",ready:false,why:"GIF encoder/optimizer required"}
+,{cat:"Other",icon:"📽️",name:"Slideshow Maker",slug:"slideshow-maker",desc:"Create slideshow video from photos.",mode:"locked",ready:false,why:"FFmpeg video encoder required"}
+,{cat:"Other",icon:"🎬",name:"Video to GIF",slug:"video-to-gif",desc:"Convert video clips into GIF.",mode:"locked",ready:false,why:"FFmpeg WASM integration required"}
+,{cat:"Other",icon:"🎥",name:"Photos to Video",slug:"photos-to-video",desc:"Create video from selected photos.",mode:"locked",ready:false,why:"FFmpeg video encoder required"}
+
 ];
 const $=s=>document.querySelector(s);let activeCat="All",currentTool=null,sourceFiles=[],sourceImage=null,outputBlob=null,outputUrl=null;
 const cats=["All","Compressor","Resizer","Passport Photo","Editing","Converter","Signature","AI Photo Editor","Other"];
