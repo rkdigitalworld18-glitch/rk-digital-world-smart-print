@@ -42,13 +42,13 @@ const tools = [
 {cat:"Compressor",icon:"🗜️",name:"Compress Image to Exact KB",slug:"compress-kb",desc:"JPEG को target KB के अंदर compress करें।",mode:"compress",ready:true},
 {cat:"Compressor",icon:"📦",name:"5KB – 1MB Preset Compressor",slug:"preset-compress",desc:"Government form के लिए common KB sizes।",mode:"preset",ready:true},
 {cat:"Compressor",icon:"🖼️",name:"JPG Compressor",slug:"jpg-compressor",desc:"JPG quality और file size कम करें।",mode:"compress",ready:true},
-{cat:"Compressor",icon:"📚",name:"Bulk Image Compression",slug:"bulk-compress",desc:"एक साथ कई images compress करें।",mode:"bulk",ready:false,why:"ZIP module integration pending"},
+{cat:"Compressor",icon:"📚",name:"Bulk Image Compression",slug:"bulk-compress",desc:"एक साथ कई images compress करके ZIP डाउनलोड करें।",mode:"bulk-compress",ready:true},
 {cat:"Compressor",icon:"➕",name:"Increase Image Size",slug:"increase-size",desc:"Image को upscale या कम compression के साथ export करें।",mode:"resize",ready:true},
 {cat:"Resizer",icon:"📐",name:"Resize by Pixels",slug:"resize-pixels",desc:"Custom width और height pixels में।",mode:"resize",ready:true},
 {cat:"Resizer",icon:"📏",name:"Resize by CM / MM / Inches",slug:"resize-physical",desc:"DPI के आधार पर physical dimensions।",mode:"physical",ready:true},
 {cat:"Resizer",icon:"🎯",name:"Resize by DPI",slug:"resize-dpi",desc:"72, 150, 200, 300 या 600 DPI dimensions।",mode:"physical",ready:true},
 {cat:"Resizer",icon:"🔍",name:"Image Upscaler",slug:"upscale",desc:"Pixel dimensions बढ़ाएँ; खोई detail वापस नहीं आती।",mode:"resize",ready:true},
-{cat:"Resizer",icon:"🗂️",name:"Bulk Image Resizer",slug:"bulk-resize",desc:"कई images का batch resize।",mode:"bulk",ready:false,why:"ZIP module integration pending"},
+{cat:"Resizer",icon:"🗂️",name:"Bulk Image Resizer",slug:"bulk-resize",desc:"कई images resize करके ZIP डाउनलोड करें।",mode:"bulk-resize",ready:true},
 {cat:"Passport Photo",icon:"🪪",name:"Passport Photo Maker",slug:"passport-photo",desc:"35 × 45 mm photo preset, crop और white background।",mode:"passport",ready:true},
 {cat:"Passport Photo",icon:"⬜",name:"White Background Passport",slug:"passport-white",desc:"White background और passport dimensions।",mode:"passport",ready:true},
 {cat:"Passport Photo",icon:"🟦",name:"Blue Background Passport",slug:"passport-blue",desc:"Blue canvas background और passport dimensions।",mode:"passport",ready:true},
@@ -62,11 +62,11 @@ const tools = [
 {cat:"Editing",icon:"🔤",name:"Add Text / Watermark",slug:"text-watermark",desc:"Image पर text watermark जोड़ें।",mode:"text",ready:true},
 {cat:"Editing",icon:"🌫️",name:"Blur Image",slug:"blur",desc:"Canvas blur filter apply करें।",mode:"blur",ready:true},
 {cat:"Editing",icon:"⚫",name:"Circle Crop",slug:"circle-crop",desc:"Circular PNG profile image बनाएं।",mode:"circle",ready:true},
-{cat:"Editing",icon:"🧩",name:"Join Images",slug:"join-images",desc:"एक image को दूसरे के नीचे जोड़ें।",mode:"join",ready:false,why:"Multi-image canvas page pending"},
+{cat:"Editing",icon:"🧩",name:"Join Images",slug:"join-images",desc:"दो या अधिक images को vertical strip में जोड़ें।",mode:"join",ready:true},
 {cat:"Converter",icon:"🔁",name:"JPG / PNG / WEBP Converter",slug:"image-converter",desc:"Browser-supported formats में convert करें।",mode:"convert",ready:true},
-{cat:"Converter",icon:"📄",name:"Image to PDF",slug:"image-to-pdf",desc:"Image को PDF में बदलें।",mode:"pdf",ready:false,why:"PDF library integration pending"},
-{cat:"Converter",icon:"🔎",name:"Image to Text (OCR)",slug:"image-ocr",desc:"Image से text पहचानें।",mode:"ocr",ready:false,why:"OCR engine integration pending"},
-{cat:"Signature",icon:"🖊️",name:"Signature Maker",slug:"signature-maker",desc:"Transparent canvas पर signature draw करें।",mode:"signature-draw",ready:false,why:"Drawing workspace pending"},
+{cat:"Converter",icon:"📄",name:"Image to PDF",slug:"image-to-pdf",desc:"Image को PDF में बदलें और डाउनलोड करें।",mode:"pdf",ready:true},
+{cat:"Converter",icon:"🔎",name:"Image to Text (OCR)",slug:"image-ocr",desc:"Tesseract OCR से Hindi/English text पहचानें।",mode:"ocr",ready:true},
+{cat:"Signature",icon:"🖊️",name:"Signature Maker",slug:"signature-maker",desc:"Touch या mouse से transparent signature बनाएँ।",mode:"signature-draw",ready:true},
 {cat:"Other",icon:"🎨",name:"Image Color Picker",slug:"color-picker",desc:"Image से pixel color और HEX code चुनें।",mode:"color",ready:true},
 {cat:"Other",icon:"🧾",name:"Metadata Remover",slug:"metadata",desc:"Canvas export से नया image बनाकर embedded metadata हटाएँ।",mode:"metadata",ready:true},
 {cat:"AI Photo Editor",icon:"✨",name:"AI Photo Enhancer",slug:"ai-enhancer",desc:"AI model integration के बाद उपलब्ध होगा।",mode:"locked",ready:false,why:"Paid AI provider required"},
@@ -81,7 +81,7 @@ const tools = [
 ,{cat:"Passport Photo",icon:"🖼️",name:"600 × 600 Pixels Photo",slug:"photo-600",desc:"Square 600 × 600 px photo.",mode:"resize",ready:true}
 ,{cat:"Passport Photo",icon:"📷",name:"3.5 × 4.5 CM Photo",slug:"photo-3545",desc:"Standard 35 × 45 mm photo.",mode:"passport",ready:true}
 ,{cat:"Passport Photo",icon:"📷",name:"35 × 45 MM Photo",slug:"photo-35x45",desc:"Standard 35 × 45 mm photo.",mode:"passport",ready:true}
-,{cat:"Passport Photo",icon:"🧾",name:"Photo & Signature Merger",slug:"photo-signature-merge",desc:"Combine portrait and signature into one application image.",mode:"locked",ready:false,why:"Dedicated two-file layout workspace pending"}
+,{cat:"Passport Photo",icon:"🧾",name:"Photo & Signature Merger",slug:"photo-signature-merge",desc:"Photo और signature को एक canvas में जोड़ें।",mode:"photo-signature",ready:true}
 ,{cat:"Passport Photo",icon:"🔠",name:"Add Name & Date on Photo",slug:"name-date-photo",desc:"Stamp applicant name and date on image.",mode:"text",ready:true}
 ,{cat:"Editing",icon:"🖐️",name:"Freehand Crop",slug:"freehand-crop",desc:"Draw a custom crop selection.",mode:"locked",ready:false,why:"Interactive crop-selection UI pending"}
 ,{cat:"Editing",icon:"🟦",name:"Square Crop",slug:"square-crop",desc:"Center square crop.",mode:"crop",ready:true}
@@ -92,7 +92,7 @@ const tools = [
 ,{cat:"Editing",icon:"🔡",name:"Remove Text",slug:"remove-text",desc:"Erase text while reconstructing background.",mode:"locked",ready:false,why:"OCR plus AI inpainting required"}
 ,{cat:"Editing",icon:"🟠",name:"Round Corners",slug:"round-corners",desc:"Round image corners with transparent output.",mode:"border",ready:true}
 ,{cat:"Editing",icon:"↔️",name:"Change Aspect Ratio",slug:"aspect-ratio",desc:"Fit image into common aspect ratios.",mode:"crop",ready:true}
-,{cat:"Editing",icon:"🪓",name:"Image Splitter",slug:"image-splitter",desc:"Split an image into equal tiles.",mode:"locked",ready:false,why:"Multi-output export workspace pending"}
+,{cat:"Editing",icon:"🪓",name:"Image Splitter",slug:"image-splitter",desc:"Image को 2×2 tiles में split करके ZIP लें।",mode:"splitter",ready:true}
 ,{cat:"AI Photo Editor",icon:"🔎",name:"AI Image Upscaler",slug:"ai-upscaler",desc:"AI detail reconstruction and super resolution.",mode:"locked",ready:false,why:"Paid AI upscaling model required"}
 ,{cat:"AI Photo Editor",icon:"🙂",name:"Face Enhancement",slug:"face-enhancement",desc:"Natural face detail restoration.",mode:"locked",ready:false,why:"Face restoration model required"}
 ,{cat:"AI Photo Editor",icon:"✨",name:"Skin Retouching",slug:"skin-retouch",desc:"Subtle portrait retouching.",mode:"locked",ready:false,why:"Portrait retouch model required"}
@@ -112,7 +112,7 @@ const tools = [
 ,{cat:"Converter",icon:"📑",name:"JPG to PDF Size Limits",slug:"jpg-to-pdf-limits",desc:"Create PDF under common KB limits.",mode:"locked",ready:false,why:"PDF generation and output-size optimizer required"}
 ,{cat:"Signature",icon:"🇮🇳",name:"Hindi Signature Maker",slug:"hindi-signature",desc:"Hindi text signature composition.",mode:"locked",ready:false,why:"Dedicated Devanagari font and drawing workspace pending"}
 ,{cat:"Signature",icon:"✍️",name:"Text to Handwriting",slug:"text-handwriting",desc:"Render typed text in handwriting styles.",mode:"locked",ready:false,why:"Handwriting font licensing and export workspace pending"}
-,{cat:"Other",icon:"🧩",name:"Photo Collage Maker",slug:"photo-collage",desc:"Arrange multiple photos in a grid.",mode:"locked",ready:false,why:"Multi-image layout workspace pending"}
+,{cat:"Other",icon:"🧩",name:"Photo Collage Maker",slug:"photo-collage",desc:"कई photos का grid collage बनाएँ।",mode:"collage",ready:true}
 ,{cat:"Other",icon:"🧾",name:"Metadata Editor",slug:"metadata-editor",desc:"Edit EXIF and image metadata fields.",mode:"locked",ready:false,why:"Metadata writer backend/library required"}
 ,{cat:"Other",icon:"🎞️",name:"GIF Maker",slug:"gif-maker",desc:"Create animated GIF from images.",mode:"locked",ready:false,why:"GIF encoder integration required"}
 ,{cat:"Other",icon:"🗜️",name:"GIF Compressor",slug:"gif-compressor",desc:"Optimize animated GIF size.",mode:"locked",ready:false,why:"GIF encoder/optimizer required"}
