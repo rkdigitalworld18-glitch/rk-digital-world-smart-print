@@ -23,7 +23,7 @@ The server uses Node.js 18+ (global `fetch`, `FormData`, and `Blob` are required
 ## Current limitations that must remain visible
 
 - Exact byte-for-byte KB is not guaranteed; compression tools enforce a maximum size and report the actual output.
-- Embedded DPI metadata is not written by Canvas. Dimensions are calculated using DPI, but print portals requiring an actual EXIF/JFIF DPI tag need a separate metadata writer.
+- JPEG and PNG resize outputs include JFIF density / PNG pHYs DPI metadata. WEBP outputs retain pixel dimensions but do not receive a DPI tag from this pipeline.
 - Passport dimensions are crop/resize presets. White/blue/red background replacement depends on the optional paid background-removal provider.
 - Face enhancement, AI upscaling, skin retouching, object/logo/text removal, old-photo restoration and advanced inpainting are not enabled.
 - GIF creation from still photos is implemented; GIF optimization, video-to-GIF and photos-to-video still need a video/GIF decoder pipeline.
