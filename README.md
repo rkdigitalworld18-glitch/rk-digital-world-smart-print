@@ -14,7 +14,7 @@ Professional browser-first image tools for RK Digital World.
 
 The Image Studio is served from `public/image-studio.html`. Common image processing runs in the browser using Canvas and Blob APIs; files for these tools are not uploaded to the server. Bulk ZIP, PDF generation and OCR load their processing libraries on demand from jsDelivr, so the first use requires an internet connection.
 
-Implemented browser-side modules include image compression (maximum target KB), resizing, passport/signature dimension presets, crop, rotate/flip, border, watermark, blur, circle crop, format conversion, bulk ZIP compression/resizing, image-to-PDF, OCR, multi-image join/collage, photo-signature composition, image splitting, color sampling, metadata-stripping re-export and signature drawing.
+Implemented browser-side modules include image compression (maximum target KB), resizing, passport/signature dimension presets, crop, rotate/flip, border, watermark, blur, circle crop, format conversion, bulk ZIP compression/resizing, image-to-PDF with maximum-size mode, Hindi/English OCR, OCR-to-DOCX, HEIC decode, animated GIF creation from photos, multi-image join/collage, photo-signature composition, image splitting, color sampling, EXIF viewing/editing, metadata-stripping re-export and signature drawing.
 
 ## Optional AI background removal
 
