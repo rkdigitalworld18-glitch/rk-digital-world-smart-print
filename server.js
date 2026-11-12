@@ -93,6 +93,57 @@ const upload = multer({
 
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "RK Digital World Smart Print" }));
 
+app.get("/api/studio/capabilities", (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.json({ backgroundRemoval: Boolean(process.env.REMOVE_BG_API_KEY) });
+});
+
+// Optional paid remove.bg adapter. The API key stays on the server and uploaded files
+// are deleted in a finally block immediately after processing.
+const studioRate = new Map();
+app.post("/api/studio/remove-background", (req, res, next) => {
+  const now = Date.now();
+  const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(",")[0].trim();
+  const state = studioRate.get(ip) || { start: now, count: 0 };
+  if (now - state.start > 60 * 1000) { state.start = now; state.count = 0; }
+  state.count += 1;
+  studioRate.set(ip, state);
+  if (state.count > 8) return res.status(429).json({ error: "Too many background-removal requests. Please wait one minute." });
+  next();
+}, upload.single("image"), async (req, res) => {
+  const file = req.file;
+  if (!file) return res.status(400).json({ error: "Please upload an image." });
+  try {
+    if (!file.mimetype || !file.mimetype.startsWith("image/")) return res.status(415).json({ error: "Only image files are supported." });
+    if (!process.env.REMOVE_BG_API_KEY) return res.status(503).json({ error: "Background removal is not configured. Add REMOVE_BG_API_KEY to the Render environment variables." });
+    const form = new FormData();
+    form.append("image_file", new Blob([fs.readFileSync(file.path)], { type: file.mimetype }), path.basename(file.originalname));
+    form.append("size", "auto");
+    const response = await fetch("https://api.remove.bg/v1.0/removebg", {
+      method: "POST",
+      headers: { "X-Api-Key": process.env.REMOVE_BG_API_KEY },
+      body: form
+    });
+    if (!response.ok) {
+      const message = (await response.text()).slice(0, 500);
+      return res.status(response.status === 402 ? 402 : 502).json({ error: "Background-removal provider error: " + message });
+    }
+    const result = Buffer.from(await response.arrayBuffer());
+    if (!result.length || result.length > 25 * 1024 * 1024) return res.status(502).json({ error: "Provider returned an invalid or oversized result." });
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Content-Disposition", 'inline; filename="rk-background-removed.png"');
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.send(result);
+  } catch (err) {
+    console.error("Background removal failed:", err.message);
+    res.status(502).json({ error: "Background-removal service is temporarily unavailable." });
+  } finally {
+    if (file && file.path) fs.unlink(file.path, () => {});
+  }
+});
+
+
 // Customer submits a print file. ID-card requests may also keep the original front/back photos
 // privately so the owner can fix the crop when a customer cannot edit it correctly.
 const customerUploadFields = upload.fields([
