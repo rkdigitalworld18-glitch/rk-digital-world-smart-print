@@ -52,7 +52,7 @@ function draw(){
  const back=mode!=='front',front=mode==='front';
  $('backphoto').hidden=!back||!backUrl;$('art').hidden=!back||!artUrl;
  $('frontScreen').hidden=!front;
- $('island').hidden=!back||mode==='back';$('cameraDetails').hidden=!back||mode==='back';
+ $('island').hidden=!back;$('cameraDetails').hidden=!back;
  const i=$('island'),x=n('cx'),y=n('cy'),iw=n('cw'),ih=n('ch');i.style.left=(x*scale)+'px';i.style.top=(y*scale)+'px';i.style.width=(iw*scale)+'px';i.style.height=(ih*scale)+'px';i.style.borderRadius=(4*scale)+'px';
  const details=$('cameraDetails');details.innerHTML='';const profile=cameraProfile($('model').value);
  const layouts={diag:[[.30,.28],[.68,.68],[.68,.28]],row:[[.25,.5],[.5,.5],[.75,.5]],grid:[[.3,.28],[.7,.28],[.3,.68]],vertical:[[.32,.2],[.32,.5],[.32,.8]]};
