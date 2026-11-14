@@ -77,7 +77,7 @@ $('artfile').onchange=e=>{const f=e.target.files[0];if(!f)return;if(artUrl)URL.r
   if(chosen){
    const spec=await fetch('https://phone-specs-api-production.up.railway.app/api/v1/specs/'+encodeURIComponent(chosen.id),{headers:{Accept:'application/json'}});
    if(spec.ok){
-    const body=await spec.json();deviceSpecData=body.phone||body.specs||body;
+    const body=await spec.json();deviceSpecData=body.data||body.phone||body.specs||body;
     const dims=String(deviceSpecData.dimensions||chosen.dimensions||'').match(/([0-9]+(?:\.[0-9]+)?)\s*[x×]\s*([0-9]+(?:\.[0-9]+)?)\s*[x×]\s*([0-9]+(?:\.[0-9]+)?)/i);
     if(dims){$('h').value=Number(dims[1]);$('w').value=Number(dims[2]);}
     devicePhotoUrl=deviceSpecData.image_url||chosen.image_url||'';
