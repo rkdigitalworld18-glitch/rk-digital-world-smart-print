@@ -101,9 +101,21 @@ function collectManualCutouts(){
  if(!cutouts.island&&!cutouts.circles.length)throw new Error('Manual cutouts confirm करने से पहले कम-से-कम एक measured opening दर्ज करें।');
  return cutouts;
 }
+function validateGeometry(cuts,w,h){
+ if(!cuts||typeof cuts!=='object')throw new Error('Verified geometry record invalid.');
+ if(cuts.island){
+  const i=cuts.island;
+  if(![i.x,i.y,i.width,i.height,i.radius].every(Number.isFinite)||i.x<0||i.y<0||i.width<=0||i.height<=0||i.radius<0||i.radius>Math.min(i.width,i.height)/2||i.x+i.width>w||i.y+i.height>h)throw new Error('Verified camera island bounds invalid.');
+ }
+ if(!Array.isArray(cuts.circles))throw new Error('Verified opening list invalid.');
+ cuts.circles.forEach((c,index)=>validateCircle({x:c.x,y:c.y,d:c.d,label:c.label||('Opening '+(index+1))},w,h));
+ if(!cuts.island&&!cuts.circles.length)throw new Error('Verified geometry is empty.');
+ return cuts;
+}
 function activeCutouts(){
+ const w=n('w'),h=n('h');
  if(activeTemplate&&activeTemplate.status==='verified'&&activeTemplate.machineReady===true&&activeTemplate.geometry){
-  return activeTemplate.geometry;
+  return validateGeometry(activeTemplate.geometry,w,h);
  }
  return $('manualCutoutsConfirmed').checked?collectManualCutouts():null;
 }
@@ -118,7 +130,7 @@ function draw(){
  if(r<0||r>Math.min(w,h)/2)throw new Error('Body corner radius सीमा से बाहर है।');
  const scale=Math.min(300/w,410/h),pw=w*scale,ph=h*scale,back=mode!=='front',front=mode==='front';
  let cutouts=null;
- if(back&&$('manualCutoutsConfirmed').checked)cutouts=activeCutouts();
+ if(back)cutouts=activeCutouts();
  const frontAvailable=!!deviceCatalogImage;
  p.hidden=front&&!frontAvailable;
  $('frontUnavailable').hidden=!(front&&!frontAvailable);
@@ -144,10 +156,12 @@ function draw(){
   });
  }
  $('sizeLabel').textContent='Body: '+w.toFixed(2)+' × '+h.toFixed(2)+' mm · '+(mode==='front'?'Front':mode==='back'?'Back':'Full body')+' · '+($('model').value||'Custom')+' · corner R '+r.toFixed(2)+' mm';
- if(activeTemplate&&activeTemplate.status==='unverified'){
-  showStatus(activeTemplate.name+' dimensions source से मिले हैं, लेकिन यह verified cutout नहीं है। Preview body proportions तक सीमित है; camera openings hidden हैं। Corner radius अभी manual है।',false);
+ if(activeTemplate&&activeTemplate.status==='verified'&&activeTemplate.machineReady===true&&cutouts){
+  showStatus('Verified source geometry loaded. PDF/SVG में validated cut paths शामिल होंगे। Production से पहले test fit करें।',true);
  }else if(cutouts){
   showStatus('Custom measured cut paths preview में दिख रहे हैं। सभी rear openings और body radius को असली फोन से दोबारा मिलाएं। यह manufacturer-verified template नहीं है।',false);
+ }else if(activeTemplate&&activeTemplate.status==='unverified'){
+  showStatus(activeTemplate.name+' dimensions source से मिले हैं, लेकिन यह verified cutout नहीं है। Preview body proportions तक सीमित है; camera openings hidden हैं। Corner radius अभी manual है।',false);
  }else{
   showStatus('Body outline only. Camera/lens/flash/sensor/microphone cut paths छिपे हैं क्योंकि verified coordinates उपलब्ध नहीं हैं।',false);
  }
@@ -185,7 +199,7 @@ function svgCutPaths(){
  const w=n('w'),h=n('h'),r=n('r'),m=n('pm');
  if(w<=0||h<=0)throw new Error('पहले सही body width और height भरें।');
  if(r<0||r>Math.min(w,h)/2)throw new Error('Body corner radius सीमा से बाहर है।');
- const cuts=$('manualCutoutsConfirmed').checked?collectManualCutouts():null;
+ const cuts=activeCutouts();
  const pageW=w+2*m,pageH=h+2*m,paths=[];
  paths.push('<path id="body-outline" d="'+roundedRectPath(m,m,w,h,r)+'"/>');
  if(cuts&&cuts.island){const i=cuts.island;paths.push('<path id="camera-island" d="'+roundedRectPath(m+i.x,m+i.y,i.width,i.height,i.radius)+'"/>');}
@@ -207,7 +221,7 @@ $('pdf').onclick=async()=>{
   const w=n('w'),h=n('h'),r=n('r'),margin=n('pm');
   if(w<=0||h<=0||w>120||h>250)throw new Error('पहले सही body width और height भरें।');
   if(r<0||r>Math.min(w,h)/2||margin<0||margin>20)throw new Error('Radius या PDF margin गलत है।');
-  const cuts=$('manualCutoutsConfirmed').checked?collectManualCutouts():null;
+  const cuts=activeCutouts();
   if(!window.jspdf)throw new Error('PDF library load नहीं हुई। Internet connection जांचें।');
   const {jsPDF}=window.jspdf,pageW=w+margin*2,pageH=h+margin*2;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:[pageW,pageH],compress:true});
