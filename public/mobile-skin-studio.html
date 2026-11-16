@@ -173,8 +173,38 @@ async function loadCatalogDevice(){
  activeTemplate=null;deviceCatalogImage='';catalogModel='';
  if(!model){$('w').value='';$('h').value='';$('r').value='';draw();return;}
  const local=findTemplate(model);
- if(local)applyLocalTemplate(local);
- else{$('w').value='';$('h').value='';$('r').value='';showStatus('इस exact model के लिए manufacturer-sourced dimensions / cutout template database में नहीं हैं। Manual measurement करें; किसी दूसरे model के dimensions इस्तेमाल नहीं होंगे।');$('catalogStatus').textContent='No exact local model record · custom measurement required';}
+ if(local){
+  applyLocalTemplate(local);
+ }else{
+  $('w').value='';$('h').value='';$('r').value='';
+  $('catalogStatus').textContent='Exact manufacturer template not found; checking exact third-party dimension record…';
+  try{
+   const search=await fetch('https://phone-specs-api-production.up.railway.app/api/v1/search?q='+encodeURIComponent(model)+'&limit=100',{headers:{Accept:'application/json'}});
+   if(search.ok){
+    const sd=await search.json(),results=sd.results||[];
+    const chosen=results.find(x=>norm(x.model)===norm(model)||norm((x.brand||'')+' '+(x.model||''))===norm(model)||norm(x.model_name)===norm(model)||norm((x.brand||'')+' '+(x.model_name||''))===norm(model));
+    if(chosen){
+     const spec=await fetch('https://phone-specs-api-production.up.railway.app/api/v1/specs/'+encodeURIComponent(chosen.id),{headers:{Accept:'application/json'}});
+     if(spec.ok){
+      const body=await spec.json(),record=body.data||body.phone||body.specs||body;
+      const dims=String(record.dimensions||chosen.dimensions||'').match(/([0-9]+(?:\.[0-9]+)?)\s*[x×]\s*([0-9]+(?:\.[0-9]+)?)\s*[x×]\s*([0-9]+(?:\.[0-9]+)?)/i);
+      if(dims){
+       const height=Number(dims[1]),width=Number(dims[2]),thickness=Number(dims[3]);
+       if(height>80&&height<250&&width>30&&width<120&&thickness>0&&thickness<30){
+        $('h').value=height;$('w').value=width;
+        activeTemplate={name:(record.brand||chosen.brand||'')+' '+(record.model||chosen.model||model),status:'unverified',machineReady:false,dimensionsMm:{height,width,thickness},cornerRadiusMm:null,geometry:null,sourceLabel:'third-party Phone Specs record ('+(record.source||chosen.source||'source not stated')+')',missingGeometry:['Body corner profile','Camera island perimeter','Every lens centre and diameter','Flash opening','Rear sensor openings','Microphone openings']};
+        $('catalogStatus').textContent='THIRD-PARTY DIMENSIONS ONLY · '+activeTemplate.name+' · not machine-ready';
+       }
+      }
+     }
+    }
+   }
+  }catch(e){console.warn('Third-party exact model lookup failed:',e);}
+  if(!activeTemplate){
+   showStatus('इस exact model के लिए manufacturer dimensions या exact third-party dimensions नहीं मिले। Width, height और corner radius स्वयं मापें; पिछले मॉडल के dimensions reuse नहीं होंगे।');
+   $('catalogStatus').textContent='No exact model dimensions found · custom measurement required';
+  }
+ }
  try{
   const res=await fetch('https://open-device-frame.vercel.app/api/v1/resolve?model='+encodeURIComponent(model),{headers:{Accept:'application/json'}});
   if(res.ok){
@@ -185,8 +215,7 @@ async function loadCatalogDevice(){
    }
   }
  }catch(e){console.warn('Front frame lookup failed:',e);}
- if(deviceCatalogImage)$('catalogStatus').textContent='Exact front frame found: '+catalogModel+' · community asset';
- else if(local)$('catalogStatus').textContent='UNVERIFIED · manufacturer body dimensions only · no exact camera cutout geometry';
+ if(deviceCatalogImage)$('catalogStatus').textContent='Exact front frame found: '+catalogModel+' · community asset'+(activeTemplate?' · '+activeTemplate.status:'');
  try{draw();}catch(e){showStatus(e.message);}
 }
 function roundedRectPath(x,y,w,h,r){
