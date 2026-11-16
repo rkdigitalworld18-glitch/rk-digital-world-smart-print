@@ -162,7 +162,7 @@ function draw(){
  }else if(cutouts){
   showStatus('Custom measured cut paths preview में दिख रहे हैं। सभी rear openings और body radius को असली फोन से दोबारा मिलाएं। यह manufacturer-verified template नहीं है।',false);
  }else if(activeTemplate&&activeTemplate.status==='unverified'){
-  showStatus(activeTemplate.name+' dimensions source से मिले हैं, लेकिन यह verified cutout नहीं है। Preview body proportions तक सीमित है; camera openings hidden हैं। Corner radius अभी manual है।',false);
+  showStatus(activeTemplate.name+' dimensions '+(activeTemplate.sourceLabel||((activeTemplate.sources&&activeTemplate.sources[0]&&activeTemplate.sources[0].label)||'source record'))+' से मिले हैं, लेकिन यह verified cutout नहीं है। Preview body proportions तक सीमित है; camera openings hidden हैं। Corner radius manual है; R भरने तक square-corner placeholder दिखेगा.',false);
  }else{
   showStatus('Body outline only. Camera/lens/flash/sensor/microphone cut paths छिपे हैं क्योंकि verified coordinates उपलब्ध नहीं हैं।',false);
  }
