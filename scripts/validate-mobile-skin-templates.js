@@ -56,6 +56,11 @@ assert.match(html, /Math\.abs\(actualW-pageW\)>0\.01/, 'PDF page dimensions are 
 assert.match(html, /bytes\.byteLength<500/, 'generated PDF byte output is checked');
 assert.match(html, /function svgCutPaths/, 'SVG vector export exists');
 assert.match(html, /if\(exact&&device\.status==='published'/, 'front frame lookup requires an exact published model match');
+assert.match(html, /const chosen=results\.find\(/, 'third-party dimension lookup uses exact matches only');
+assert.doesNotMatch(html, /results\.find\(x=>norm\(x\.model\)\.includes/, 'no fuzzy model fallback');
+assert.match(html, /id="previewUnavailable"/, 'missing-dimensions preview state exists');
+assert.match(html, /id="frontUnavailable"/, 'missing-front-frame preview state exists');
+assert.match(html, /square-corner placeholder/, 'unknown corner radius is disclosed');
 
 function checkPageSize(width, height, margin) {
   const page = { width: width + margin * 2, height: height + margin * 2 };
