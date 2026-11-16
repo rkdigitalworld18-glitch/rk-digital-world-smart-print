@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-11-16",
+  "policy": {
+    "verifiedRequires": [
+      "Exact manufacturer model/variant identification",
+      "Body width and height plus measured corner profile",
+      "Camera-island perimeter and corner geometry",
+      "Every rear lens centre and cut diameter",
+      "Flash, rear sensor and microphone opening positions and sizes",
+      "Coordinate origin and source traceability"
+    ],
+    "unverifiedBehavior": "Show sourced body dimensions only. Do not infer corner radii or rear cutouts. Hide guessed openings. PDF/SVG exports remain body-outline-only unless the user explicitly confirms and enters measured custom cutouts."
+  },
+  "models": [
+    {
+      "id": "samsung-galaxy-s25-edge-sm-s937b-india",
+      "name": "Samsung Galaxy S25 Edge",
+      "aliases": [
+        "Galaxy S25 Edge",
+        "Samsung S25 Edge",
+        "SM-S937B",
+        "SM-S937BZSBINS"
+      ],
+      "status": "unverified",
+      "machineReady": false,
+      "variant": "India Titanium Silver 256GB listing (SM-S937BZSBINS)",
+      "dimensionsMm": {
+        "height": 158.2,
+        "width": 75.6,
+        "thickness": 5.8
+      },
+      "cornerRadiusMm": null,
+      "rearFeatures": {
+        "cameraModules": 2,
+        "flash": "Rear LED flash",
+        "rearSensors": null,
+        "microphones": null
+      },
+      "geometry": null,
+      "missingGeometry": [
+        "Body corner radius/profile",
+        "Camera-island perimeter and corner radii",
+        "Each rear lens centre and opening diameter",
+        "Flash centre and opening diameter",
+        "Any rear sensor opening coordinates",
+        "Rear microphone opening coordinates"
+      ],
+      "sources": [
+        {
+          "label": "Samsung India official product specifications",
+          "url": "https://www.samsung.com/in/business/smartphones/galaxy-s/galaxy-s25-edge-titanium-silver-256gb-sm-s937bzsbins/",
+          "supports": [
+            "Exact India product listing",
+            "158.2 × 75.6 × 5.8 mm body dimensions",
+            "Two rear cameras",
+            "Rear flash"
+          ]
+        },
+        {
+          "label": "Samsung Newsroom India",
+          "url": "https://news.samsung.com/in/meet-the-samsung-galaxy-s25-edge-an-engineering-marvel-of-new-slim-hardware-innovation",
+          "supports": [
+            "Galaxy S25 Edge model identity",
+            "75.6 × 158.2 × 5.8 mm dimensions"
+          ]
+        }
+      ],
+      "notes": "Manufacturer specs do not publish the complete back-surface cutout coordinates. Not suitable for automatic camera cutting."
+    },
+    {
+      "id": "motorola-moto-g67-power-5g-india",
+      "name": "Motorola moto g67 power 5G",
+      "aliases": [
+        "Motorola Moto G67 Power",
+        "moto g67 power",
+        "moto g67 power 5G"
+      ],
+      "status": "unverified",
+      "machineReady": false,
+      "variant": "India product listing, SKU 592",
+      "dimensionsMm": {
+        "height": 166.23,
+        "width": 76.5,
+        "thickness": 8.6
+      },
+      "cornerRadiusMm": null,
+      "rearFeatures": {
+        "cameraModules": 2,
+        "additionalSensor": "2-in-1 flicker sensor",
+        "flash": "Dual LED flash",
+        "rearSensors": [
+          "2-in-1 flicker sensor"
+        ],
+        "microphones": 2
+      },
+      "geometry": null,
+      "missingGeometry": [
+        "Body corner radius/profile",
+        "Camera-island perimeter and corner radii",
+        "Each rear lens centre and opening diameter",
+        "Flicker-sensor opening coordinates",
+        "Both flash-emitter opening coordinates",
+        "Microphone opening coordinates"
+      ],
+      "sources": [
+        {
+          "label": "Motorola India official product specifications",
+          "url": "https://www.motorola.in/smartphones-moto-g67-power-5g/p?skuId=592",
+          "supports": [
+            "Exact moto g67 power 5G product listing",
+            "166.23 × 76.5 × 8.6 mm dimensions",
+            "Rear camera and sensor specification"
+          ]
+        },
+        {
+          "label": "Motorola Support India specifications",
+          "url": "https://en-in.support.motorola.com/app/answers/detail/a_id/191004/~/specifications---moto-g67-/-g67-power",
+          "supports": [
+            "Dimensions",
+            "50 MP + 8 MP rear cameras",
+            "2-in-1 flicker sensor",
+            "Dual LED flash",
+            "Two microphones"
+          ]
+        }
+      ],
+      "notes": "Camera, sensor, flash and microphone counts are known, but their physical opening coordinates are not published. Not suitable for automatic camera cutting."
+    },
+    {
+      "id": "vivo-y28s-5g-india",
+      "name": "vivo Y28s 5G",
+      "aliases": [
+        "vivo Y28s",
+        "Y28s 5G",
+        "Vivo Y28s 5G"
+      ],
+      "status": "unverified",
+      "machineReady": false,
+      "variants": [
+        {
+          "name": "Vintage Red",
+          "dimensionsMm": {
+            "height": 163.63,
+            "width": 75.58,
+            "thickness": 8.39
+          }
+        },
+        {
+          "name": "Twinkling Purple",
+          "dimensionsMm": {
+            "height": 163.63,
+            "width": 75.58,
+            "thickness": 8.53
+          }
+        }
+      ],
+      "dimensionsMm": {
+        "height": 163.63,
+        "width": 75.58,
+        "thickness": null
+      },
+      "cornerRadiusMm": null,
+      "rearFeatures": {
+        "cameraModules": 2,
+        "flash": "Rear flash",
+        "rearSensors": null,
+        "microphones": null
+      },
+      "geometry": null,
+      "missingGeometry": [
+        "Colour variant must be confirmed for full thickness specification",
+        "Body corner radius/profile",
+        "Camera-island perimeter and corner radii",
+        "Each rear lens centre and opening diameter",
+        "Flash centre and opening diameter",
+        "Rear sensor opening coordinates",
+        "Microphone opening coordinates"
+      ],
+      "sources": [
+        {
+          "label": "vivo India official Y28s 5G specifications",
+          "url": "https://www.vivo.com/in/products/param/y28s-5g",
+          "supports": [
+            "Exact Y28s 5G model",
+            "Colour-specific body dimensions",
+            "Rear camera specification",
+            "Rear flash"
+          ]
+        },
+        {
+          "label": "vivo India online store product specification",
+          "url": "https://shop.vivo.com/in/product/10282",
+          "supports": [
+            "India retail variant",
+            "Colour-specific dimensions",
+            "Rear camera and flash specification"
+          ]
+        }
+      ],
+      "notes": "The two colour variants have different thickness values. No official camera, flash, sensor or microphone cutout coordinates were found."
+    }
+  ]
+}
