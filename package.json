@@ -5,7 +5,8 @@
   "description": "Smart print portal starter for RK Digital World",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:mobile-templates": "node scripts/validate-mobile-skin-templates.js"
   },
   "dependencies": {
     "express": "^4.21.2",
